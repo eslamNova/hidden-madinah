@@ -52,7 +52,9 @@ const fontStepScript = `try{var s=localStorage.getItem("hm-font-step");if(s==="1
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const messages = await getMessages();
+  // Admin strings stay out of public pages' RSC payload; the admin layout
+  // provides the full message set for /admin/*.
+  const { admin: _adminMessages, ...publicMessages } = await getMessages();
   const t = await getTranslations("common");
 
   return (
@@ -65,7 +67,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: fontStepScript }} />
       </head>
       <body className="min-h-dvh bg-sand text-basalt antialiased">
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider messages={publicMessages}>
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-50 focus:rounded-xl focus:bg-primary focus:px-4 focus:py-3 focus:text-surface"
