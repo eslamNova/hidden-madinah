@@ -1,7 +1,23 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+import withSerwistInit from "@serwist/next";
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
+const withSerwist = withSerwistInit({
+  swSrc: "src/app/sw.ts",
+  swDest: "public/sw.js",
+  disable: process.env.NODE_ENV === "development",
+});
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    // Supabase free tier has no image transformations; variants are
+    // pre-generated at 400/800/1600 and the loader snaps to the nearest one.
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
+    deviceSizes: [400, 800, 1600],
+  },
 };
 
-export default nextConfig;
+export default withSerwist(withNextIntl(nextConfig));
