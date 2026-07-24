@@ -51,6 +51,9 @@
     "distanceUnder2": "أقل من 2 كم",
     "distance2to5": "من 2 إلى 5 كم",
     "distanceOver5": "أكثر من 5 كم",
+    "timeMorning": "الصباح",
+    "timeAsr": "الظهر والعصر",
+    "timeEvening": "المغرب والمساء",
     "listView": "قائمة",
     "mapView": "خريطة",
     "empty": "لا توجد أماكن مطابقة لبحثك.",
@@ -75,6 +78,7 @@
     "galleryImageOf": "صورة {current} من {total}",
     "videoPlay": "تشغيل الفيديو",
     "kmUnit": "كم",
+    "free": "مجانًا",
     "notFoundTitle": "المكان غير موجود",
     "notFoundMessage": "ربما تغيّر الرابط أو لم يُنشر هذا المكان بعد.",
     "backToPlaces": "العودة إلى الأماكن"

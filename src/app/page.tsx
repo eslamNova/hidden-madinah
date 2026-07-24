@@ -1,103 +1,152 @@
-import Image from "next/image";
+import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { ChevronLeft } from "lucide-react";
+import { getPublishedPlaces, getRoutes, getRouteWithStops } from "@/lib/queries";
+import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/maps";
+import { CategoryIcon } from "@/components/CategoryIcon";
+import { PlaceCard, toPlaceCardData } from "@/components/place/PlaceCard";
+import { NearestPlaces, type NearestPlaceInput } from "@/components/place/NearestPlaces";
 
-export default function Home() {
+export const revalidate = 86400;
+
+export default async function HomePage() {
+  const t = await getTranslations("home");
+  const tCommon = await getTranslations("common");
+  const tPlaces = await getTranslations("places");
+  const tRoutes = await getTranslations("routes");
+
+  const places = await getPublishedPlaces();
+  const featured = places.filter((p) => p.featured).slice(0, 4);
+  const routes = await getRoutes();
+  const routesWithStops = await Promise.all(
+    routes.map(async (r) => {
+      const full = await getRouteWithStops(r.id);
+      return { ...r, stopCount: full?.stops.length ?? 0 };
+    })
+  );
+
+  const nearestInput: NearestPlaceInput[] = places
+    .filter((p) => p.lat != null && p.lng != null)
+    .map((p) => ({
+      slug: p.slug,
+      name_ar: p.name_ar,
+      category: p.category,
+      lat: Number(p.lat),
+      lng: Number(p.lng),
+    }));
+
+  const categoryCounts = new Map<string, number>();
+  for (const p of places) {
+    categoryCounts.set(p.category, (categoryCounts.get(p.category) ?? 0) + 1);
+  }
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="space-y-12 pb-8">
+      {/* Hero */}
+      <section className="bg-gradient-to-b from-primary-dark to-primary px-4 py-14 text-surface">
+        <div className="mx-auto max-w-3xl space-y-5 text-center">
+          <p className="font-wordmark text-xl text-accent">{tCommon("siteName")}</p>
+          <h1 className="text-4xl leading-snug sm:text-5xl">{t("heroTitle")}</h1>
+          <p className="mx-auto max-w-xl text-lg leading-relaxed text-surface/90">
+            {t("heroSubtitle")}
+          </p>
+          <div className="pt-2">
+            <Link
+              href="/places"
+              className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-surface px-10 text-lg font-semibold text-primary shadow-md"
+            >
+              {t("heroCta")}
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      <div className="mx-auto max-w-5xl space-y-12 px-4">
+        {/* Featured */}
+        {featured.length > 0 && (
+          <section aria-label={t("featuredTitle")} className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl">{t("featuredTitle")}</h2>
+              <Link
+                href="/places"
+                className="flex min-h-12 items-center gap-1 font-medium text-primary"
+              >
+                {tCommon("viewAll")}
+                <ChevronLeft aria-hidden="true" className="h-5 w-5" />
+              </Link>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {featured.map((p) => (
+                <PlaceCard key={p.slug} place={toPlaceCardData(p)} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Categories */}
+        <section aria-label={t("categoriesTitle")} className="space-y-4">
+          <h2 className="text-2xl">{t("categoriesTitle")}</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {CATEGORY_ORDER.filter((c) => c !== "other").map((c) => (
+              <Link
+                key={c}
+                href={`/places?category=${c}`}
+                className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl border border-basalt/10 bg-surface p-4 text-center shadow-sm"
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex h-12 w-12 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: `${CATEGORY_META[c].color}1f` }}
+                >
+                  <CategoryIcon category={c} className="h-7 w-7" />
+                </span>
+                <span className="text-lg font-semibold">{CATEGORY_META[c].pluralAr}</span>
+                <span className="text-sm text-muted">
+                  {tPlaces("count", { count: categoryCounts.get(c) ?? 0 })}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Nearest (geolocation, client) */}
+        <NearestPlaces places={nearestInput} />
+
+        {/* Curated routes */}
+        {routesWithStops.length > 0 && (
+          <section aria-label={t("routesTitle")} className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl">{t("routesTitle")}</h2>
+              <Link
+                href="/routes"
+                className="flex min-h-12 items-center gap-1 font-medium text-primary"
+              >
+                {tCommon("viewAll")}
+                <ChevronLeft aria-hidden="true" className="h-5 w-5" />
+              </Link>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {routesWithStops.map((r) => (
+                <Link
+                  key={r.id}
+                  href={`/routes/${r.id}`}
+                  className="block rounded-2xl border border-basalt/10 bg-surface p-5 shadow-sm"
+                >
+                  <h3 className="text-xl">{r.title_ar}</h3>
+                  {r.description_ar && (
+                    <p className="mt-2 line-clamp-2 text-base leading-relaxed text-muted">
+                      {r.description_ar}
+                    </p>
+                  )}
+                  <p className="mt-3 text-sm font-medium text-primary">
+                    {tRoutes("stopsCount", { count: r.stopCount })}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }

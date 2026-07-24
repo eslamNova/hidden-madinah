@@ -1,0 +1,92 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import { haversineKm } from "@/lib/geo";
+import { getRouteIds, getRouteWithStops } from "@/lib/queries";
+import { PlaceCard, toPlaceCardData } from "@/components/place/PlaceCard";
+import { RouteMap, type RouteMapStop } from "@/components/map/RouteMap";
+
+export const revalidate = 86400;
+
+export async function generateStaticParams() {
+  const ids = await getRouteIds();
+  return ids.map((id) => ({ id }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const route = await getRouteWithStops(id);
+  return route ? { title: route.title_ar, description: route.description_ar ?? undefined } : {};
+}
+
+export default async function RouteDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const route = await getRouteWithStops(id);
+  if (!route) notFound();
+
+  const t = await getTranslations("routes");
+
+  const mapStops: RouteMapStop[] = route.stops
+    .filter((s) => s.lat != null && s.lng != null)
+    .map((s) => ({
+      lat: Number(s.lat),
+      lng: Number(s.lng),
+      nameAr: s.name_ar,
+      slug: s.slug,
+    }));
+
+  let totalKm = 0;
+  for (let i = 1; i < mapStops.length; i++) {
+    totalKm += haversineKm(mapStops[i - 1], mapStops[i]);
+  }
+  totalKm = Math.round(totalKm * 10) / 10;
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-8 px-4 py-8">
+      <header className="space-y-2">
+        <h1 className="text-3xl">{route.title_ar}</h1>
+        {route.description_ar && (
+          <p className="text-lg leading-relaxed text-muted">{route.description_ar}</p>
+        )}
+        <p className="font-medium text-primary">
+          {t("stopsCount", { count: route.stops.length })}
+          {mapStops.length >= 2 && (
+            <>
+              {" · "}
+              <span className="ltr-nums">{t("totalDistance", { km: totalKm })}</span>
+            </>
+          )}
+        </p>
+      </header>
+
+      {mapStops.length >= 2 && <RouteMap stops={mapStops} />}
+
+      <ol className="space-y-6">
+        {route.stops.map((stop, i) => (
+          <li key={stop.slug} className="relative">
+            <div className="mb-2 flex items-center gap-3">
+              <span
+                aria-hidden="true"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-lg font-bold text-surface"
+              >
+                {i + 1}
+              </span>
+              <span className="text-lg font-semibold text-muted">
+                {t("stopLabel", { n: i + 1 })}
+              </span>
+            </div>
+            <PlaceCard place={toPlaceCardData(stop)} compact />
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
