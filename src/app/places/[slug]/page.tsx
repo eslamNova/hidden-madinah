@@ -11,7 +11,7 @@ import { Gallery } from "@/components/place/Gallery";
 import { PlaceholderImage } from "@/components/place/PlaceImage";
 import { RelatedPlaces } from "@/components/place/RelatedPlaces";
 import { VisitInfoCard } from "@/components/place/VisitInfoCard";
-import { PlaceMap } from "@/components/map/PlaceMap";
+import { PlaceMapLazy } from "@/components/map/LazyMaps";
 
 export const revalidate = 86400;
 
@@ -130,7 +130,7 @@ export default async function PlacePage({
 
       {place.lat != null && place.lng != null && (
         <section className="space-y-4">
-          <PlaceMap
+          <PlaceMapLazy
             lat={Number(place.lat)}
             lng={Number(place.lng)}
             nameAr={place.name_ar}

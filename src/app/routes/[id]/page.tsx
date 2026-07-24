@@ -4,7 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { haversineKm } from "@/lib/geo";
 import { getRouteIds, getRouteWithStops } from "@/lib/queries";
 import { PlaceCard, toPlaceCardData } from "@/components/place/PlaceCard";
-import { RouteMap, type RouteMapStop } from "@/components/map/RouteMap";
+import type { RouteMapStop } from "@/components/map/RouteMap";
+import { RouteMapLazy } from "@/components/map/LazyMaps";
 
 export const revalidate = 86400;
 
@@ -67,7 +68,7 @@ export default async function RouteDetailPage({
         </p>
       </header>
 
-      {mapStops.length >= 2 && <RouteMap stops={mapStops} />}
+      {mapStops.length >= 2 && <RouteMapLazy stops={mapStops} />}
 
       <ol className="space-y-6">
         {route.stops.map((stop, i) => (

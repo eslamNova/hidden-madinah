@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { List, Map as MapIcon, Search } from "lucide-react";
 import { arabicIncludes, normalizeArabic } from "@/lib/arabic";
@@ -63,14 +64,9 @@ function Chip({
 }
 
 /** Client-side search + filters over the (small) published-places list. */
-export function PlacesExplorer({
-  places,
-  initialCategory,
-}: {
-  places: ExplorerPlace[];
-  initialCategory?: string;
-}) {
+export function PlacesExplorer({ places }: { places: ExplorerPlace[] }) {
   const t = useTranslations("places");
+  const initialCategory = useSearchParams().get("category") ?? undefined;
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<PlaceCategory | "all">(
     CATEGORY_ORDER.includes(initialCategory as PlaceCategory)

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { stripVerify } from "@/lib/content";
 import { getPublishedPlaces } from "@/lib/queries";
@@ -15,12 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
-export default async function PlacesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ category?: string }>;
-}) {
-  const { category } = await searchParams;
+export default async function PlacesPage() {
   const t = await getTranslations("places");
   const places = await getPublishedPlaces();
 
@@ -34,7 +30,10 @@ export default async function PlacesPage({
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
       <h1 className="text-3xl">{t("title")}</h1>
-      <PlacesExplorer places={dtos} initialCategory={category} />
+      {/* Suspense: PlacesExplorer reads ?category= via useSearchParams. */}
+      <Suspense>
+        <PlacesExplorer places={dtos} />
+      </Suspense>
     </div>
   );
 }
