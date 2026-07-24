@@ -8,6 +8,9 @@ const withSerwist = withSerwistInit({
   swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
   disable: process.env.NODE_ENV === "development",
+  // The offline fallback document must be precached — the PrecacheFallbackPlugin
+  // serves it from the precache. New revision per build refreshes it.
+  additionalPrecacheEntries: [{ url: "/~offline", revision: crypto.randomUUID() }],
 });
 
 const nextConfig: NextConfig = {
