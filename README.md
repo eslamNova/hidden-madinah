@@ -122,6 +122,46 @@ Then open the site, browse a few pages, and in DevTools → **Network** set thro
 
 ---
 
+## Deployment (Vercel)
+
+Live: <https://hidden-madinah.vercel.app> — Vercel project `eslamnovas-projects/hidden-madinah`,
+repo <https://github.com/eslamNova/hidden-madinah> (private).
+
+Environment variables set on Vercel (Production + Preview):
+
+| Variable | Why |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | needed at build time for SSG and at runtime |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | same |
+| `REVALIDATE_SECRET` | guards `POST /api/revalidate` |
+
+`NEXT_PUBLIC_SITE_URL` is deliberately **not** set on Vercel: `siteUrl()` in
+`src/lib/constants.ts` falls back to `VERCEL_PROJECT_PRODUCTION_URL`, so canonical
+URLs, OG images, sitemap and robots track the deployment automatically. Set it only
+when a custom domain is attached. `SUPABASE_SERVICE_ROLE_KEY` is **not** needed on
+Vercel — it is only used by the local scripts.
+
+Deploy manually with:
+
+```bash
+npx vercel --prod
+```
+
+### Two things to finish
+
+1. **Connect the GitHub repo for auto-deploys.** `vercel git connect` fails until
+   Vercel's GitHub App can see the private repo. Grant it in the Vercel dashboard
+   (Project → Settings → Git → Connect), or install/configure the Vercel GitHub App
+   on `eslamNova/hidden-madinah`, then pushes to `master` deploy on their own.
+
+2. **Move the photos into Supabase Storage.** `public/media/` is git-ignored, so it
+   is absent from the repo. The CLI (`vercel --prod`) uploads the working directory
+   and therefore *does* include it — which is why images work on the current
+   deployment. A **git-triggered** deploy will not include it and the images will
+   404. Fix by pasting `SUPABASE_SERVICE_ROLE_KEY` into `.env.local`, running
+   `npx tsx scripts/import-media.ts --dir "<folder>" --slug masjid-quba`, deleting
+   the old local-path rows, and redeploying.
+
 ## Scripts reference
 
 Run all scripts from the repo root with `npx tsx`:
