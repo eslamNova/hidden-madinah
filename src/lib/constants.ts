@@ -8,3 +8,16 @@ export const FONT_STEP_STORAGE_KEY = "hm-font-step";
 
 /** Time-based ISR safety net; admin edits revalidate on demand. */
 export const REVALIDATE_SECONDS = 86400;
+
+/**
+ * Absolute site origin, used for canonical URLs, OG images, sitemap and robots.
+ * Prefers an explicit NEXT_PUBLIC_SITE_URL (custom domain), then falls back to
+ * the Vercel production URL so a fresh deploy is correct without configuration.
+ */
+export function siteUrl(): string {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (explicit) return explicit.replace(/\/+$/, "");
+  const vercelProduction = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  if (vercelProduction) return `https://${vercelProduction}`;
+  return "http://localhost:3000";
+}
