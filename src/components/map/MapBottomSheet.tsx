@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { CATEGORY_META, type PlaceCategory } from "@/lib/maps";
+import { PlaceImage } from "@/components/place/PlaceImage";
 
 export type MapPlacePreview = {
   slug: string;
@@ -54,11 +54,9 @@ export function MapBottomSheet({
         <div className="mb-3 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             {place.thumb ? (
-              <Image
-                src={place.thumb.url}
+              <PlaceImage
+                media={place.thumb}
                 alt={place.name_ar}
-                width={place.thumb.width}
-                height={place.thumb.height}
                 sizes="96px"
                 className="h-20 w-20 rounded-xl object-cover"
               />

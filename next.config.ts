@@ -13,14 +13,8 @@ const withSerwist = withSerwistInit({
   additionalPrecacheEntries: [{ url: "/~offline", revision: crypto.randomUUID() }],
 });
 
-const nextConfig: NextConfig = {
-  images: {
-    // Supabase free tier has no image transformations; variants are
-    // pre-generated at 400/800/1600 and the loader snaps to the nearest one.
-    loader: "custom",
-    loaderFile: "./src/lib/image-loader.ts",
-    deviceSizes: [400, 800, 1600],
-  },
-};
+// Images are served straight from the pre-generated variant set (400/800/1600)
+// by src/components/place/PlaceImage.tsx — no optimizer, no custom loader.
+const nextConfig: NextConfig = {};
 
 export default withSerwist(withNextIntl(nextConfig));

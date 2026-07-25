@@ -64,7 +64,7 @@ export function PlaceCard({
         <PlaceImage
           media={place.thumb}
           alt={place.name_ar}
-          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 360px"
+          sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 260px"
           className={`${aspect} w-full object-cover`}
           priority={priority}
         />

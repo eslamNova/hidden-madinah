@@ -187,7 +187,7 @@ export function PlacesExplorer({ places }: { places: ExplorerPlace[] }) {
           <p className="mt-1 text-muted">{t("emptyHint")}</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
           {filtered.map((p) => (
             <PlaceCard key={p.slug} place={p} />
           ))}

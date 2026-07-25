@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ChevronDown, ChevronUp, Film, Trash2 } from "lucide-react";
 import type { Tables } from "@/lib/database.types";
+import { PlaceImage } from "@/components/place/PlaceImage";
 import {
   deleteMediaAction,
   reorderMediaAction,
@@ -52,11 +52,9 @@ export function MediaList({
         >
           <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-sand">
             {m.thumb_url ? (
-              <Image
-                src={m.thumb_url}
+              <PlaceImage
+                media={{ url: m.thumb_url, width: m.width, height: m.height }}
                 alt={m.caption_ar ?? ""}
-                width={m.width ?? 400}
-                height={m.height ?? 300}
                 sizes="96px"
                 className="h-full w-full object-cover"
               />

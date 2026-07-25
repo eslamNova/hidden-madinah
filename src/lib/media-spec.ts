@@ -1,6 +1,6 @@
 /**
  * Single source of truth for the media pipeline, shared by
- * scripts/import-media.ts, the admin uploader, and the next/image loader.
+ * scripts/import-media.ts, the admin uploader, and PlaceImage.
  * Changing widths here without regenerating existing variants will break URLs.
  */
 export const IMAGE_VARIANT_WIDTHS = [400, 800, 1600] as const;

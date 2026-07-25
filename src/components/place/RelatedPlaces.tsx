@@ -15,7 +15,7 @@ export async function RelatedPlaces({ slugs }: { slugs: string[] }) {
   return (
     <section aria-label={t("relatedTitle")}>
       <h2 className="mb-4 text-2xl">{t("relatedTitle")}</h2>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         {places.map((p) => (
           <PlaceCard key={p.slug} place={toPlaceCardData(p)} compact />
         ))}

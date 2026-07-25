@@ -1,11 +1,16 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element -- variants are pre-generated at
+   fixed widths (400/800/1600); a plain <img> with an explicit srcSet is both
+   simpler and faster here than next/image with a custom loader, which cannot
+   express "only these three widths exist". */
 import { CATEGORY_META, type PlaceCategory } from "@/lib/maps";
+import { IMAGE_VARIANT_WIDTHS, variantUrl } from "@/lib/media-spec";
 import type { MediaRow } from "@/lib/queries";
 import { CategoryIcon } from "@/components/CategoryIcon";
 
 /**
- * next/image wrapper for a media row: explicit width/height from the row keep
- * layout shift at zero; the custom loader snaps to pre-generated variants.
+ * Responsive image over the pre-generated variant set. width/height come from
+ * the media row (all variants share the aspect ratio) so layout shift is zero;
+ * the browser picks the smallest variant that satisfies `sizes`.
  */
 export function PlaceImage({
   media,
@@ -20,15 +25,22 @@ export function PlaceImage({
   className?: string;
   priority?: boolean;
 }) {
+  const srcSet = IMAGE_VARIANT_WIDTHS.map(
+    (w) => `${variantUrl(media.url, w)} ${w}w`
+  ).join(", ");
+
   return (
-    <Image
-      src={media.url}
+    <img
+      src={variantUrl(media.url, 800)}
+      srcSet={srcSet}
+      sizes={sizes}
       alt={alt}
       width={media.width ?? 1600}
       height={media.height ?? 1200}
-      sizes={sizes}
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : undefined}
+      decoding="async"
       className={className}
-      priority={priority}
     />
   );
 }
