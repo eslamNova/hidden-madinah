@@ -45,3 +45,6 @@ public/sw.js
 
 # Locally-processed media bridge (regenerate with scripts/import-media-local.ts)
 public/media/
+
+.vercel
+.env*
