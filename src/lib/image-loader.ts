@@ -14,9 +14,10 @@ export default function supabaseVariantLoader({
   width: number;
   quality?: number;
 }): string {
-  if (!src.includes("/storage/v1/object/public/media/")) return src;
-  const match = src.match(/-(400|800|1600)\.webp$/);
-  if (!match) return src;
+  const isVariantSource =
+    src.includes("/storage/v1/object/public/media/") || src.startsWith("/media/");
+  if (!isVariantSource) return src;
+  if (!/-(400|800|1600)\.webp$/.test(src)) return src;
   const snapped = VARIANT_WIDTHS.find((w) => w >= width) ?? 1600;
   return src.replace(/-(400|800|1600)\.webp$/, `-${snapped}.webp`);
 }

@@ -89,6 +89,24 @@ export async function getRoutes(): Promise<RouteRow[]> {
   return data ?? [];
 }
 
+/**
+ * All routes with their stops in ONE round trip — used by the home and routes
+ * pages, which previously issued a query per route.
+ */
+export async function getRoutesWithStops(): Promise<RouteWithStops[]> {
+  const { data, error } = await publicClient
+    .from("routes")
+    .select("*, route_places(sort_order, places(*, media(*)))")
+    .order("title_ar");
+  if (error) throw error;
+  return (data ?? []).map(({ route_places, ...route }) => ({
+    ...route,
+    stops: (route_places ?? [])
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .flatMap((rp) => (rp.places && rp.places.is_published ? [sortMedia(rp.places)] : [])),
+  }));
+}
+
 export async function getRouteWithStops(id: string): Promise<RouteWithStops | null> {
   const { data, error } = await publicClient
     .from("routes")

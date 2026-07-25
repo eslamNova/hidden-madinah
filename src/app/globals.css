@@ -49,6 +49,74 @@ h5 {
   font-family: var(--font-wordmark);
 }
 
+/* --------------------------------------------------------------------------
+   Gallery treatment: photography carries the page, text sits on a dark scrim.
+   -------------------------------------------------------------------------- */
+
+/* Bottom-up scrim so white text stays legible over any photo. */
+.scrim {
+  background-image: linear-gradient(
+    to top,
+    rgba(20, 20, 24, 0.94) 0%,
+    rgba(20, 20, 24, 0.75) 28%,
+    rgba(20, 20, 24, 0.32) 58%,
+    rgba(20, 20, 24, 0.05) 100%
+  );
+}
+
+/* Heavier scrim for hero imagery carrying a headline. */
+.scrim-hero {
+  background-image: linear-gradient(
+    to top,
+    rgba(20, 20, 24, 0.96) 0%,
+    rgba(20, 20, 24, 0.82) 35%,
+    rgba(20, 20, 24, 0.55) 70%,
+    rgba(20, 20, 24, 0.38) 100%
+  );
+}
+
+/* Warm heritage wash over photos — ties disparate photography together. */
+.warm-wash {
+  background-image: linear-gradient(
+    135deg,
+    rgba(200, 162, 75, 0.14) 0%,
+    rgba(31, 92, 61, 0.16) 100%
+  );
+}
+
+/* Dark, textured stand-in for places that have no photo yet. */
+.placeholder-tile {
+  background-image:
+    radial-gradient(
+      120% 90% at 78% 12%,
+      color-mix(in srgb, var(--tile-color, #1f5c3d) 55%, transparent) 0%,
+      transparent 62%
+    ),
+    linear-gradient(150deg, #22323a 0%, #1b1b20 58%, #14141a 100%);
+}
+
+/* Thin gold hairline used sparingly as a heritage accent. */
+.gold-rule {
+  background-image: linear-gradient(
+    to left,
+    transparent,
+    var(--color-accent) 22%,
+    var(--color-accent) 78%,
+    transparent
+  );
+}
+
+.card-lift {
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+@media (hover: hover) {
+  .card-lift:hover {
+    transform: translateY(-3px);
+  }
+}
+
 /* Embedded Latin text / numbers inside RTL copy keep their LTR order. */
 .ltr-nums {
   direction: ltr;

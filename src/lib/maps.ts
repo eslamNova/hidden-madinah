@@ -6,16 +6,53 @@ export type PlaceCategory = Enums<"place_category">;
  * Category display metadata. `icon` is a lucide-react icon name resolved in
  * components; `color` is the map-pin/badge color (calm, heritage-adjacent —
  * gold stays decorative and is never used as a category color).
+ * `tintOnDark` is the same hue lifted for legibility on photo scrims.
  */
 export const CATEGORY_META: Record<
   PlaceCategory,
-  { labelAr: string; pluralAr: string; color: string; icon: "landmark" | "droplets" | "trees" | "castle" | "map-pin" }
+  {
+    labelAr: string;
+    pluralAr: string;
+    color: string;
+    tintOnDark: string;
+    icon: "landmark" | "droplets" | "trees" | "castle" | "map-pin";
+  }
 > = {
-  mosque: { labelAr: "مسجد أثري", pluralAr: "مساجد أثرية", color: "#1F5C3D", icon: "landmark" },
-  well: { labelAr: "بئر", pluralAr: "آبار", color: "#33628C", icon: "droplets" },
-  garden: { labelAr: "بستان", pluralAr: "بساتين", color: "#5B8A3C", icon: "trees" },
-  historical_site: { labelAr: "موقع تاريخي", pluralAr: "مواقع تاريخية", color: "#7A5C3E", icon: "castle" },
-  other: { labelAr: "مكان", pluralAr: "أماكن أخرى", color: "#615B4E", icon: "map-pin" },
+  mosque: {
+    labelAr: "مسجد أثري",
+    pluralAr: "مساجد أثرية",
+    color: "#1F5C3D",
+    tintOnDark: "#8FD3AC",
+    icon: "landmark",
+  },
+  well: {
+    labelAr: "بئر",
+    pluralAr: "آبار",
+    color: "#33628C",
+    tintOnDark: "#9CC6EE",
+    icon: "droplets",
+  },
+  garden: {
+    labelAr: "بستان",
+    pluralAr: "بساتين",
+    color: "#5B8A3C",
+    tintOnDark: "#B6DC8E",
+    icon: "trees",
+  },
+  historical_site: {
+    labelAr: "موقع تاريخي",
+    pluralAr: "مواقع تاريخية",
+    color: "#7A5C3E",
+    tintOnDark: "#DFBE97",
+    icon: "castle",
+  },
+  other: {
+    labelAr: "مكان",
+    pluralAr: "أماكن أخرى",
+    color: "#615B4E",
+    tintOnDark: "#CFC7B6",
+    icon: "map-pin",
+  },
 };
 
 export const CATEGORY_ORDER: PlaceCategory[] = [

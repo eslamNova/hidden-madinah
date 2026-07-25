@@ -1,14 +1,6 @@
 import { useTranslations } from "next-intl";
-import {
-  Car,
-  Clock,
-  DoorOpen,
-  MapPin,
-  Signpost,
-  Wallet,
-} from "lucide-react";
-import { parseTransportOptions, stripVerify } from "@/lib/content";
-import type { PlaceRow } from "@/lib/queries";
+import { Car, Clock, DoorOpen, MapPin, Signpost, Wallet } from "lucide-react";
+import type { PublicPlaceView } from "@/lib/content";
 
 function InfoRow({
   icon,
@@ -32,20 +24,13 @@ function InfoRow({
   );
 }
 
-/** The practical-logistics card — the app's core differentiator. */
-export function VisitInfoCard({ place }: { place: PlaceRow }) {
+/**
+ * The practical-logistics card — the app's core differentiator. Takes the
+ * sanitized view, never the raw row.
+ */
+export function VisitInfoCard({ place }: { place: PublicPlaceView }) {
   const t = useTranslations("place");
   const tCommon = useTranslations("common");
-
-  const howToGet = stripVerify(place.how_to_get_there_ar);
-  const transportOptions = parseTransportOptions(place.transport_options);
-  const transportNote = stripVerify(place.transport_note_ar);
-  const bestTime = stripVerify(place.best_time_ar);
-  const openStatus = stripVerify(place.open_status_ar);
-  const km =
-    place.distance_from_prophets_mosque_km != null
-      ? Number(place.distance_from_prophets_mosque_km)
-      : null;
 
   return (
     <section
@@ -54,29 +39,29 @@ export function VisitInfoCard({ place }: { place: PlaceRow }) {
     >
       <h2 className="mb-2 text-2xl">{t("visitInfo")}</h2>
 
-      {km != null && (
+      {place.distanceKm != null && (
         <InfoRow icon={<MapPin className="h-6 w-6" />} label={t("distance")}>
-          {tCommon("distanceKm", { km })}
+          {tCommon("distanceKm", { km: place.distanceKm })}
         </InfoRow>
       )}
 
-      {place.drive_time_from_haram_min != null && (
+      {place.driveTimeMin != null && (
         <InfoRow icon={<Car className="h-6 w-6" />} label={t("driveTime")}>
-          {t("driveTimeValue", { min: place.drive_time_from_haram_min })}
+          {t("driveTimeValue", { min: place.driveTimeMin })}
         </InfoRow>
       )}
 
-      {howToGet && (
+      {place.howToGet && (
         <InfoRow icon={<Signpost className="h-6 w-6" />} label={t("howToGet")}>
-          {howToGet}
+          {place.howToGet}
         </InfoRow>
       )}
 
-      {(transportOptions.length > 0 || transportNote) && (
+      {(place.transportOptions.length > 0 || place.transportNote) && (
         <InfoRow icon={<Wallet className="h-6 w-6" />} label={t("transport")}>
-          {transportOptions.length > 0 && (
+          {place.transportOptions.length > 0 && (
             <ul className="space-y-2">
-              {transportOptions.map((option, i) => (
+              {place.transportOptions.map((option, i) => (
                 <li key={i} className="flex flex-wrap items-baseline gap-x-3">
                   <span className="font-medium">{option.mode_ar}</span>
                   {option.min_sar != null &&
@@ -98,21 +83,21 @@ export function VisitInfoCard({ place }: { place: PlaceRow }) {
               ))}
             </ul>
           )}
-          {transportNote && (
-            <p className="mt-2 text-base text-muted">{transportNote}</p>
+          {place.transportNote && (
+            <p className="mt-2 text-base text-muted">{place.transportNote}</p>
           )}
         </InfoRow>
       )}
 
-      {bestTime && (
+      {place.bestTime && (
         <InfoRow icon={<Clock className="h-6 w-6" />} label={t("bestTime")}>
-          {bestTime}
+          {place.bestTime}
         </InfoRow>
       )}
 
-      {openStatus && (
+      {place.openStatus && (
         <InfoRow icon={<DoorOpen className="h-6 w-6" />} label={t("openStatus")}>
-          {openStatus}
+          {place.openStatus}
         </InfoRow>
       )}
     </section>

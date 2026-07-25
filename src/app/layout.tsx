@@ -54,7 +54,10 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   // Admin strings stay out of public pages' RSC payload; the admin layout
   // provides the full message set for /admin/*.
-  const { admin: _adminMessages, ...publicMessages } = await getMessages();
+  const allMessages = await getMessages();
+  const publicMessages = Object.fromEntries(
+    Object.entries(allMessages).filter(([namespace]) => namespace !== "admin")
+  );
   const t = await getTranslations("common");
 
   return (

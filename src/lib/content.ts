@@ -48,6 +48,70 @@ export function hasVerifyFlags(place: Partial<Tables<"places">>): boolean {
   return verifyFlaggedFields(place).length > 0 || !!place.admin_notes_ar?.trim();
 }
 
+/**
+ * Everything a public page may show about a place — [VERIFY] markers already
+ * stripped, owner-only columns (admin_notes_ar) dropped. Building this at the
+ * page boundary keeps raw rows out of the RSC payload entirely, so unconfirmed
+ * facts cannot leak even through a client component's props.
+ */
+export type PublicPlaceView = {
+  slug: string;
+  name_ar: string;
+  category: Tables<"places">["category"];
+  featured: boolean;
+  summary: string | null;
+  story: string | null;
+  virtue: string | null;
+  tips: string | null;
+  quote: string | null;
+  quoteSource: string | null;
+  howToGet: string | null;
+  transportOptions: TransportOption[];
+  transportNote: string | null;
+  bestTime: string | null;
+  openStatus: string | null;
+  distanceKm: number | null;
+  driveTimeMin: number | null;
+  lat: number | null;
+  lng: number | null;
+  mapsUrl: string | null;
+  relatedSlugs: string[];
+  lastUpdated: string;
+};
+
+export function toPublicPlaceView(
+  place: Tables<"places">,
+  mapsUrl: string | null
+): PublicPlaceView {
+  return {
+    slug: place.slug,
+    name_ar: place.name_ar,
+    category: place.category,
+    featured: place.featured,
+    summary: stripVerify(place.summary_ar),
+    story: stripVerify(place.story_ar),
+    virtue: stripVerify(place.virtue_ar),
+    tips: stripVerify(place.visiting_tips_ar),
+    quote: stripVerify(place.featured_quote_ar),
+    quoteSource: stripVerify(place.featured_quote_source_ar),
+    howToGet: stripVerify(place.how_to_get_there_ar),
+    transportOptions: parseTransportOptions(place.transport_options),
+    transportNote: stripVerify(place.transport_note_ar),
+    bestTime: stripVerify(place.best_time_ar),
+    openStatus: stripVerify(place.open_status_ar),
+    distanceKm:
+      place.distance_from_prophets_mosque_km != null
+        ? Number(place.distance_from_prophets_mosque_km)
+        : null,
+    driveTimeMin: place.drive_time_from_haram_min,
+    lat: place.lat != null ? Number(place.lat) : null,
+    lng: place.lng != null ? Number(place.lng) : null,
+    mapsUrl,
+    relatedSlugs: place.related_place_slugs,
+    lastUpdated: place.last_updated,
+  };
+}
+
 export type TransportOption = {
   mode_ar: string;
   min_sar?: number;

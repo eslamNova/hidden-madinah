@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Serwist build artifact
 public/sw.js
+
+# Locally-processed media bridge (regenerate with scripts/import-media-local.ts)
+public/media/
