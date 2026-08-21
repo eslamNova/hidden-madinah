@@ -9,7 +9,7 @@ function MapSkeleton() {
   return (
     <div
       aria-hidden="true"
-      className="aspect-[4/3] w-full animate-pulse rounded-2xl bg-basalt/10"
+      className="aspect-[4/3] w-full animate-pulse rounded-2xl bg-ink/10"
     />
   );
 }

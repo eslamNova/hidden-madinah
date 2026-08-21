@@ -284,10 +284,10 @@ export function MediaUploader({
           e.preventDefault();
           addFiles(e.dataTransfer.files);
         }}
-        className="rounded-2xl border-2 border-dashed border-basalt/30 bg-surface p-6 text-center"
+        className="rounded-2xl border-2 border-dashed border-ink/30 bg-surface p-6 text-center"
       >
         <p className="mb-4 text-muted">{t("dropHint")}</p>
-        <label className="inline-flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-lg font-semibold text-surface">
+        <label className="inline-flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-lg font-semibold text-paper">
           <ImagePlus aria-hidden="true" className="h-6 w-6" />
           {t("upload")}
           <input
@@ -309,7 +309,7 @@ export function MediaUploader({
           {items.map((item) => (
             <li
               key={item.key}
-              className="flex flex-wrap items-center gap-3 rounded-xl border border-basalt/10 bg-surface p-3"
+              className="flex flex-wrap items-center gap-3 rounded-xl border border-ink/10 bg-surface p-3"
             >
               <span className="min-w-0 flex-1 truncate ltr-nums text-base">
                 {statusLabel[item.status](item.name)}
@@ -318,7 +318,7 @@ export function MediaUploader({
                 <button
                   type="button"
                   onClick={() => void processItem(item)}
-                  className="flex min-h-12 items-center rounded-xl border-[1.5px] border-basalt/30 bg-surface px-4 font-medium"
+                  className="flex min-h-12 items-center rounded-xl border-[1.5px] border-ink/30 bg-surface px-4 font-medium"
                 >
                   {t("retry")}
                 </button>

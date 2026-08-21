@@ -4,12 +4,14 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
+  BookOpenText,
   ChevronDown,
   ChevronLeft,
   Compass,
   Play,
   Route as RouteIcon,
 } from "lucide-react";
+import { SEERAH_APP } from "@/lib/constants";
 import {
   LazyMotion,
   MotionConfig,
@@ -63,6 +65,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
   const tCommon = useTranslations("common");
   const tPlaces = useTranslations("places");
   const tRoutes = useTranslations("routes");
+  const tSeerah = useTranslations("seerah");
   const reduceMotion = useReducedMotion() ?? false;
   const baseId = useId();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -144,7 +147,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
               <StoryItem>
                 <h1
                   id={headingId(0)}
-                  className="text-4xl leading-tight text-surface sm:text-5xl"
+                  className="text-4xl leading-tight text-paper sm:text-5xl"
                 >
                   {t("heroTitle")}
                 </h1>
@@ -155,12 +158,12 @@ export function StoryLanding({ data }: { data: StoryData }) {
                     "live" cue — no pulsing. */}
                 <Link
                   href="/tour"
-                  className="tour-sheen press relative inline-flex min-h-14 items-center gap-3 overflow-hidden rounded-2xl bg-surface px-7 text-lg font-semibold text-primary-dark shadow-lg"
+                  className="tour-sheen press relative inline-flex min-h-14 items-center gap-3 overflow-hidden rounded-2xl bg-paper px-7 text-lg font-semibold text-primary-dark shadow-lg"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
                     <Play
                       aria-hidden="true"
-                      className="h-4 w-4 text-surface"
+                      className="h-4 w-4 text-paper"
                       fill="currentColor"
                     />
                   </span>
@@ -169,7 +172,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
               </StoryItem>
               {data.hero?.photo && (
                 <StoryItem>
-                  <p className="text-sm text-surface/60">
+                  <p className="text-sm text-paper/60">
                     {t("heroCredit", { name: data.hero.name_ar })}
                   </p>
                 </StoryItem>
@@ -204,14 +207,14 @@ export function StoryLanding({ data }: { data: StoryData }) {
                   <StoryItem>
                     <h2
                       id={headingId(idx)}
-                      className="text-3xl leading-tight text-surface sm:text-4xl"
+                      className="text-3xl leading-tight text-paper sm:text-4xl"
                     >
                       {p.name_ar}
                     </h2>
                   </StoryItem>
                   {p.tagline && (
                     <StoryItem>
-                      <p className="line-clamp-1 max-w-xl text-lg text-surface/85">
+                      <p className="line-clamp-1 max-w-xl text-lg text-paper/85">
                         {p.tagline}
                       </p>
                     </StoryItem>
@@ -219,7 +222,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                   <StoryItem className="pt-1">
                     <Link
                       href={`/places/${encodeURIComponent(p.slug)}`}
-                      className="press inline-flex min-h-14 items-center gap-2 rounded-2xl bg-surface px-7 text-lg font-semibold text-primary-dark shadow-lg"
+                      className="press inline-flex min-h-14 items-center gap-2 rounded-2xl bg-paper px-7 text-lg font-semibold text-primary-dark shadow-lg"
                     >
                       {t("story.openPlace")}
                       <ChevronLeft aria-hidden="true" className="h-5 w-5" />
@@ -241,7 +244,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
               <StoryItem>
                 <h2
                   id={headingId(categoriesIdx)}
-                  className="text-3xl text-surface"
+                  className="text-3xl text-paper"
                 >
                   {t("categoriesTitle")}
                 </h2>
@@ -272,13 +275,13 @@ export function StoryLanding({ data }: { data: StoryData }) {
                       <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 p-3">
                         <CategoryIcon
                           category={c.category}
-                          className="h-6 w-6 shrink-0 text-surface"
+                          className="h-6 w-6 shrink-0 text-paper"
                         />
                         <span className="min-w-0">
-                          <span className="block truncate text-base font-semibold text-surface">
+                          <span className="block truncate text-base font-semibold text-paper">
                             {CATEGORY_META[c.category].pluralAr}
                           </span>
-                          <span className="block text-sm text-surface/75">
+                          <span className="block text-sm text-paper/75">
                             {tPlaces("count", { count: c.count })}
                           </span>
                         </span>
@@ -304,7 +307,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                     <div>
                       <h2
                         id={headingId(routesIdx)}
-                        className="text-3xl text-surface"
+                        className="text-3xl text-paper"
                       >
                         {t("routesTitle")}
                       </h2>
@@ -315,7 +318,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                     </div>
                     <Link
                       href="/routes"
-                      className="flex min-h-12 items-center gap-1 font-medium text-surface/85"
+                      className="flex min-h-12 items-center gap-1 font-medium text-paper/85"
                     >
                       {tCommon("viewAll")}
                       <ChevronLeft aria-hidden="true" className="h-5 w-5" />
@@ -350,7 +353,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                             <RouteIcon aria-hidden="true" className="h-4 w-4" />
                             {tRoutes("stopsCount", { count: r.stopsCount })}
                           </span>
-                          <span className="block text-xl font-bold text-surface">
+                          <span className="block text-xl font-bold text-paper">
                             {r.title_ar}
                           </span>
                         </div>
@@ -378,7 +381,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
               <StoryItem>
                 <h2
                   id={headingId(closingIdx)}
-                  className="text-3xl leading-tight text-surface sm:text-4xl"
+                  className="text-3xl leading-tight text-paper sm:text-4xl"
                 >
                   {t("story.closingTitle")}
                 </h2>
@@ -389,12 +392,12 @@ export function StoryLanding({ data }: { data: StoryData }) {
                       opening panel, so the story ends where it can restart. */}
                   <Link
                     href="/tour"
-                    className="tour-sheen press relative flex min-h-14 items-center justify-center gap-3 overflow-hidden rounded-2xl bg-surface px-7 text-lg font-semibold text-primary-dark shadow-lg"
+                    className="tour-sheen press relative flex min-h-14 items-center justify-center gap-3 overflow-hidden rounded-2xl bg-paper px-7 text-lg font-semibold text-primary-dark shadow-lg"
                   >
                     <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
                       <Play
                         aria-hidden="true"
-                        className="h-4 w-4 text-surface"
+                        className="h-4 w-4 text-paper"
                         fill="currentColor"
                       />
                     </span>
@@ -402,7 +405,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                   </Link>
                   <Link
                     href="/places"
-                    className="press flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-surface px-8 text-lg font-semibold text-primary-dark shadow-lg"
+                    className="press flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-paper px-8 text-lg font-semibold text-primary-dark shadow-lg"
                   >
                     <Compass aria-hidden="true" className="h-6 w-6" />
                     {t("heroCta")}
@@ -411,10 +414,44 @@ export function StoryLanding({ data }: { data: StoryData }) {
                       legibility, and blur over scrolling imagery costs frames. */}
                   <Link
                     href="/map"
-                    className="press flex min-h-14 items-center justify-center rounded-2xl border-[1.5px] border-surface/70 px-8 text-lg font-semibold text-surface"
+                    className="press flex min-h-14 items-center justify-center rounded-2xl border-[1.5px] border-paper/70 px-8 text-lg font-semibold text-paper"
                   >
                     {t("heroMapCta")}
                   </Link>
+                </div>
+              </StoryItem>
+              <StoryItem className="pt-4">
+                {/* Companion app, compact dark variant — the farewell is
+                    "continue your journey", and «سيرة» is where it continues. */}
+                <div className="flex flex-col gap-3 rounded-2xl border border-paper/15 bg-basalt/60 p-4 sm:flex-row sm:items-center sm:gap-4">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/20 text-accent"
+                  >
+                    <BookOpenText className="h-6 w-6" />
+                  </span>
+                  <div className="min-w-0 sm:flex-1">
+                    <p className="text-base font-semibold text-paper">{tSeerah("title")}</p>
+                    <p className="text-sm text-paper/75">{tSeerah("short")}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <a
+                      href={SEERAH_APP.appStore}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="press inline-flex min-h-12 items-center rounded-xl border border-paper/30 px-4 text-sm font-semibold text-paper"
+                    >
+                      {tSeerah("appStore")}
+                    </a>
+                    <a
+                      href={SEERAH_APP.googlePlay}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="press inline-flex min-h-12 items-center rounded-xl border border-paper/30 px-4 text-sm font-semibold text-paper"
+                    >
+                      {tSeerah("googlePlay")}
+                    </a>
+                  </div>
                 </div>
               </StoryItem>
             </StoryPanel>
@@ -427,7 +464,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
           <div className="pointer-events-none absolute inset-x-0 bottom-28 z-10 flex flex-col items-center gap-2">
             <span
               aria-hidden="true"
-              className={`rounded-full bg-basalt/75 px-4 py-1 text-sm text-surface transition-opacity duration-300 ${
+              className={`rounded-full bg-basalt/75 px-4 py-1 text-sm text-paper transition-opacity duration-300 ${
                 active === 0 ? "opacity-100" : "opacity-0"
               }`}
             >
@@ -438,7 +475,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
               onClick={() => goTo(active + 1)}
               aria-label={t("story.next")}
               tabIndex={active === total - 1 ? -1 : 0}
-              className={`press flex h-14 w-14 items-center justify-center rounded-full bg-surface text-basalt shadow-lg transition-opacity duration-300 ${
+              className={`press flex h-14 w-14 items-center justify-center rounded-full bg-paper text-basalt shadow-lg transition-opacity duration-300 ${
                 active === total - 1
                   ? "pointer-events-none opacity-0"
                   : "pointer-events-auto opacity-100"
@@ -461,7 +498,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
               <span
                 key={i}
                 className={`h-2 w-2 rounded-full transition-[background-color,transform] duration-300 ease-out ${
-                  i === active ? "scale-[1.4] bg-surface" : "bg-surface/40"
+                  i === active ? "scale-[1.4] bg-paper" : "bg-paper/40"
                 }`}
               />
             ))}

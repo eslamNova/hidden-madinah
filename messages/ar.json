@@ -26,6 +26,7 @@
   },
   "fontSize": {
     "label": "حجم الخط",
+    "controlsLabel": "حجم الخط والمظهر",
     "increase": "تكبير الخط",
     "decrease": "تصغير الخط",
     "announce": "حجم الخط الآن {size} نقطة"
@@ -88,6 +89,7 @@
     "relatedTitle": "أماكن خفية قريبة",
     "openInMaps": "افتح في الخرائط",
     "gallery": "معرض الصور",
+    "mediaTourCta": "شاهد الصور والفيديو ({count})",
     "galleryImageOf": "صورة {current} من {total}",
     "galleryNext": "الصورة التالية",
     "galleryPrev": "الصورة السابقة",
@@ -115,9 +117,14 @@
     "notFoundTitle": "الجولة غير موجودة",
     "backToRoutes": "العودة إلى الجولات"
   },
+  "theme": {
+    "switchToDark": "تفعيل الوضع الداكن",
+    "switchToLight": "تفعيل الوضع الفاتح"
+  },
   "seerah": {
     "title": "أكمل رحلتك مع السيرة النبوية",
-    "description": "أنت الآن في مواضع السيرة — تطبيق «سيرة» رحلة صوتية تفاعلية مجانية في سيرة النبي ﷺ، تكمل ما رأيته هنا.",
+    "description": "أنت الآن في مواضع السيرة، تطبيق «سيرة» رحلة صوتية تفاعلية مجانية في سيرة النبي ﷺ، تكمل ما رأيته هنا.",
+    "short": "تطبيق «سيرة»، رحلة صوتية مجانية في سيرة النبي ﷺ",
     "appStore": "App Store",
     "googlePlay": "Google Play"
   },
@@ -125,10 +132,13 @@
     "title": "جولة مصوّرة في المدينة الخفية",
     "regionLabel": "شرائح الجولة المصوّرة",
     "exit": "إنهاء الجولة",
+    "exitShort": "إنهاء",
+    "placeTitle": "صور وفيديو {name}",
     "openPlace": "افتح المكان",
     "slideOf": "مشهد {current} من {total}",
     "pauseTour": "إيقاف الجولة مؤقتاً",
     "playTour": "متابعة الجولة",
+    "loading": "جارٍ تحميل الصورة…",
     "empty": "لا توجد وسائط بعد — عُد قريباً."
   },
   "offline": {

@@ -12,7 +12,7 @@ export function FeaturedQuote({
 }) {
   return (
     <figure className="card-elevated border-accent/50 p-6 text-center sm:p-8">
-      <blockquote className="font-wordmark text-2xl leading-loose text-primary-dark">
+      <blockquote className="font-wordmark text-2xl leading-loose text-brand-dark">
         {quote}
       </blockquote>
       <span aria-hidden="true" className="gold-rule mx-auto mt-4 block h-px w-24" />

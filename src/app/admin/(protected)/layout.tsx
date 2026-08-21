@@ -24,12 +24,12 @@ export default async function AdminProtectedLayout({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
-      <div className="mb-6 flex items-center justify-between gap-4 border-b border-basalt/10 pb-4">
+      <div className="mb-6 flex items-center justify-between gap-4 border-b border-ink/10 pb-4">
         <h1 className="text-2xl">{t("title")}</h1>
         <form action={signOutAction}>
           <button
             type="submit"
-            className="flex min-h-12 items-center rounded-xl border-[1.5px] border-basalt/30 bg-surface px-5 font-medium"
+            className="flex min-h-12 items-center rounded-xl border-[1.5px] border-ink/30 bg-surface px-5 font-medium"
           >
             {t("signOut")}
           </button>

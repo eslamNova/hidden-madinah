@@ -18,7 +18,7 @@ export default function ErrorPage({
         <button
           type="button"
           onClick={reset}
-          className="press flex min-h-14 items-center justify-center rounded-2xl bg-primary px-8 text-lg font-semibold text-surface"
+          className="press flex min-h-14 items-center justify-center rounded-2xl bg-primary px-8 text-lg font-semibold text-paper"
         >
           {t("retry")}
         </button>

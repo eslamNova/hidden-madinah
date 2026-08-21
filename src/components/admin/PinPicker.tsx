@@ -98,7 +98,7 @@ export function PinPicker({
       <p className="text-base text-muted">{t("dragHint")}</p>
       <div
         ref={containerRef}
-        className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-basalt/10"
+        className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-ink/10"
         role="application"
         aria-label={t("title")}
       />
@@ -108,7 +108,7 @@ export function PinPicker({
           <button
             type="button"
             onClick={applyExif}
-            className="flex min-h-12 items-center gap-2 rounded-xl bg-primary px-4 font-medium text-surface"
+            className="flex min-h-12 items-center gap-2 rounded-xl bg-primary px-4 font-medium text-paper"
           >
             <Crosshair aria-hidden="true" className="h-5 w-5" />
             {t("useExif")}

@@ -19,7 +19,7 @@ import { MediaList } from "@/components/admin/MediaList";
 type PlaceRow = Tables<"places">;
 
 const inputClass =
-  "min-h-[52px] w-full rounded-xl border-[1.5px] border-basalt/30 bg-surface px-4 text-lg";
+  "min-h-[52px] w-full rounded-xl border-[1.5px] border-ink/30 bg-surface px-4 text-lg";
 const flaggedClass = "ring-2 ring-accent border-accent";
 
 function FieldShell({
@@ -282,12 +282,12 @@ export function PlaceForm({
       <section className="space-y-5">
         {text("how_to_get_there_ar", t("fields.howToGet"), { rows: 3 })}
 
-        <fieldset className="space-y-3 rounded-2xl border border-basalt/10 bg-surface p-4">
+        <fieldset className="space-y-3 rounded-2xl border border-ink/10 bg-surface p-4">
           <legend className="px-1 text-base font-semibold">
             {t("transportOptions.title")}
           </legend>
           {transport.map((option, i) => (
-            <div key={i} className="space-y-2 rounded-xl border border-basalt/10 p-3">
+            <div key={i} className="space-y-2 rounded-xl border border-ink/10 p-3">
               <label className="block">
                 <span className="mb-1 block text-sm font-semibold text-muted">
                   {t("transportOptions.mode")}
@@ -373,7 +373,7 @@ export function PlaceForm({
               <button
                 type="button"
                 onClick={() => setTransport((prev) => prev.filter((_, j) => j !== i))}
-                className="flex min-h-12 items-center gap-2 rounded-xl border-[1.5px] border-basalt/30 bg-surface px-4 font-medium"
+                className="flex min-h-12 items-center gap-2 rounded-xl border-[1.5px] border-ink/30 bg-surface px-4 font-medium"
               >
                 <Trash2 aria-hidden="true" className="h-5 w-5" />
                 {t("transportOptions.remove")}
@@ -383,7 +383,7 @@ export function PlaceForm({
           <button
             type="button"
             onClick={() => setTransport((prev) => [...prev, { mode_ar: "" }])}
-            className="flex min-h-12 items-center gap-2 rounded-xl border-[1.5px] border-basalt/30 bg-surface px-4 font-medium"
+            className="flex min-h-12 items-center gap-2 rounded-xl border-[1.5px] border-ink/30 bg-surface px-4 font-medium"
           >
             <Plus aria-hidden="true" className="h-5 w-5" />
             {t("transportOptions.add")}
@@ -437,11 +437,11 @@ export function PlaceForm({
       )}
 
       {/* Sticky save bar */}
-      <div className="sticky bottom-20 z-30 flex items-center gap-3 rounded-2xl border border-basalt/10 bg-surface/95 p-3 shadow-lg backdrop-blur">
+      <div className="sticky bottom-20 z-30 flex items-center gap-3 rounded-2xl border border-ink/10 bg-surface/95 p-3 shadow-lg backdrop-blur">
         <button
           type="submit"
           disabled={saving}
-          className="flex min-h-14 flex-1 items-center justify-center rounded-2xl bg-primary px-6 text-lg font-semibold text-surface disabled:opacity-60"
+          className="flex min-h-14 flex-1 items-center justify-center rounded-2xl bg-primary px-6 text-lg font-semibold text-paper disabled:opacity-60"
         >
           {saving ? t("saving") : t("save")}
         </button>
@@ -449,7 +449,7 @@ export function PlaceForm({
           <button
             type="button"
             onClick={() => void onDelete()}
-            className="flex min-h-14 items-center justify-center rounded-2xl border-[1.5px] border-basalt/30 bg-surface px-5 text-lg font-medium"
+            className="flex min-h-14 items-center justify-center rounded-2xl border-[1.5px] border-ink/30 bg-surface px-5 text-lg font-medium"
           >
             {t("delete")}
           </button>

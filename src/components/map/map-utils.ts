@@ -84,6 +84,8 @@ export function createPinElement(color: string, label: string): HTMLButtonElemen
   });
   inner.appendChild(dot);
 
+  // Caption colors follow the tile theme (markers are re-created on toggle).
+  const dark = document.documentElement.dataset.theme === "dark";
   const caption = document.createElement("span");
   caption.textContent = label;
   Object.assign(caption.style, {
@@ -99,9 +101,10 @@ export function createPinElement(color: string, label: string): HTMLButtonElemen
     fontSize: "12px",
     fontWeight: "700",
     lineHeight: "1.4",
-    color: "#2e2e33",
-    textShadow:
-      "0 0 3px #faf6ef, 0 0 3px #faf6ef, 0 0 4px #faf6ef, 0 1px 3px #faf6ef",
+    color: dark ? "#faf6ef" : "#2e2e33",
+    textShadow: dark
+      ? "0 0 3px #141418, 0 0 3px #141418, 0 0 4px #141418, 0 1px 3px #141418"
+      : "0 0 3px #faf6ef, 0 0 3px #faf6ef, 0 0 4px #faf6ef, 0 1px 3px #faf6ef",
     pointerEvents: "none",
   });
   inner.appendChild(caption);

@@ -1,19 +1,42 @@
 @import "tailwindcss";
 
 @theme {
-  /* Madinah heritage palette */
+  /* Madinah heritage palette.
+     Two families of tokens:
+     - THEMED (flip in dark mode): sand (page), surface (cards/light glass),
+       ink (body text), muted, brand / brand-dark (brand-colored TEXT).
+     - CONSTANT: basalt (dark overlays, scrims, pins, dark cards), paper
+       (light text ON dark things), primary (brand BACKGROUNDS), accent. */
   --color-primary: #1f5c3d;
   --color-primary-dark: #143d28;
+  --color-brand: #1f5c3d;
+  --color-brand-dark: #143d28;
   --color-accent: #c8a24b; /* gold — decorative only, never text on light bg */
   --color-basalt: #2e2e33;
+  --color-paper: #faf6ef;
   --color-sand: #ede4d3;
   --color-surface: #faf6ef;
+  --color-ink: #2e2e33;
   --color-muted: #615b4e; /* secondary text — keeps >=4.5:1 on sand */
   --color-muted-decorative: #7a7466; /* purely decorative text only */
 
   --font-heading: var(--font-cairo), sans-serif;
   --font-body: var(--font-plex-arabic), sans-serif;
   --font-wordmark: var(--font-amiri), serif;
+}
+
+/* Dark mode — opted in via the floating control (persisted, applied
+   pre-paint in layout.tsx). Only the THEMED tokens change; photography,
+   scrims and brand buttons keep their exact look. */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --color-sand: #141418;
+  --color-surface: #1f1f25;
+  --color-ink: #f1ece2;
+  --color-muted: #b9b1a3; /* ≥7:1 on #141418 */
+  --color-muted-decorative: #8c8679;
+  --color-brand: #7fcfa2; /* brand green as TEXT on dark — 8.9:1 on #141418 */
+  --color-brand-dark: #a6e3c2;
 }
 
 /* Elderly-first type scale: rem everywhere; the in-app control moves the root. */
@@ -29,7 +52,7 @@ html[data-font-step="2"] {
 
 body {
   background-color: var(--color-sand);
-  color: var(--color-basalt);
+  color: var(--color-ink);
   font-family: var(--font-body);
   line-height: 1.8;
   -webkit-font-smoothing: antialiased;
@@ -148,7 +171,8 @@ h5 {
 
 html {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-sand)) transparent;
+  /* brand (themed text green) so the thumb stays visible in both themes */
+  scrollbar-color: color-mix(in srgb, var(--color-brand) 45%, var(--color-sand)) transparent;
 }
 /* Legacy fallback (Chromium <121 ignores the standard props above; newer
    Chromium ignores these once standard props apply — intended). */
@@ -163,7 +187,7 @@ html::-webkit-scrollbar-thumb {
   border-radius: 8px;
   border: 2px solid transparent;
   background-clip: content-box;
-  background-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-sand));
+  background-color: color-mix(in srgb, var(--color-brand) 45%, var(--color-sand));
 }
 
 /* --------------------------------------------------------------------------
@@ -185,6 +209,15 @@ body::before {
     linear-gradient(to bottom, var(--color-surface) 0%, var(--color-sand) 28%, var(--color-sand) 100%);
 }
 
+/* Immersive routes (landing, tours): dark ground, no gradient — iOS safe
+   areas and overscroll then show basalt, never a sand band around photos. */
+html[data-immersive] body {
+  background-color: var(--color-basalt);
+}
+html[data-immersive] body::before {
+  display: none;
+}
+
 /* Fades a photo header's bottom edge into the page ground. */
 .hero-melt {
   background-image: linear-gradient(to bottom, transparent, var(--color-sand));
@@ -197,7 +230,8 @@ body::before {
 @layer components {
   .card-elevated {
     background-color: var(--color-surface);
-    border: 1px solid rgba(46, 46, 51, 0.08);
+    /* ink-based hairline so it survives the dark theme too */
+    border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
     border-radius: 1.5rem;
     box-shadow:
       0 1px 2px rgba(46, 46, 51, 0.05),
@@ -329,7 +363,7 @@ body::before {
 /* Two-tone ring: the light halo separates the green outline from dark photos
    and basalt panels (the green alone is ~1.7:1 on basalt — invisible). */
 :focus-visible {
-  outline: 3px solid var(--color-primary);
+  outline: 3px solid var(--color-brand); /* themed: stays visible on dark grounds */
   outline-offset: 2px;
   border-radius: 4px;
   box-shadow:

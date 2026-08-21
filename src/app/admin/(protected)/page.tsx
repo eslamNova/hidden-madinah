@@ -23,7 +23,7 @@ export default async function AdminPlacesList() {
         <h2 className="text-xl">{t("placesTitle")}</h2>
         <Link
           href="/admin/places/new"
-          className="flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 font-semibold text-surface"
+          className="flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 font-semibold text-paper"
         >
           <Plus aria-hidden="true" className="h-5 w-5" />
           {t("addPlace")}
@@ -35,7 +35,7 @@ export default async function AdminPlacesList() {
           <li key={p.id}>
             <Link
               href={`/admin/places/${p.id}`}
-              className="flex min-h-14 flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-basalt/10 bg-surface p-4 shadow-sm"
+              className="flex min-h-14 flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-ink/10 bg-surface p-4 shadow-sm"
             >
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-lg font-semibold">{p.name_ar}</span>
@@ -53,7 +53,7 @@ export default async function AdminPlacesList() {
               <span
                 className={`rounded-full px-3 py-1 text-sm font-medium ${
                   p.is_published
-                    ? "bg-primary/10 text-primary-dark"
+                    ? "bg-primary/10 text-brand-dark"
                     : "bg-basalt/10 text-muted"
                 }`}
               >

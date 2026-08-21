@@ -86,33 +86,49 @@ export function Gallery({ media, placeName }: { media: MediaRow[]; placeName: st
       </div>
 
       {media.length > 1 && (
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex gap-2">
-            {/* In RTL, "next" is visually to the left. */}
-            {/* Static action labels — the aria-live counter below announces
-                position; computed labels produced "صورة 0 من N" at the ends. */}
-            <button
-              type="button"
-              onClick={() => goTo(current + 1)}
-              disabled={current === media.length - 1}
-              aria-label={t("galleryNext")}
-              className="press flex h-12 w-12 items-center justify-center rounded-xl border-[1.5px] border-basalt/30 bg-surface disabled:opacity-40"
-            >
-              <ChevronLeft aria-hidden="true" className="h-6 w-6" />
-            </button>
-            <button
-              type="button"
-              onClick={() => goTo(current - 1)}
-              disabled={current === 0}
-              aria-label={t("galleryPrev")}
-              className="press flex h-12 w-12 items-center justify-center rounded-xl border-[1.5px] border-basalt/30 bg-surface disabled:opacity-40"
-            >
-              <ChevronRight aria-hidden="true" className="h-6 w-6" />
-            </button>
+        <div className="mt-3 space-y-3">
+          {/* Dots: one per slide (the counter takes over past 12). */}
+          {media.length <= 12 && (
+            <div aria-hidden="true" className="flex justify-center gap-1.5">
+              {media.map((m, i) => (
+                <span
+                  key={m.id}
+                  className={`h-2 w-2 rounded-full transition-[background-color,transform] duration-300 ease-out ${
+                    i === current ? "scale-[1.4] bg-brand" : "bg-ink/25"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-3">
+            {/* Labeled controls — a chevron alone was not expressive enough.
+                In RTL "next" is visually to the left. */}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => goTo(current + 1)}
+                disabled={current === media.length - 1}
+                aria-label={t("galleryNext")}
+                className="press inline-flex min-h-12 items-center gap-1.5 rounded-2xl bg-primary px-4 text-base font-semibold text-paper shadow-sm disabled:opacity-40"
+              >
+                <ChevronLeft aria-hidden="true" className="h-5 w-5" />
+                {t("galleryNext")}
+              </button>
+              <button
+                type="button"
+                onClick={() => goTo(current - 1)}
+                disabled={current === 0}
+                aria-label={t("galleryPrev")}
+                className="press inline-flex min-h-12 items-center gap-1.5 rounded-2xl border-[1.5px] border-ink/15 bg-surface px-4 text-base font-semibold text-ink shadow-sm disabled:opacity-40"
+              >
+                {t("galleryPrev")}
+                <ChevronRight aria-hidden="true" className="h-5 w-5" />
+              </button>
+            </div>
+            <p aria-live="polite" className="text-base font-medium text-muted">
+              {t("galleryImageOf", { current: current + 1, total: media.length })}
+            </p>
           </div>
-          <p aria-live="polite" className="text-base text-muted">
-            {t("galleryImageOf", { current: current + 1, total: media.length })}
-          </p>
         </div>
       )}
     </section>

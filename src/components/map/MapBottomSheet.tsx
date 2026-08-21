@@ -60,7 +60,7 @@ export function MapBottomSheet({
       key={place.slug}
       className="fixed inset-x-0 bottom-[6.25rem] z-50 mx-auto max-w-lg px-2 pb-[env(safe-area-inset-bottom)]"
     >
-      <div className="sheet-in rounded-t-3xl border border-basalt/10 bg-surface p-4 shadow-lg">
+      <div className="sheet-in rounded-t-3xl border border-ink/10 bg-surface p-4 shadow-lg">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             {place.thumb ? (
@@ -97,7 +97,7 @@ export function MapBottomSheet({
             type="button"
             onClick={onClose}
             aria-label={t("closePreview")}
-            className="press flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-[1.5px] border-basalt/30 bg-surface text-basalt"
+            className="press flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-[1.5px] border-ink/30 bg-surface text-ink"
           >
             <X aria-hidden="true" className="h-5 w-5" />
           </button>
@@ -109,7 +109,7 @@ export function MapBottomSheet({
         )}
         <Link
           href={`/places/${encodeURIComponent(place.slug)}`}
-          className="press flex min-h-14 items-center justify-center rounded-2xl bg-primary px-6 text-lg font-semibold text-surface"
+          className="press flex min-h-14 items-center justify-center rounded-2xl bg-primary px-6 text-lg font-semibold text-paper"
         >
           {t("openPlace")}
         </Link>

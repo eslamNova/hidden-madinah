@@ -1,12 +1,34 @@
 # دليل المدينة الخفية — Hidden Madinah: state of play
 
-Snapshot taken **2026-08-03**, after the second production deploy: owner content
-for three places, all media moved to Supabase Storage, video support in the
-import pipeline, and the new cinematic story landing page.
+Snapshot taken **2026-08-21 (evening)**. The README is now the full feature and
+operations reference; this file tracks only what is still open.
 
-Previous snapshot: 2026-07-25 (first deploy). Of its three blockers, **step 2
-(service key + media to Storage) is fully done**, step 1 (owner account) is
-still open, and step 3 (GitHub auto-deploy) is now safe to do — see below.
+## Open items
+
+1. **Owner content** — 2 drafts await material (بئر الخاتم، بيوت الصحابة بقباء);
+   6 unpublished placeholder places need real content + photos before
+   re-publishing (بئر عثمان، جبل سلع، مسجد بني حرام، بساتين قباء، بساتين العوالي،
+   محطة سكة الحجاز). Photos for بستان المستظل (video-only today).
+2. **`[VERIFY]` items** — أبو بكر hadith wording/source, جبل الرماة entry fee,
+   قباء best-time/open-hours, بئر غرس pin confirmation (all visible in /admin).
+3. **GitHub auto-deploys** — safe to connect now (all media in Storage);
+   Vercel → Settings → Git.
+4. **Admin** — works (owner account created 2026-08-21); `PinPicker` still uses
+   the light map style in dark mode (admin is out of the redesign's scope).
+5. **Engineering** — no automated tests; no Lighthouse/real-device pass; Node 22
+   upgrade would drop the `--experimental-websocket` flag; Supabase free-tier
+   weekly pause is the main availability risk.
+
+## Gotchas worth remembering
+
+- Next fetch cache: `rm -rf .next` before a build after content changes.
+- Vercel CLI ignores `.gitignore` — `.vercelignore` keeps `my_data/` (~1 GB) out.
+- The anon and service keys look identical; decode the JWT `role` claim.
+- Large uploads on this uplink fail in Node fetch — `import-media.ts` retries;
+  a stubborn file can be pushed with `curl` straight to the Storage REST API.
+- Never set inline `position` on a maplibre marker element (breaks placement).
+- Dark mode token rule: `text-ink` on themed surfaces, `text-paper` on
+  photography/dark glass; CTAs over photos use constant `bg-paper`.
 
 ---
 

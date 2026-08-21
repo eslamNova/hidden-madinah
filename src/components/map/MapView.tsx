@@ -10,7 +10,8 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useTranslations } from "next-intl";
 import { MADINAH_BOUNDS, MADINAH_CENTER } from "@/lib/geo";
-import { CATEGORY_META, CATEGORY_ORDER, MAP_STYLE_URL } from "@/lib/maps";
+import { CATEGORY_META, CATEGORY_ORDER, mapStyleUrl } from "@/lib/maps";
+import { useTheme } from "@/lib/use-theme";
 import {
   applyArabicLabels,
   createPinElement,
@@ -36,8 +37,13 @@ export function MapView({ pins }: { pins: MapPin[] }) {
   const markersRef = useRef<Marker[]>([]);
   const [selected, setSelected] = useState<MapPlacePreview | null>(null);
   const [loading, setLoading] = useState(true);
+  // Camera survives the theme re-create so a toggle never resets the view.
+  const viewRef = useRef<{ center: [number, number]; zoom: number } | null>(null);
   const t = useTranslations("map");
+  const [theme] = useTheme();
 
+  // Re-created on theme change so the tile style follows light/dark; the
+  // markers effect below re-adds the pins (theme in its deps too).
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -45,15 +51,16 @@ export function MapView({ pins }: { pins: MapPin[] }) {
 
     const map = new MaplibreMap({
       container,
-      style: MAP_STYLE_URL,
-      center: [MADINAH_CENTER.lng, MADINAH_CENTER.lat],
-      zoom: 12,
+      style: mapStyleUrl(theme),
+      center: viewRef.current?.center ?? [MADINAH_CENTER.lng, MADINAH_CENTER.lat],
+      zoom: viewRef.current?.zoom ?? 12,
       minZoom: 10,
       maxBounds: MADINAH_BOUNDS,
       attributionControl: { compact: true },
     });
     map.addControl(new NavigationControl({ showCompass: false }), "top-left");
     map.addControl(new GeolocateControl({ trackUserLocation: false }), "top-left");
+    setLoading(true);
     map.on("load", () => {
       applyArabicLabels(map);
       setLoading(false);
@@ -61,12 +68,14 @@ export function MapView({ pins }: { pins: MapPin[] }) {
     mapRef.current = map;
 
     return () => {
+      const c = map.getCenter();
+      viewRef.current = { center: [c.lng, c.lat], zoom: map.getZoom() };
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [theme]);
 
   // Markers mount once — pins are static SSG data.
   useEffect(() => {
@@ -81,7 +90,7 @@ export function MapView({ pins }: { pins: MapPin[] }) {
       });
       return new Marker({ element: el }).setLngLat([lng, lat]).addTo(map);
     });
-  }, [pins]);
+  }, [pins, theme]);
 
   return (
     // 5.5rem = floating-dock clearance only; there is no top bar anymore.
@@ -99,7 +108,7 @@ export function MapView({ pins }: { pins: MapPin[] }) {
       <div ref={containerRef} className="h-full w-full" aria-label={t("title")} />
       {/* end = physical LEFT in RTL — the same corner maplibre puts its 48px
           zoom/geolocate stack, so inset past it. */}
-      <details className="absolute end-[4.5rem] top-2 z-10 rounded-2xl border border-basalt/10 bg-surface/95 p-2.5 shadow-lg">
+      <details className="absolute end-[4.5rem] top-2 z-10 rounded-2xl border border-ink/10 bg-surface/95 p-2.5 shadow-lg">
         <summary className="press flex min-h-12 cursor-pointer items-center gap-1 rounded-lg px-2 text-base font-semibold">
           {t("legend")}
         </summary>

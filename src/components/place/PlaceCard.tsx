@@ -76,7 +76,7 @@ export function PlaceCard({
       {/* Near-opaque pill, light label: gold on 70% glass fell below AA over
           bright photos (gold stays on the decorative star only). */}
       {place.featured && (
-        <span className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-basalt/85 px-3 py-1 text-sm font-medium text-surface">
+        <span className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-basalt/85 px-3 py-1 text-sm font-medium text-paper">
           <Star
             aria-hidden="true"
             className="h-4 w-4 text-accent"
@@ -90,10 +90,10 @@ export function PlaceCard({
           line-clamp keeps the START of long names visible (they were clipping
           from the top on narrow mobile columns). */}
       <div className="absolute inset-x-0 bottom-0 space-y-2 p-4">
-        <h3 className="line-clamp-2 text-xl leading-snug text-surface drop-shadow-sm sm:text-2xl">
+        <h3 className="line-clamp-2 text-xl leading-snug text-paper drop-shadow-sm sm:text-2xl">
           {place.name_ar}
         </h3>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-surface/90">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-paper/90">
           {place.distanceKm != null && (
             <span className="inline-flex items-center gap-1">
               <MapPin aria-hidden="true" className="h-4 w-4 shrink-0" />

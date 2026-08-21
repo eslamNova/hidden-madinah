@@ -5,7 +5,8 @@ import { Map as MaplibreMap, Marker, NavigationControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useTranslations } from "next-intl";
 import { MADINAH_BOUNDS } from "@/lib/geo";
-import { MAP_STYLE_URL } from "@/lib/maps";
+import { mapStyleUrl } from "@/lib/maps";
+import { useTheme } from "@/lib/use-theme";
 import { applyArabicLabels, ensureRtlTextPlugin } from "./map-utils";
 
 /** Small embedded map with a single pin, for the place detail page. */
@@ -22,7 +23,9 @@ export function PlaceMap({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations("map");
+  const [theme] = useTheme();
 
+  // Re-created on theme change so the tile style follows light/dark.
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -30,7 +33,7 @@ export function PlaceMap({
 
     const map = new MaplibreMap({
       container,
-      style: MAP_STYLE_URL,
+      style: mapStyleUrl(theme),
       center: [lng, lat],
       zoom: 14,
       minZoom: 10,
@@ -47,12 +50,12 @@ export function PlaceMap({
       marker.remove();
       map.remove();
     };
-  }, [lat, lng, color]);
+  }, [lat, lng, color, theme]);
 
   return (
     <div
       ref={containerRef}
-      className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-basalt/10"
+      className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-ink/10"
       role="application"
       aria-label={`${t("title")}: ${nameAr}`}
     />

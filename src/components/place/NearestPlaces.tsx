@@ -57,7 +57,7 @@ export function NearestPlaces({ places }: { places: NearestPlaceInput[] }) {
           <button
             type="button"
             onClick={locate}
-            className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-lg font-semibold text-surface sm:w-auto"
+            className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-lg font-semibold text-paper sm:w-auto"
           >
             <LocateFixed aria-hidden="true" className="h-6 w-6" />
             {t("nearestButton")}

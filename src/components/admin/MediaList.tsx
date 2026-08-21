@@ -48,7 +48,7 @@ export function MediaList({
       {media.map((m, i) => (
         <li
           key={m.id}
-          className="flex flex-wrap items-start gap-3 rounded-2xl border border-basalt/10 bg-surface p-3"
+          className="flex flex-wrap items-start gap-3 rounded-2xl border border-ink/10 bg-surface p-3"
         >
           <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-sand">
             {m.thumb_url ? (
@@ -64,7 +64,7 @@ export function MediaList({
               </span>
             )}
             {m.type === "video" && (
-              <span className="absolute bottom-1 end-1 rounded bg-basalt/80 p-1 text-surface">
+              <span className="absolute bottom-1 end-1 rounded bg-basalt/80 p-1 text-paper">
                 <Film aria-hidden="true" className="h-4 w-4" />
               </span>
             )}
@@ -85,7 +85,7 @@ export function MediaList({
                     );
                   }
                 }}
-                className="min-h-[52px] w-full rounded-xl border-[1.5px] border-basalt/30 bg-surface px-3 text-lg"
+                className="min-h-[52px] w-full rounded-xl border-[1.5px] border-ink/30 bg-surface px-3 text-lg"
               />
             </label>
           </div>
@@ -96,7 +96,7 @@ export function MediaList({
               onClick={() => void move(i, -1)}
               disabled={i === 0}
               aria-label={t("moveUp")}
-              className="flex h-12 w-12 items-center justify-center rounded-xl border-[1.5px] border-basalt/30 bg-surface disabled:opacity-40"
+              className="flex h-12 w-12 items-center justify-center rounded-xl border-[1.5px] border-ink/30 bg-surface disabled:opacity-40"
             >
               <ChevronUp aria-hidden="true" className="h-5 w-5" />
             </button>
@@ -105,7 +105,7 @@ export function MediaList({
               onClick={() => void move(i, 1)}
               disabled={i === media.length - 1}
               aria-label={t("moveDown")}
-              className="flex h-12 w-12 items-center justify-center rounded-xl border-[1.5px] border-basalt/30 bg-surface disabled:opacity-40"
+              className="flex h-12 w-12 items-center justify-center rounded-xl border-[1.5px] border-ink/30 bg-surface disabled:opacity-40"
             >
               <ChevronDown aria-hidden="true" className="h-5 w-5" />
             </button>
@@ -113,7 +113,7 @@ export function MediaList({
               type="button"
               onClick={() => void remove(m.id)}
               aria-label={t("remove")}
-              className="flex h-12 w-12 items-center justify-center rounded-xl border-[1.5px] border-basalt/30 bg-surface text-basalt"
+              className="flex h-12 w-12 items-center justify-center rounded-xl border-[1.5px] border-ink/30 bg-surface text-ink"
             >
               <Trash2 aria-hidden="true" className="h-5 w-5" />
             </button>

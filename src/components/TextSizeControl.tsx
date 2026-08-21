@@ -34,7 +34,7 @@ export function TextSizeControl() {
   }
 
   const buttonClass =
-    "flex h-12 w-12 items-center justify-center rounded-xl border-[1.5px] border-basalt/30 bg-surface text-lg font-semibold text-basalt disabled:opacity-40";
+    "flex h-12 w-12 items-center justify-center rounded-xl border-[1.5px] border-ink/30 bg-surface text-lg font-semibold text-ink disabled:opacity-40";
 
   return (
     <div role="group" aria-label={t("label")} className="flex items-center gap-2">

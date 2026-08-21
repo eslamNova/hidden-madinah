@@ -80,5 +80,15 @@ export function googleMapsUrl(
 /** OpenFreeMap style — free vector tiles, no API key. */
 export const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 
+/** OpenFreeMap styles per theme (both token-free, both carry Arabic names). */
+export const MAP_STYLE_URLS = {
+  light: MAP_STYLE_URL,
+  dark: "https://tiles.openfreemap.org/styles/dark",
+} as const;
+
+export function mapStyleUrl(theme: "light" | "dark"): string {
+  return MAP_STYLE_URLS[theme];
+}
+
 /** Self-hosted RTL text plugin (public/) so Arabic labels shape correctly offline. */
 export const RTL_TEXT_PLUGIN_URL = "/mapbox-gl-rtl-text.js";

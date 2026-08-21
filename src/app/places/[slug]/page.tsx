@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ExternalLink, Star } from "lucide-react";
+import Link from "next/link";
+import { ExternalLink, Play, Star } from "lucide-react";
 import { coverImage, stripVerify, toPublicPlaceView } from "@/lib/content";
 import { CATEGORY_META, googleMapsUrl } from "@/lib/maps";
 import { variantUrl } from "@/lib/media-spec";
@@ -39,7 +40,7 @@ export async function generateMetadata({
   // A video-only place falls back to its poster frame, which exists at 800 only.
   const cover = coverImage(place.media);
   const ogImage = !cover
-    ? "/og-fallback.jpg"
+    ? "/og-image.jpg"
     : cover.singleVariant
       ? cover.url
       : variantUrl(cover.url, 1600).replace(/\.webp$/, ".jpg");
@@ -117,17 +118,30 @@ export default async function PlacePage({
         <div className="relative flex min-h-[62dvh] flex-col justify-end px-5 pb-8 pt-24">
           <div className="mx-auto w-full max-w-3xl space-y-3">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-basalt/60 px-3 py-1 text-sm font-medium backdrop-blur-sm">
-              <CategoryIcon category={place.category} className="h-4 w-4 text-surface" />
+              <CategoryIcon category={place.category} className="h-4 w-4 text-paper" />
               <span style={{ color: meta.tintOnDark }}>{meta.labelAr}</span>
               {place.featured && (
                 <Star aria-hidden="true" className="h-4 w-4 text-accent" fill="currentColor" />
               )}
             </span>
-            <h1 className="text-4xl leading-tight text-surface sm:text-5xl">
+            <h1 className="text-4xl leading-tight text-paper sm:text-5xl">
               {place.name_ar}
             </h1>
             {view.summary && (
-              <p className="max-w-2xl text-xl leading-relaxed text-surface/85">{view.summary}</p>
+              <p className="max-w-2xl text-xl leading-relaxed text-paper/85">{view.summary}</p>
+            )}
+            {place.media.length > 0 && (
+              // Full-screen media tour for this place — same sheen CTA as
+              // the landing; the inline gallery below stays as the quick look.
+              <Link
+                href={`/places/${encodeURIComponent(place.slug)}/tour`}
+                className="tour-sheen press relative mt-2 inline-flex min-h-14 items-center gap-3 overflow-hidden rounded-2xl bg-paper px-6 text-lg font-semibold text-primary-dark shadow-lg"
+              >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+                  <Play aria-hidden="true" className="h-4 w-4 text-paper" fill="currentColor" />
+                </span>
+                {t("mediaTourCta", { count: place.media.length })}
+              </Link>
             )}
           </div>
         </div>
@@ -156,7 +170,7 @@ export default async function PlacePage({
         {view.virtue && (
           <section
             aria-label={t("virtue")}
-            className="space-y-3 rounded-3xl border-s-4 border-primary bg-surface p-5 shadow-[0_1px_2px_rgba(46,46,51,0.05),0_16px_40px_-16px_rgba(46,46,51,0.18)]"
+            className="space-y-3 rounded-3xl border-s-4 border-brand bg-surface p-5 shadow-[0_1px_2px_rgba(46,46,51,0.05),0_16px_40px_-16px_rgba(46,46,51,0.18)]"
           >
             <h2 className="text-2xl">{t("virtue")}</h2>
             <p className="text-lg leading-loose">{view.virtue}</p>
@@ -184,7 +198,7 @@ export default async function PlacePage({
                 href={view.mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-lg font-semibold text-surface"
+                className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-lg font-semibold text-paper"
               >
                 <ExternalLink aria-hidden="true" className="h-5 w-5" />
                 {t("openInMaps")}
@@ -197,7 +211,7 @@ export default async function PlacePage({
 
         <RelatedPlaces slugs={view.relatedSlugs} />
 
-        <footer className="border-t border-basalt/10 pt-4 text-base text-muted">
+        <footer className="border-t border-ink/10 pt-4 text-base text-muted">
           {tCommon("lastUpdated", { date: lastUpdated })}
         </footer>
       </div>

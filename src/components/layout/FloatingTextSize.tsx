@@ -3,7 +3,10 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Moon, Sun } from "lucide-react";
 import { TextSizeControl } from "@/components/TextSizeControl";
+import { useTheme } from "@/lib/use-theme";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 /**
  * The أ−/أ+ font stepper as a floating corner control — the top navbar is
@@ -24,6 +27,10 @@ export function FloatingTextSize() {
   const rootRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
+  const [theme] = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const dark = mounted && theme === "dark";
 
   useEffect(() => {
     if (!open) return;
@@ -53,12 +60,12 @@ export function FloatingTextSize() {
 
   // The admin area has its own top chrome — a floating button would overlap
   // it — and the tour is a chrome-less media stream with its own exit button.
-  if (pathname.startsWith("/admin") || pathname === "/tour") return null;
+  if (pathname.startsWith("/admin") || pathname.endsWith("/tour")) return null;
 
   const onStory = pathname === "/";
   const shell = onStory
-    ? "border-surface/15 bg-basalt/85 text-surface"
-    : "border-basalt/10 bg-surface/95 text-basalt";
+    ? "border-paper/15 bg-basalt/85 text-paper"
+    : "border-ink/10 bg-surface/95 text-ink";
 
   return (
     <div
@@ -69,14 +76,21 @@ export function FloatingTextSize() {
         ref={toggleRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label={t("label")}
+        aria-label={t("controlsLabel")}
         aria-expanded={open}
         aria-controls={panelId}
-        className={`press flex h-12 w-12 items-center justify-center rounded-full border shadow-lg ${shell}`}
+        className={`press flex h-12 items-center gap-1.5 rounded-full border px-3.5 shadow-lg ${shell}`}
       >
-        <span aria-hidden="true" className="text-xl font-bold">
+        {/* Two symbols so the button reads as "text size + theme" at a glance. */}
+        <span aria-hidden="true" className="text-xl font-bold leading-none">
           أ
         </span>
+        <span aria-hidden="true" className="h-4 w-px bg-current/25" />
+        {dark ? (
+          <Sun aria-hidden="true" className="h-5 w-5" />
+        ) : (
+          <Moon aria-hidden="true" className="h-5 w-5" />
+        )}
       </button>
       <div
         id={panelId}
@@ -85,10 +99,14 @@ export function FloatingTextSize() {
             ? "translate-x-0 opacity-100"
             : "pointer-events-none translate-x-2 opacity-0"
         }`}
-        // Keep the stepper out of the tab order while visually hidden.
+        // Keep the controls out of the tab order while visually hidden.
         {...(!open && { inert: true })}
       >
-        <TextSizeControl />
+        <div className="flex items-center gap-2">
+          <TextSizeControl />
+          <span aria-hidden="true" className="h-8 w-px bg-current/20" />
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   );

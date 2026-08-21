@@ -48,9 +48,9 @@ export function VideoPlayer({
           className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-basalt/30"
         >
           <span className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/90 shadow-lg">
-            <Play aria-hidden="true" className="h-9 w-9 text-surface" fill="currentColor" />
+            <Play aria-hidden="true" className="h-9 w-9 text-paper" fill="currentColor" />
           </span>
-          <span className="rounded-full bg-basalt/70 px-4 py-1 text-base font-medium text-surface">
+          <span className="rounded-full bg-basalt/70 px-4 py-1 text-base font-medium text-paper">
             {t("videoPlay")}: {title}
           </span>
         </button>

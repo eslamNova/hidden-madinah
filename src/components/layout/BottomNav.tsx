@@ -24,8 +24,9 @@ export function BottomNav() {
 
   const onStory = pathname === "/";
 
-  // The tour is a full-screen immersive stream — no chrome; its X exits.
-  if (pathname === "/tour") return null;
+  // Tours (site-wide and per-place) are full-screen immersive streams — no
+  // chrome; their exit button returns.
+  if (pathname === "/tour" || pathname.endsWith("/tour")) return null;
 
   return (
     <nav
@@ -35,8 +36,8 @@ export function BottomNav() {
       <ul
         className={`mx-auto flex max-w-md items-stretch gap-1 rounded-[1.75rem] border p-1.5 shadow-lg ${
           onStory
-            ? "border-surface/15 bg-basalt/85"
-            : "border-basalt/10 bg-surface/95"
+            ? "border-paper/15 bg-basalt/85"
+            : "border-ink/10 bg-surface/95"
         }`}
       >
         {ITEMS.map(({ href, key, Icon }) => {
@@ -50,10 +51,10 @@ export function BottomNav() {
                 className={`press flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-3xl px-1 py-1.5 text-sm transition-colors duration-150 ${
                   onStory
                     ? active
-                      ? "bg-surface/15 font-semibold text-surface"
-                      : "text-surface/70"
+                      ? "bg-paper/15 font-semibold text-paper"
+                      : "text-paper/70"
                     : active
-                      ? "bg-primary/10 font-semibold text-primary"
+                      ? "bg-primary/10 font-semibold text-brand"
                       : "text-muted"
                 }`}
               >

@@ -4,7 +4,7 @@
    express "only these three widths exist". */
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CATEGORY_META, type PlaceCategory } from "@/lib/maps";
 import { IMAGE_VARIANT_WIDTHS, variantUrl } from "@/lib/media-spec";
 import type { MediaRow } from "@/lib/queries";
@@ -35,6 +35,7 @@ export function PlaceImage({
   className,
   priority = false,
   capMobile = false,
+  onLoaded,
 }: {
   media: Pick<MediaRow, "url" | "width" | "height"> & { singleVariant?: boolean };
   alt: string;
@@ -42,9 +43,18 @@ export function PlaceImage({
   className?: string;
   priority?: boolean;
   capMobile?: boolean;
+  /** Fires once the bytes are on screen (or failed) — the tour gates its clock on it. */
+  onLoaded?: () => void;
 }) {
   const [loaded, setLoaded] = useState(priority);
-  const markLoaded = () => setLoaded(true);
+  // The ref callback re-runs every render; fire the callback exactly once.
+  const firedRef = useRef(false);
+  const markLoaded = () => {
+    if (firedRef.current) return;
+    firedRef.current = true;
+    setLoaded(true);
+    onLoaded?.();
+  };
 
   const img = (
     <img
@@ -66,7 +76,7 @@ export function PlaceImage({
       onLoad={markLoaded}
       onError={markLoaded}
       ref={(el) => {
-        if (el?.complete) setLoaded(true);
+        if (el?.complete && el.naturalWidth > 0) markLoaded();
       }}
       className={`${className ?? ""} transition-opacity duration-500 ease-out ${
         loaded ? "opacity-100" : "opacity-0"
@@ -125,7 +135,7 @@ export function PlaceholderImage({
       </svg>
       <CategoryIcon
         category={category}
-        className={`relative ${iconClassName} text-surface/45`}
+        className={`relative ${iconClassName} text-paper/45`}
       />
     </div>
   );

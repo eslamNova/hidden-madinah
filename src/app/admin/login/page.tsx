@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
             dir="ltr"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="min-h-[52px] w-full rounded-2xl border-[1.5px] border-basalt/30 bg-surface px-4 text-lg"
+            className="min-h-[52px] w-full rounded-2xl border-[1.5px] border-ink/30 bg-surface px-4 text-lg"
           />
         </div>
         <div>
@@ -60,18 +60,18 @@ export default function AdminLoginPage() {
             dir="ltr"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="min-h-[52px] w-full rounded-2xl border-[1.5px] border-basalt/30 bg-surface px-4 text-lg"
+            className="min-h-[52px] w-full rounded-2xl border-[1.5px] border-ink/30 bg-surface px-4 text-lg"
           />
         </div>
         {error && (
-          <p role="alert" className="rounded-xl bg-basalt px-4 py-3 text-surface">
+          <p role="alert" className="rounded-xl bg-basalt px-4 py-3 text-paper">
             {t("signInError")}
           </p>
         )}
         <button
           type="submit"
           disabled={busy}
-          className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-primary px-6 text-lg font-semibold text-surface disabled:opacity-60"
+          className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-primary px-6 text-lg font-semibold text-paper disabled:opacity-60"
         >
           {busy ? t("signingIn") : t("signIn")}
         </button>

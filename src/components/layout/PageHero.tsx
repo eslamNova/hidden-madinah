@@ -54,10 +54,10 @@ export async function PageHero({
       <div className="relative flex min-h-[30dvh] flex-col justify-end px-4 pb-14 pt-20 md:min-h-[34dvh]">
         <div className={`mx-auto w-full space-y-2 ${innerClassName}`}>
           <p className="font-wordmark text-lg text-accent">{t("siteName")}</p>
-          <h1 className="text-4xl leading-tight text-surface">{title}</h1>
+          <h1 className="text-4xl leading-tight text-paper">{title}</h1>
           <span aria-hidden="true" className="gold-rule block h-px w-20" />
           {subtitle && (
-            <p className="max-w-2xl text-lg leading-relaxed text-surface/85">{subtitle}</p>
+            <p className="max-w-2xl text-lg leading-relaxed text-paper/85">{subtitle}</p>
           )}
           {children}
         </div>

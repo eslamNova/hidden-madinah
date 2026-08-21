@@ -12,8 +12,8 @@ function InfoRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex gap-3 border-b border-basalt/10 py-4 last:border-b-0">
-      <span aria-hidden="true" className="mt-1 shrink-0 text-primary">
+    <div className="flex gap-3 border-b border-ink/10 py-4 last:border-b-0">
+      <span aria-hidden="true" className="mt-1 shrink-0 text-brand">
         {icon}
       </span>
       <div className="min-w-0 flex-1">
@@ -82,14 +82,14 @@ export function VisitInfoCard({ place }: { place: PublicPlaceView }) {
                       // Only the numeric range sits in the LTR isolate —
                       // wrapping the whole phrase dragged "ريال" to the
                       // reading-start side of the numbers.
-                      <span className="font-semibold text-primary">
+                      <span className="font-semibold text-brand">
                         <span className="ltr-nums">
                           {option.min_sar}–{option.max_sar}
                         </span>{" "}
                         {tCommon("sarUnit")}
                       </span>
                     ) : (
-                      <span className="font-semibold text-primary">{t("free")}</span>
+                      <span className="font-semibold text-brand">{t("free")}</span>
                     ))}
                   {option.note_ar && (
                     <span className="w-full text-base text-muted">{option.note_ar}</span>

@@ -64,7 +64,7 @@ export default async function RouteDetailPage({
         title={route.title_ar}
         subtitle={description}
       >
-        <p className="font-medium text-surface/90">
+        <p className="font-medium text-paper/90">
           {t("stopsCount", { count: route.stops.length })}
           {mapStops.length >= 2 && (
             <>
@@ -83,7 +83,7 @@ export default async function RouteDetailPage({
             <div className="mb-2 flex items-center gap-3">
               <span
                 aria-hidden="true"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-lg font-bold text-surface"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-lg font-bold text-paper"
               >
                 {i + 1}
               </span>

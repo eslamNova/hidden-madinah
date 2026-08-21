@@ -10,7 +10,8 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useTranslations } from "next-intl";
 import { MADINAH_BOUNDS } from "@/lib/geo";
-import { MAP_STYLE_URL } from "@/lib/maps";
+import { mapStyleUrl } from "@/lib/maps";
+import { useTheme } from "@/lib/use-theme";
 import {
   applyArabicLabels,
   createNumberedPinElement,
@@ -28,7 +29,9 @@ export type RouteMapStop = {
 export function RouteMap({ stops }: { stops: RouteMapStop[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations("map");
+  const [theme] = useTheme();
 
+  // Re-created on theme change so the tile style follows light/dark.
   useEffect(() => {
     const container = containerRef.current;
     if (!container || stops.length === 0) return;
@@ -39,7 +42,7 @@ export function RouteMap({ stops }: { stops: RouteMapStop[] }) {
 
     const map = new MaplibreMap({
       container,
-      style: MAP_STYLE_URL,
+      style: mapStyleUrl(theme),
       bounds,
       fitBoundsOptions: { padding: 60, maxZoom: 15 },
       minZoom: 10,
@@ -67,7 +70,7 @@ export function RouteMap({ stops }: { stops: RouteMapStop[] }) {
         type: "line",
         source: "route",
         paint: {
-          "line-color": "#1F5C3D",
+          "line-color": theme === "dark" ? "#7FCFA2" : "#1F5C3D",
           "line-width": 3,
           "line-dasharray": [2, 1.5],
           "line-opacity": 0.85,
@@ -85,14 +88,14 @@ export function RouteMap({ stops }: { stops: RouteMapStop[] }) {
       markers.forEach((m) => m.remove());
       map.remove();
     };
-  }, [stops]);
+  }, [stops, theme]);
 
   if (stops.length === 0) return null;
 
   return (
     <div
       ref={containerRef}
-      className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-basalt/10"
+      className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-ink/10"
       role="application"
       aria-label={t("title")}
     />

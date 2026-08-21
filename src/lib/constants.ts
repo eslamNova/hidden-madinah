@@ -6,6 +6,10 @@ export const SITE_DESCRIPTION =
 export const FONT_STEPS = [18, 20, 23] as const;
 export const FONT_STEP_STORAGE_KEY = "hm-font-step";
 
+/** Theme applied on <html> via data-theme ("light" | "dark"), persisted. */
+export const THEME_STORAGE_KEY = "hm-theme";
+export type Theme = "light" | "dark";
+
 /** Time-based ISR safety net; admin edits revalidate on demand. */
 export const REVALIDATE_SECONDS = 86400;
 

@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 import { FloatingTextSize } from "@/components/layout/FloatingTextSize";
+import { ImmersiveBody } from "@/components/layout/ImmersiveBody";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { OfflineBanner } from "@/components/layout/OfflineBanner";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/constants";
@@ -31,26 +32,50 @@ const amiri = Amiri({
   preload: false,
 });
 
+// Share previews (WhatsApp, iMessage, X, Facebook) read these. Child pages
+// that only set `title` inherit the image; place pages supply their own.
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
   description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   openGraph: {
     siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
     locale: "ar_SA",
     type: "website",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: SITE_NAME,
+        type: "image/jpeg",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: ["/og-image.jpg"],
   },
 };
 
 // Zoom must never be disabled (elderly-first): no maximumScale / userScalable.
+// viewport-fit=cover lets full-bleed screens (landing, tours) extend under the
+// iPhone notch and home bar instead of Safari painting those bands sand.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: "#1f5c3d",
 };
 
-// Applies the persisted font step before first paint (no FOUC).
-const fontStepScript = `try{var s=localStorage.getItem("hm-font-step");if(s==="1"||s==="2"){document.documentElement.dataset.fontStep=s}}catch(e){}`;
+// Applies the persisted font step and theme before first paint (no FOUC).
+// Theme: stored choice wins; otherwise follow the OS preference.
+const fontStepScript = `try{var d=document.documentElement,s=localStorage.getItem("hm-font-step");if(s==="1"||s==="2"){d.dataset.fontStep=s}var t=localStorage.getItem("hm-theme");if(t!=="dark"&&t!=="light"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}d.dataset.theme=t}catch(e){}`;
 
 export default async function RootLayout({
   children,
@@ -67,19 +92,22 @@ export default async function RootLayout({
     <html
       lang="ar"
       dir="rtl"
+      // data-font-step / data-theme are set pre-paint by the inline script.
+      suppressHydrationWarning
       className={`${cairo.variable} ${plexArabic.variable} ${amiri.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: fontStepScript }} />
       </head>
-      <body className="min-h-dvh bg-sand text-basalt antialiased">
+      <body className="min-h-dvh bg-sand text-ink antialiased">
         <NextIntlClientProvider messages={publicMessages}>
           <a
             href="#main"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-50 focus:rounded-xl focus:bg-primary focus:px-4 focus:py-3 focus:text-surface"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-50 focus:rounded-xl focus:bg-primary focus:px-4 focus:py-3 focus:text-paper"
           >
             {t("skipToContent")}
           </a>
+          <ImmersiveBody />
           <OfflineBanner />
           <FloatingTextSize />
           <main id="main" className="pb-28">

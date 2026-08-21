@@ -64,9 +64,9 @@ export default async function RoutesPage() {
                     <RouteIcon aria-hidden="true" className="h-4 w-4" />
                     {t("stopsCount", { count: r.stops.length })}
                   </span>
-                  <h2 className="text-2xl text-surface">{r.title_ar}</h2>
+                  <h2 className="text-2xl text-paper">{r.title_ar}</h2>
                   {description && (
-                    <p className="line-clamp-2 text-base leading-relaxed text-surface/80">
+                    <p className="line-clamp-2 text-base leading-relaxed text-paper/80">
                       {description}
                     </p>
                   )}
