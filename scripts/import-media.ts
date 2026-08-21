@@ -1,5 +1,5 @@
 /**
- * import-media — bulk photo importer for دليل المدينة الخفية.
+ * import-media — bulk photo & video importer for دليل المدينة الخفية.
  *
  * Usage (run from the repo root):
  *   npx tsx scripts/import-media.ts --dir "<folder>" --slug <place-slug> [--dry-run]
@@ -15,9 +15,19 @@
  *   5. suggests/sets the place map pin from the median photo GPS,
  *   6. asks the dev server to revalidate the affected pages.
  *
+ * For each .mp4 it additionally (requires ffmpeg + ffprobe on PATH):
+ *   - probes capture date / GPS / dimensions,
+ *   - re-encodes to 720p H.264 (crf 23, faststart, metadata stripped) so the
+ *     result fits the bucket's 50 MB / video-mp4-only limits,
+ *   - extracts a poster frame (≤800px JPEG) used as thumb_url,
+ *   - upserts a type='video' media row (idempotent — keyed on the mp4 URL).
+ *   Storage paths match the admin uploader: places/{id}/{base}.mp4 + {base}-poster-800.jpg.
+ *
  * Re-running on the same folder produces 0 new rows and simply refreshes files.
  */
-import { readdir, readFile, stat } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import os from "node:os";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import dotenv from "dotenv";
@@ -33,6 +43,8 @@ import {
   JPEG_QUALITY,
   MEDIA_BUCKET,
   mediaObjectPath,
+  videoObjectPath,
+  videoPosterPath,
 } from "../src/lib/media-spec";
 import { PROPHETS_MOSQUE, distanceFromHaramKm, haversineKm } from "../src/lib/geo";
 
@@ -128,6 +140,12 @@ function requireEnv(): { url: string; serviceKey: string } {
 // ---------------------------------------------------------------------------
 
 const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+const VIDEO_EXTENSIONS = new Set([".mp4"]);
+/** storage.buckets file_size_limit for the media bucket (003_storage.sql). */
+const BUCKET_FILE_SIZE_LIMIT = 52_428_800;
+/** Videos are re-encoded so their SHORTER side is at most this. */
+const VIDEO_TARGET_SHORT_SIDE = 720;
+const VIDEO_POSTER_WIDTH = 800;
 
 type ExifInfo = {
   lat: number | null;
@@ -141,18 +159,50 @@ type Variant = {
   buffer: Buffer;
 };
 
+type VideoData = {
+  /** Re-encoded 720p H.264 mp4, metadata stripped. */
+  buffer: Buffer;
+  durationSeconds: number;
+  poster: { buffer: Buffer; width: number; height: number } | null;
+};
+
 type FileRecord = {
   file: string;
+  kind: "photo" | "video";
   base: string; // sha1(original).slice(0, 10)
   exif: ExifInfo;
   variants: Variant[];
-  /** Actual pixel size of the largest (1600) WebP output. */
+  video?: VideoData;
+  /** Photos: pixel size of the largest (1600) WebP. Videos: poster size. */
   outWidth: number;
   outHeight: number;
   sortOrder: number;
   status: "pending" | "inserted" | "updated" | "dry-run" | "failed";
   error?: string;
 };
+
+/**
+ * Storage uploads intermittently die with "fetch failed" (Node 20 fetch +
+ * larger bodies over flaky links). Retry with backoff before giving up —
+ * the outer run is idempotent, but healing here saves whole re-runs.
+ */
+async function uploadWithRetry(
+  doUpload: () => Promise<{ error: { message: string } | null }>,
+  label: string
+): Promise<void> {
+  const delaysMs = [0, 2000, 6000];
+  let lastMessage = "";
+  for (const delay of delaysMs) {
+    if (delay > 0) {
+      console.warn(`إعادة المحاولة بعد ${delay / 1000} ث / retrying in ${delay / 1000}s: ${label}`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+    const { error } = await doUpload();
+    if (!error) return;
+    lastMessage = error.message;
+  }
+  throw new Error(`upload ${label}: ${lastMessage}`);
+}
 
 function median(values: number[]): number {
   const sorted = [...values].sort((a, b) => a - b);
@@ -215,6 +265,133 @@ async function buildVariants(buffer: Buffer): Promise<{ variants: Variant[]; out
 }
 
 // ---------------------------------------------------------------------------
+// Video helpers (ffmpeg / ffprobe)
+// ---------------------------------------------------------------------------
+
+function ffAvailable(): boolean {
+  for (const cmd of ["ffmpeg", "ffprobe"]) {
+    const res = spawnSync(cmd, ["-version"], { stdio: "ignore" });
+    if (res.error || res.status !== 0) return false;
+  }
+  return true;
+}
+
+type VideoProbe = {
+  width: number;
+  height: number;
+  durationSeconds: number;
+  takenAt: Date | null;
+  lat: number | null;
+  lng: number | null;
+};
+
+/** Parse an ISO 6709 location tag ("+24.4357+039.6155/") into lat/lng. */
+function parseIso6709(loc: string | undefined): { lat: number; lng: number } | null {
+  if (typeof loc !== "string") return null;
+  const m = /^([+-]\d+(?:\.\d+)?)([+-]\d+(?:\.\d+)?)/.exec(loc.trim());
+  if (!m) return null;
+  const lat = Number(m[1]);
+  const lng = Number(m[2]);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+}
+
+function probeVideo(fullPath: string): VideoProbe {
+  const res = spawnSync(
+    "ffprobe",
+    ["-v", "error", "-print_format", "json", "-show_format", "-show_streams", fullPath],
+    { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }
+  );
+  if (res.error || res.status !== 0) {
+    throw new Error(`ffprobe failed: ${res.error?.message ?? res.stderr?.slice(0, 200)}`);
+  }
+  const parsed = JSON.parse(res.stdout) as {
+    streams?: Array<{ codec_type?: string; width?: number; height?: number }>;
+    format?: { duration?: string; tags?: Record<string, string> };
+  };
+  const stream = parsed.streams?.find((s) => s.codec_type === "video");
+  if (!stream || typeof stream.width !== "number" || typeof stream.height !== "number") {
+    throw new Error("ffprobe: no video stream found");
+  }
+  const durationSeconds = Number(parsed.format?.duration);
+  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+    throw new Error("ffprobe: could not read duration");
+  }
+  const tags = parsed.format?.tags ?? {};
+  const creation = tags.creation_time ? new Date(tags.creation_time) : null;
+  const gps =
+    parseIso6709(tags.location) ??
+    parseIso6709(tags["com.apple.quicktime.location.ISO6709"]);
+  return {
+    width: stream.width,
+    height: stream.height,
+    durationSeconds,
+    takenAt: creation && !Number.isNaN(creation.getTime()) ? creation : null,
+    lat: gps?.lat ?? null,
+    lng: gps?.lng ?? null,
+  };
+}
+
+/**
+ * Re-encode to H.264/AAC mp4 (≤720p short side, crf 23, faststart) and strip
+ * all container metadata — the published file must carry no GPS, matching the
+ * photo pipeline. Also extracts a ≤800px JPEG poster frame.
+ */
+async function processVideo(fullPath: string, probe: VideoProbe, workDir: string): Promise<VideoData> {
+  const outPath = path.join(workDir, `${createHash("sha1").update(fullPath).digest("hex").slice(0, 8)}.mp4`);
+
+  const args = ["-y", "-v", "error", "-i", fullPath];
+  // Cap the SHORTER side at 720, never enlarging. Expressed as a filter
+  // expression (not from probe dimensions) because ffmpeg applies the
+  // rotation flag before filtering — probe width/height are pre-rotation.
+  const t = VIDEO_TARGET_SHORT_SIDE;
+  args.push(
+    "-vf",
+    `scale=w='if(gte(iw,ih),-2,min(${t},iw))':h='if(gte(iw,ih),min(${t},ih),-2)'`
+  );
+  args.push(
+    "-map_metadata", "-1",
+    "-c:v", "libx264",
+    "-crf", "23",
+    "-preset", "medium",
+    "-pix_fmt", "yuv420p",
+    "-movflags", "+faststart",
+    "-c:a", "aac",
+    "-b:a", "128k",
+    outPath
+  );
+  const enc = spawnSync("ffmpeg", args, { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+  if (enc.error || enc.status !== 0) {
+    throw new Error(`ffmpeg encode failed: ${enc.error?.message ?? enc.stderr?.slice(0, 300)}`);
+  }
+  const buffer = await readFile(outPath);
+  if (buffer.length > BUCKET_FILE_SIZE_LIMIT) {
+    throw new Error(
+      `compressed video is ${(buffer.length / 1024 / 1024).toFixed(1)} MB — over the 50 MB bucket limit; trim the clip and retry`
+    );
+  }
+
+  // Poster frame from the re-encoded file, same timestamp rule as the admin
+  // uploader: min(0.5s, duration/2).
+  let poster: VideoData["poster"] = null;
+  const posterSrc = path.join(workDir, "poster-frame.jpg");
+  const seek = Math.min(0.5, probe.durationSeconds / 2).toFixed(3);
+  const grab = spawnSync(
+    "ffmpeg",
+    ["-y", "-v", "error", "-ss", seek, "-i", outPath, "-frames:v", "1", posterSrc],
+    { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }
+  );
+  if (!grab.error && grab.status === 0) {
+    const { data, info } = await sharp(await readFile(posterSrc))
+      .resize({ width: VIDEO_POSTER_WIDTH, withoutEnlargement: true })
+      .jpeg({ quality: JPEG_QUALITY })
+      .toBuffer({ resolveWithObject: true });
+    poster = { buffer: data, width: info.width, height: info.height };
+  }
+
+  return { buffer, durationSeconds: probe.durationSeconds, poster };
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
@@ -266,40 +443,79 @@ async function main(): Promise<void> {
 
   const entries = await readdir(dir);
   const files = entries
-    .filter((name) => IMAGE_EXTENSIONS.has(path.extname(name).toLowerCase()))
+    .filter((name) => {
+      const ext = path.extname(name).toLowerCase();
+      return IMAGE_EXTENSIONS.has(ext) || VIDEO_EXTENSIONS.has(ext);
+    })
     .sort((a, b) => a.localeCompare(b));
 
   if (files.length === 0) {
     console.error(
-      `خطأ: لا توجد صور (.jpg / .jpeg / .png / .webp) في المجلد. / Error: no images found in: ${dir}`
+      `خطأ: لا توجد صور (.jpg / .jpeg / .png / .webp) أو فيديوهات (.mp4) في المجلد. / Error: no photos or videos found in: ${dir}`
     );
     process.exit(1);
   }
-  console.log(`عدد الصور / Images found: ${files.length}\n`);
+  const videoCount = files.filter((f) => VIDEO_EXTENSIONS.has(path.extname(f).toLowerCase())).length;
+  console.log(`الملفات / Files found: ${files.length} (${files.length - videoCount} صورة / photo(s), ${videoCount} فيديو / video(s))\n`);
+
+  if (videoCount > 0 && !ffAvailable()) {
+    console.error(
+      [
+        "خطأ: يوجد فيديوهات في المجلد لكن ffmpeg/ffprobe غير مثبتين أو غير موجودين في PATH.",
+        "Error: the folder contains videos but ffmpeg/ffprobe are not installed or not on PATH.",
+      ].join("\n")
+    );
+    process.exit(1);
+  }
+  const workDir = videoCount > 0 ? await mkdtemp(path.join(os.tmpdir(), "import-media-")) : null;
 
   // 3+4. EXIF + variants per file -------------------------------------------
   const records: FileRecord[] = [];
   for (const file of files) {
     const fullPath = path.join(dir, file);
+    const isVideo = VIDEO_EXTENSIONS.has(path.extname(file).toLowerCase());
     try {
-      const buffer = await readFile(fullPath);
-      const exif = await readExif(buffer); // BEFORE processing — sharp output has no EXIF
-      const { variants, outWidth, outHeight } = await buildVariants(buffer);
-      const base = createHash("sha1").update(buffer).digest("hex").slice(0, 10);
-      records.push({
-        file,
-        base,
-        exif,
-        variants,
-        outWidth,
-        outHeight,
-        sortOrder: 0,
-        status: "pending",
-      });
-      console.log(`تمت المعالجة / Processed: ${file} (${outWidth}x${outHeight})`);
+      if (isVideo) {
+        const probe = probeVideo(fullPath);
+        const video = await processVideo(fullPath, probe, workDir!);
+        const base = createHash("sha1").update(await readFile(fullPath)).digest("hex").slice(0, 10);
+        records.push({
+          file,
+          kind: "video",
+          base,
+          exif: { lat: probe.lat, lng: probe.lng, takenAt: probe.takenAt },
+          variants: [],
+          video,
+          outWidth: video.poster?.width ?? 0,
+          outHeight: video.poster?.height ?? 0,
+          sortOrder: 0,
+          status: "pending",
+        });
+        console.log(
+          `تمت المعالجة / Processed: ${file} (فيديو ${Math.round(video.durationSeconds)}ث → ${(video.buffer.length / 1024 / 1024).toFixed(1)} MB / video)`
+        );
+      } else {
+        const buffer = await readFile(fullPath);
+        const exif = await readExif(buffer); // BEFORE processing — sharp output has no EXIF
+        const { variants, outWidth, outHeight } = await buildVariants(buffer);
+        const base = createHash("sha1").update(buffer).digest("hex").slice(0, 10);
+        records.push({
+          file,
+          kind: "photo",
+          base,
+          exif,
+          variants,
+          outWidth,
+          outHeight,
+          sortOrder: 0,
+          status: "pending",
+        });
+        console.log(`تمت المعالجة / Processed: ${file} (${outWidth}x${outHeight})`);
+      }
     } catch (err) {
       records.push({
         file,
+        kind: isVideo ? "video" : "photo",
         base: "",
         exif: { lat: null, lng: null, takenAt: null },
         variants: [],
@@ -311,6 +527,9 @@ async function main(): Promise<void> {
       });
       console.error(`فشلت المعالجة / Failed to process: ${file} — ${err instanceof Error ? err.message : err}`);
     }
+  }
+  if (workDir) {
+    await rm(workDir, { recursive: true, force: true });
   }
 
   // Sort order: DateTimeOriginal ascending; files without a date go last,
@@ -355,43 +574,73 @@ async function main(): Promise<void> {
   // 5+6. Upload variants + upsert media rows --------------------------------
   for (const record of ok) {
     try {
-      let publicUrl1600 = "";
-      let thumbUrl400 = "";
+      let mainUrl = "";
+      let thumbUrl: string | null = null;
+      let durationSeconds: number | null = null;
 
-      for (const variant of record.variants) {
-        const objectPath = mediaObjectPath(place.id, record.base, variant.width, variant.ext);
-        const contentType = variant.ext === "webp" ? "image/webp" : "image/jpeg";
-        const { error: uploadError } = await supabase.storage
-          .from(MEDIA_BUCKET)
-          .upload(objectPath, variant.buffer, {
-            contentType,
-            upsert: true,
-            cacheControl: "31536000",
-          });
-        if (uploadError) {
-          throw new Error(`upload ${objectPath}: ${uploadError.message}`);
+      if (record.kind === "video" && record.video) {
+        const objectPath = videoObjectPath(place.id, record.base);
+        await uploadWithRetry(
+          () =>
+            supabase.storage.from(MEDIA_BUCKET).upload(objectPath, record.video!.buffer, {
+              contentType: "video/mp4",
+              upsert: true,
+              cacheControl: "31536000",
+            }),
+          objectPath
+        );
+        mainUrl = supabase.storage.from(MEDIA_BUCKET).getPublicUrl(objectPath).data.publicUrl;
+        durationSeconds = Math.round(record.video.durationSeconds);
+
+        if (record.video.poster) {
+          const posterPath = videoPosterPath(place.id, record.base);
+          await uploadWithRetry(
+            () =>
+              supabase.storage.from(MEDIA_BUCKET).upload(posterPath, record.video!.poster!.buffer, {
+                contentType: "image/jpeg",
+                upsert: true,
+                cacheControl: "31536000",
+              }),
+            posterPath
+          );
+          thumbUrl = supabase.storage.from(MEDIA_BUCKET).getPublicUrl(posterPath).data.publicUrl;
         }
-        const { data: pub } = supabase.storage.from(MEDIA_BUCKET).getPublicUrl(objectPath);
-        if (variant.ext === "webp" && variant.width === LARGEST_VARIANT_WIDTH) {
-          publicUrl1600 = pub.publicUrl;
-        }
-        if (variant.ext === "webp" && variant.width === THUMB_VARIANT_WIDTH) {
-          thumbUrl400 = pub.publicUrl;
+      } else {
+        for (const variant of record.variants) {
+          const objectPath = mediaObjectPath(place.id, record.base, variant.width, variant.ext);
+          const contentType = variant.ext === "webp" ? "image/webp" : "image/jpeg";
+          await uploadWithRetry(
+            () =>
+              supabase.storage.from(MEDIA_BUCKET).upload(objectPath, variant.buffer, {
+                contentType,
+                upsert: true,
+                cacheControl: "31536000",
+              }),
+            objectPath
+          );
+          const { data: pub } = supabase.storage.from(MEDIA_BUCKET).getPublicUrl(objectPath);
+          if (variant.ext === "webp" && variant.width === LARGEST_VARIANT_WIDTH) {
+            mainUrl = pub.publicUrl;
+          }
+          if (variant.ext === "webp" && variant.width === THUMB_VARIANT_WIDTH) {
+            thumbUrl = pub.publicUrl;
+          }
         }
       }
 
-      const isNew = !existingUrls.has(publicUrl1600);
+      const isNew = !existingUrls.has(mainUrl);
       const { error: upsertError } = await supabase
         .from("media")
         .upsert(
           {
             place_id: place.id,
-            type: "photo",
+            type: record.kind,
             provider: "storage",
-            url: publicUrl1600,
-            thumb_url: thumbUrl400,
+            url: mainUrl,
+            thumb_url: thumbUrl,
             width: record.outWidth,
             height: record.outHeight,
+            duration_seconds: durationSeconds,
             sort_order: record.sortOrder,
           },
           { onConflict: "url" }
@@ -516,13 +765,18 @@ function printSummary(records: FileRecord[]): void {
   console.table(
     records.map((r) => ({
       file: r.file,
+      kind: r.kind,
       size: r.outWidth > 0 ? `${r.outWidth}x${r.outHeight}` : "-",
       gps: r.exif.lat !== null && r.exif.lng !== null ? "yes" : "no",
       taken: r.exif.takenAt ? r.exif.takenAt.toISOString().slice(0, 10) : "-",
       variants:
-        r.variants.length > 0
-          ? r.variants.map((v) => `${v.width}.${v.ext}`).join(" ")
-          : "-",
+        r.kind === "video"
+          ? r.video
+            ? `mp4 ${(r.video.buffer.length / 1024 / 1024).toFixed(1)}MB${r.video.poster ? " + poster" : ""}`
+            : "-"
+          : r.variants.length > 0
+            ? r.variants.map((v) => `${v.width}.${v.ext}`).join(" ")
+            : "-",
       row: r.status + (r.error ? ` (${r.error})` : ""),
     }))
   );

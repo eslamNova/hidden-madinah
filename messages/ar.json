@@ -4,9 +4,12 @@
     "tagline": "أماكن أقل شهرة في المدينة المنورة، بمعلومات زيارة عملية",
     "openInMaps": "افتح في الخرائط",
     "distanceKm": "{km} كم من المسجد النبوي",
+    "kmCompact": "{km} كم",
+    "minCompact": "≈ {min} دقيقة",
     "driveTime": "≈ {min} دقيقة بالسيارة",
     "sar": "ريال",
     "sarRange": "{min}–{max} ريال",
+    "sarUnit": "ريال",
     "lastUpdated": "آخر تحديث: {date}",
     "featured": "مميّز",
     "viewAll": "عرض الكل",
@@ -29,11 +32,10 @@
   },
   "home": {
     "heroTitle": "اكتشف المدينة التي لا يراها الزوّار",
-    "heroSubtitle": "مساجد أثرية وآبار وبساتين ومواقع تاريخية قريبة من المسجد النبوي — مع كيفية الوصول والتكلفة وأفضل وقت للزيارة.",
     "heroCta": "تصفّح الأماكن",
     "heroMapCta": "افتح الخريطة",
     "heroCredit": "الصورة: {name}",
-    "featuredTitle": "أماكن مختارة",
+    "tourCta": "جولة مصوّرة",
     "categoriesTitle": "استكشف حسب النوع",
     "nearestTitle": "أقرب الأماكن إليك",
     "nearestPrompt": "اسمح بالوصول إلى موقعك لنعرض لك الأماكن الأقرب إليك.",
@@ -41,7 +43,15 @@
     "nearestLoading": "جارٍ تحديد موقعك…",
     "nearestDenied": "تعذّر الوصول إلى موقعك. يمكنك تصفّح كل الأماكن من صفحة الأماكن.",
     "nearestKm": "يبعد عنك {km} كم",
-    "routesTitle": "جولات منسّقة"
+    "routesTitle": "جولات منسّقة",
+    "story": {
+      "regionLabel": "جولة مصوّرة في المدينة الخفية",
+      "scrollHint": "مرّر للاستكشاف",
+      "next": "اللوحة التالية",
+      "panelOf": "لوحة {current} من {total}",
+      "openPlace": "اكتشف المكان",
+      "closingTitle": "ابدأ رحلتك في المدينة الخفية"
+    }
   },
   "places": {
     "title": "الأماكن",
@@ -79,6 +89,8 @@
     "openInMaps": "افتح في الخرائط",
     "gallery": "معرض الصور",
     "galleryImageOf": "صورة {current} من {total}",
+    "galleryNext": "الصورة التالية",
+    "galleryPrev": "الصورة السابقة",
     "videoPlay": "تشغيل الفيديو",
     "kmUnit": "كم",
     "free": "مجانًا",
@@ -102,6 +114,22 @@
     "empty": "لا توجد جولات منشورة بعد.",
     "notFoundTitle": "الجولة غير موجودة",
     "backToRoutes": "العودة إلى الجولات"
+  },
+  "seerah": {
+    "title": "أكمل رحلتك مع السيرة النبوية",
+    "description": "أنت الآن في مواضع السيرة — تطبيق «سيرة» رحلة صوتية تفاعلية مجانية في سيرة النبي ﷺ، تكمل ما رأيته هنا.",
+    "appStore": "App Store",
+    "googlePlay": "Google Play"
+  },
+  "tour": {
+    "title": "جولة مصوّرة في المدينة الخفية",
+    "regionLabel": "شرائح الجولة المصوّرة",
+    "exit": "إنهاء الجولة",
+    "openPlace": "افتح المكان",
+    "slideOf": "مشهد {current} من {total}",
+    "pauseTour": "إيقاف الجولة مؤقتاً",
+    "playTour": "متابعة الجولة",
+    "empty": "لا توجد وسائط بعد — عُد قريباً."
   },
   "offline": {
     "title": "أنت غير متصل بالإنترنت",

@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Route as RouteIcon } from "lucide-react";
+import { coverImage, stripVerify } from "@/lib/content";
+import { HERO_IMAGES } from "@/lib/hero-images";
 import { getRoutesWithStops } from "@/lib/queries";
+import { PageHero } from "@/components/layout/PageHero";
 import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
 
 export const revalidate = 86400;
@@ -16,24 +19,26 @@ export default async function RoutesPage() {
   const t = await getTranslations("routes");
   const routes = await getRoutesWithStops();
 
-  return (
-    <div className="mx-auto max-w-3xl space-y-6 px-4 py-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl">{t("title")}</h1>
-        <span aria-hidden="true" className="gold-rule block h-px w-20" />
-        <p className="text-lg text-muted">{t("subtitle")}</p>
-      </header>
+  // Header photo: the first route's cover, else the daily Nabawi frame.
+  const day = Math.floor(Date.now() / 86_400_000);
+  const heroPhoto =
+    coverImage(routes[0]?.stops.flatMap((s) => s.media) ?? []) ??
+    HERO_IMAGES[(day + 3) % HERO_IMAGES.length] ??
+    null;
 
+  return (
+    <>
+      <PageHero photo={heroPhoto} title={t("title")} subtitle={t("subtitle")} />
+      <div className="mx-auto max-w-3xl space-y-8 px-4 pb-8 pt-8">
       {routes.length === 0 ? (
-        <p className="rounded-2xl bg-surface p-8 text-center text-lg text-muted">
+        <p className="card-elevated p-8 text-center text-lg text-muted">
           {t("empty")}
         </p>
       ) : (
         <div className="space-y-5">
           {routes.map((r) => {
-            const cover = r.stops
-              .flatMap((s) => s.media.filter((m) => m.type === "photo"))
-              .find((m) => m.thumb_url && m.width && m.height);
+            const cover = coverImage(r.stops.flatMap((s) => s.media));
+            const description = stripVerify(r.description_ar);
             return (
               <Link
                 key={r.id}
@@ -42,7 +47,7 @@ export default async function RoutesPage() {
               >
                 {cover ? (
                   <PlaceImage
-                    media={{ url: cover.thumb_url!, width: cover.width, height: cover.height }}
+                    media={cover}
                     alt=""
                     sizes="(max-width: 768px) 92vw, 720px"
                     className="aspect-[16/9] w-full object-cover"
@@ -60,9 +65,9 @@ export default async function RoutesPage() {
                     {t("stopsCount", { count: r.stops.length })}
                   </span>
                   <h2 className="text-2xl text-surface">{r.title_ar}</h2>
-                  {r.description_ar && (
+                  {description && (
                     <p className="line-clamp-2 text-base leading-relaxed text-surface/80">
-                      {r.description_ar}
+                      {description}
                     </p>
                   )}
                 </div>
@@ -71,6 +76,7 @@ export default async function RoutesPage() {
           })}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

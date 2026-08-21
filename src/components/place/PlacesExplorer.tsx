@@ -52,10 +52,10 @@ function Chip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`min-h-12 rounded-full border-[1.5px] px-4 text-base font-medium ${
+      className={`press min-h-12 rounded-full border-[1.5px] px-4 text-base font-medium transition-colors duration-150 ${
         active
           ? "border-primary bg-primary text-surface"
-          : "border-basalt/30 bg-surface text-basalt"
+          : "border-basalt/15 bg-surface text-basalt shadow-sm"
       }`}
     >
       {children}
@@ -107,7 +107,7 @@ export function PlacesExplorer({ places }: { places: ExplorerPlace[] }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("searchPlaceholder")}
-            className="min-h-[52px] w-full rounded-2xl border-[1.5px] border-basalt/30 bg-surface ps-12 pe-4 text-lg"
+            className="min-h-[52px] w-full rounded-2xl border-[1.5px] border-basalt/15 bg-surface ps-12 pe-4 text-lg shadow-sm"
           />
         </div>
       </div>
@@ -166,7 +166,7 @@ export function PlacesExplorer({ places }: { places: ExplorerPlace[] }) {
         <p aria-live="polite" className="text-base text-muted">
           {t("count", { count: filtered.length })}
         </p>
-        <div className="flex overflow-hidden rounded-xl border-[1.5px] border-basalt/30">
+        <div className="flex overflow-hidden rounded-2xl border-[1.5px] border-basalt/15 shadow-sm">
           <span className="flex min-h-12 items-center gap-1.5 bg-primary px-4 font-medium text-surface">
             <List aria-hidden="true" className="h-5 w-5" />
             {t("listView")}
@@ -182,7 +182,7 @@ export function PlacesExplorer({ places }: { places: ExplorerPlace[] }) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-2xl bg-surface p-8 text-center">
+        <div className="card-elevated p-8 text-center">
           <p className="text-lg">{t("empty")}</p>
           <p className="mt-1 text-muted">{t("emptyHint")}</p>
         </div>

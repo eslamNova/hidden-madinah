@@ -13,6 +13,8 @@ import {
   MEDIA_BUCKET,
   mediaObjectPath,
   THUMB_VARIANT_WIDTH,
+  videoObjectPath,
+  videoPosterPath,
   WEBP_QUALITY,
 } from "@/lib/media-spec";
 import { saveMediaRowAction } from "@/app/admin/(protected)/actions";
@@ -160,7 +162,7 @@ export function MediaUploader({
   async function uploadVideo(file: File) {
     const supabase = createClient();
     const base = randomBase();
-    const videoPath = `places/${placeId}/${base}.mp4`;
+    const videoPath = videoObjectPath(placeId, base);
 
     const { error } = await supabase.storage
       .from(MEDIA_BUCKET)
@@ -200,7 +202,7 @@ export function MediaUploader({
 
       let posterUrl: string | null = null;
       if (poster) {
-        const posterPath = `places/${placeId}/${base}-poster-800.jpg`;
+        const posterPath = videoPosterPath(placeId, base);
         const { error: posterError } = await supabase.storage
           .from(MEDIA_BUCKET)
           .upload(posterPath, poster, {

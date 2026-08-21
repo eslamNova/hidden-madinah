@@ -3,7 +3,7 @@ import { Amiri, Cairo, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
+import { FloatingTextSize } from "@/components/layout/FloatingTextSize";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { OfflineBanner } from "@/components/layout/OfflineBanner";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/constants";
@@ -26,6 +26,9 @@ const amiri = Amiri({
   subsets: ["arabic", "latin"],
   variable: "--font-amiri",
   display: "swap",
+  // Wordmark + featured quotes only — ~248kB of woff2 that should not race
+  // the hero image on 4G. display:swap covers the late arrival.
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -78,7 +81,7 @@ export default async function RootLayout({
             {t("skipToContent")}
           </a>
           <OfflineBanner />
-          <Header />
+          <FloatingTextSize />
           <main id="main" className="pb-28">
             {children}
           </main>

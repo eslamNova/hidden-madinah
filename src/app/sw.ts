@@ -19,7 +19,11 @@ const DAY = 24 * 60 * 60;
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
-  skipWaiting: true,
+  // No skipWaiting: instant takeover let a new deploy purge the old build's
+  // precached chunks under long-open tabs, breaking the next tap with a
+  // ChunkLoadError. The new worker now activates on the next launch instead —
+  // fine for a site whose content revalidates every 24h anyway.
+  skipWaiting: false,
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: [

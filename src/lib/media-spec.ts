@@ -20,6 +20,16 @@ export function mediaObjectPath(
   return `places/${placeId}/${base}-${width}.${ext}`;
 }
 
+/** Storage object path for a video: places/{placeId}/{base}.mp4 */
+export function videoObjectPath(placeId: string, base: string): string {
+  return `places/${placeId}/${base}.mp4`;
+}
+
+/** Storage object path for a video poster frame: places/{placeId}/{base}-poster-800.jpg */
+export function videoPosterPath(placeId: string, base: string): string {
+  return `places/${placeId}/${base}-poster-800.jpg`;
+}
+
 /** Swap the width suffix on a stored variant URL (…-1600.webp → …-400.webp). */
 export function variantUrl(url: string, width: number): string {
   return url.replace(/-(400|800|1600)\.(webp|jpg)$/, `-${width}.$2`);

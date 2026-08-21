@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { coverImage, stripVerify } from "@/lib/content";
 import { haversineKm } from "@/lib/geo";
 import { getRouteIds, getRouteWithStops } from "@/lib/queries";
+import { PageHero } from "@/components/layout/PageHero";
 import { PlaceCard, toPlaceCardData } from "@/components/place/PlaceCard";
 import type { RouteMapStop } from "@/components/map/RouteMap";
 import { RouteMapLazy } from "@/components/map/LazyMaps";
@@ -21,7 +23,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const route = await getRouteWithStops(id);
-  return route ? { title: route.title_ar, description: route.description_ar ?? undefined } : {};
+  // Route descriptions are owner content — strip [VERIFY] like place fields.
+  return route
+    ? { title: route.title_ar, description: stripVerify(route.description_ar) ?? undefined }
+    : {};
 }
 
 export default async function RouteDetailPage({
@@ -34,6 +39,7 @@ export default async function RouteDetailPage({
   if (!route) notFound();
 
   const t = await getTranslations("routes");
+  const description = stripVerify(route.description_ar);
 
   const mapStops: RouteMapStop[] = route.stops
     .filter((s) => s.lat != null && s.lng != null)
@@ -51,13 +57,14 @@ export default async function RouteDetailPage({
   totalKm = Math.round(totalKm * 10) / 10;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8 px-4 py-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl">{route.title_ar}</h1>
-        {route.description_ar && (
-          <p className="text-lg leading-relaxed text-muted">{route.description_ar}</p>
-        )}
-        <p className="font-medium text-primary">
+    <>
+      <PageHero
+        photo={coverImage(route.stops.flatMap((s) => s.media))}
+        category={route.stops[0]?.category}
+        title={route.title_ar}
+        subtitle={description}
+      >
+        <p className="font-medium text-surface/90">
           {t("stopsCount", { count: route.stops.length })}
           {mapStops.length >= 2 && (
             <>
@@ -66,8 +73,8 @@ export default async function RouteDetailPage({
             </>
           )}
         </p>
-      </header>
-
+      </PageHero>
+      <div className="mx-auto max-w-3xl space-y-8 px-4 pb-8 pt-8">
       {mapStops.length >= 2 && <RouteMapLazy stops={mapStops} />}
 
       <ol className="space-y-6">
@@ -88,6 +95,7 @@ export default async function RouteDetailPage({
           </li>
         ))}
       </ol>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { MapPin, Star } from "lucide-react";
-import { stripVerify } from "@/lib/content";
-import { CATEGORY_META, type PlaceCategory } from "@/lib/maps";
+import { Clock, MapPin, Star } from "lucide-react";
+import { coverImage, stripVerify, type CoverImage } from "@/lib/content";
+import type { PlaceCategory } from "@/lib/maps";
 import type { PlaceWithMedia } from "@/lib/queries";
-import { CategoryIcon } from "@/components/CategoryIcon";
 import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
 
 /** Lean, serializable card data — safe to pass into client components. */
@@ -14,13 +13,13 @@ export type PlaceCardData = {
   category: PlaceCategory;
   summary: string | null;
   distanceKm: number | null;
-  thumb: { url: string; width: number; height: number } | null;
+  driveTimeMin: number | null;
+  thumb: CoverImage | null;
   featured: boolean;
 };
 
 /** Server-side converter: strips [VERIFY] markers and drops non-public fields. */
 export function toPlaceCardData(p: PlaceWithMedia): PlaceCardData {
-  const photo = p.media.find((m) => m.type === "photo");
   return {
     slug: p.slug,
     name_ar: p.name_ar,
@@ -30,10 +29,8 @@ export function toPlaceCardData(p: PlaceWithMedia): PlaceCardData {
       p.distance_from_prophets_mosque_km != null
         ? Number(p.distance_from_prophets_mosque_km)
         : null,
-    thumb:
-      photo?.thumb_url && photo.width && photo.height
-        ? { url: photo.thumb_url, width: photo.width, height: photo.height }
-        : null,
+    driveTimeMin: p.drive_time_from_haram_min,
+    thumb: coverImage(p.media),
     featured: p.featured,
   };
 }
@@ -52,7 +49,6 @@ export function PlaceCard({
   priority?: boolean;
 }) {
   const t = useTranslations("common");
-  const meta = CATEGORY_META[place.category];
   const aspect = compact ? "aspect-[16/10]" : "aspect-[4/5]";
 
   return (
@@ -72,35 +68,45 @@ export function PlaceCard({
         <PlaceholderImage category={place.category} className={`${aspect} w-full`} />
       )}
 
-      {/* Scrim carries the text — legible over any photograph. */}
+      {/* Soft dark veil over the whole photo + the bottom scrim: light text
+          must survive even a bright sky/sand photograph. */}
+      <div aria-hidden="true" className="absolute inset-0 bg-basalt/25" />
       <div aria-hidden="true" className="scrim absolute inset-0" />
 
+      {/* Near-opaque pill, light label: gold on 70% glass fell below AA over
+          bright photos (gold stays on the decorative star only). */}
       {place.featured && (
-        <span className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-basalt/70 px-3 py-1 text-sm font-medium text-accent backdrop-blur-sm">
-          <Star aria-hidden="true" className="h-4 w-4" fill="currentColor" />
+        <span className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-basalt/85 px-3 py-1 text-sm font-medium text-surface">
+          <Star
+            aria-hidden="true"
+            className="h-4 w-4 text-accent"
+            fill="currentColor"
+          />
           {t("featured")}
         </span>
       )}
 
-      <div className="absolute inset-x-0 bottom-0 space-y-1.5 p-4">
-        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-surface/85">
-          <CategoryIcon category={place.category} className="h-4 w-4" />
-          <span style={{ color: meta.tintOnDark }}>{meta.labelAr}</span>
-        </span>
-        <h3 className="text-2xl leading-snug text-surface drop-shadow-sm">
+      {/* Title + two info chips only — the card is a photograph, not a form.
+          line-clamp keeps the START of long names visible (they were clipping
+          from the top on narrow mobile columns). */}
+      <div className="absolute inset-x-0 bottom-0 space-y-2 p-4">
+        <h3 className="line-clamp-2 text-xl leading-snug text-surface drop-shadow-sm sm:text-2xl">
           {place.name_ar}
         </h3>
-        {!compact && place.summary && (
-          <p className="line-clamp-2 text-base leading-relaxed text-surface/80">
-            {place.summary}
-          </p>
-        )}
-        {place.distanceKm != null && (
-          <p className="flex items-center gap-1.5 pt-0.5 text-sm font-medium text-surface/90">
-            <MapPin aria-hidden="true" className="h-4 w-4" />
-            {t("distanceKm", { km: place.distanceKm })}
-          </p>
-        )}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-surface/90">
+          {place.distanceKm != null && (
+            <span className="inline-flex items-center gap-1">
+              <MapPin aria-hidden="true" className="h-4 w-4 shrink-0" />
+              {t("kmCompact", { km: place.distanceKm })}
+            </span>
+          )}
+          {place.driveTimeMin != null && (
+            <span className="inline-flex items-center gap-1">
+              <Clock aria-hidden="true" className="h-4 w-4 shrink-0" />
+              {t("minCompact", { min: place.driveTimeMin })}
+            </span>
+          )}
+        </div>
       </div>
     </Link>
   );

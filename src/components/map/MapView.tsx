@@ -9,8 +9,6 @@ import {
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useTranslations } from "next-intl";
-import { createClient } from "@/lib/supabase/client";
-import { stripVerify } from "@/lib/content";
 import { MADINAH_BOUNDS, MADINAH_CENTER } from "@/lib/geo";
 import { CATEGORY_META, CATEGORY_ORDER, MAP_STYLE_URL } from "@/lib/maps";
 import {
@@ -20,58 +18,25 @@ import {
 } from "./map-utils";
 import { MapBottomSheet, type MapPlacePreview } from "./MapBottomSheet";
 
-/** Full-screen category-pinned map of all published places. */
-export function MapView() {
+export type MapPin = {
+  place: MapPlacePreview;
+  lat: number;
+  lng: number;
+};
+
+/**
+ * Full-screen category-pinned map of all published places. Pins arrive as
+ * SSG props from the server (same 24h revalidate as every other page) — no
+ * client-side Supabase fetch, so supabase-js stays out of this bundle and
+ * pins mount together with the map instead of popping in later.
+ */
+export function MapView({ pins }: { pins: MapPin[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MaplibreMap | null>(null);
   const markersRef = useRef<Marker[]>([]);
-  const [places, setPlaces] = useState<MapPlacePreview[] | null>(null);
   const [selected, setSelected] = useState<MapPlacePreview | null>(null);
   const [loading, setLoading] = useState(true);
   const t = useTranslations("map");
-
-  // Fetch pins once (RLS: anon sees published only). Coordinates stay on a
-  // parallel list keyed by index so the preview DTO stays serializable-lean.
-  const coordsRef = useRef<Map<string, { lat: number; lng: number }>>(new Map());
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase
-      .from("places")
-      .select(
-        "slug,name_ar,category,summary_ar,lat,lng,distance_from_prophets_mosque_km,media(url,thumb_url,width,height,type,sort_order)"
-      )
-      .eq("is_published", true)
-      .not("lat", "is", null)
-      .not("lng", "is", null)
-      .then(({ data, error }) => {
-        if (error || !data) {
-          setPlaces([]);
-          return;
-        }
-        const dtos: MapPlacePreview[] = data.map((p) => {
-          coordsRef.current.set(p.slug, { lat: Number(p.lat), lng: Number(p.lng) });
-          const photo = [...(p.media ?? [])]
-            .sort((a, b) => a.sort_order - b.sort_order)
-            .find((m) => m.type === "photo");
-          return {
-            slug: p.slug,
-            name_ar: p.name_ar,
-            category: p.category,
-            summary: stripVerify(p.summary_ar),
-            distanceKm:
-              p.distance_from_prophets_mosque_km != null
-                ? Number(p.distance_from_prophets_mosque_km)
-                : null,
-            thumb:
-              photo?.thumb_url && photo.width && photo.height
-                ? { url: photo.thumb_url, width: photo.width, height: photo.height }
-                : null,
-          };
-        });
-        setPlaces(dtos);
-      });
-  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -103,41 +68,42 @@ export function MapView() {
     };
   }, []);
 
-  // Add markers once both the map and the data exist.
+  // Markers mount once — pins are static SSG data.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !places) return;
+    if (!map) return;
     markersRef.current.forEach((m) => m.remove());
-    markersRef.current = places.flatMap((p) => {
-      const coords = coordsRef.current.get(p.slug);
-      if (!coords) return [];
-      const el = createPinElement(CATEGORY_META[p.category].color, p.name_ar);
+    markersRef.current = pins.map(({ place, lat, lng }) => {
+      const el = createPinElement(CATEGORY_META[place.category].color, place.name_ar);
       el.addEventListener("click", (e) => {
         e.stopPropagation();
-        setSelected(p);
+        setSelected(place);
       });
-      return [
-        new Marker({ element: el }).setLngLat([coords.lng, coords.lat]).addTo(map),
-      ];
+      return new Marker({ element: el }).setLngLat([lng, lat]).addTo(map);
     });
-  }, [places]);
+  }, [pins]);
 
   return (
-    <div className="relative h-[calc(100dvh-8rem)] w-full">
-      {loading && (
-        <p
-          role="status"
-          className="absolute inset-0 z-10 flex items-center justify-center bg-sand text-lg text-muted"
-        >
-          {t("loading")}
-        </p>
-      )}
+    // 5.5rem = floating-dock clearance only; there is no top bar anymore.
+    <div className="relative h-[calc(100dvh-5.5rem)] w-full">
+      {/* Cross-fade the sand veil away once tiles are ready — the map warms
+          up underneath instead of popping into view. */}
+      <p
+        role="status"
+        className={`absolute inset-0 z-10 flex items-center justify-center bg-sand text-lg text-muted transition-opacity duration-500 ease-out ${
+          loading ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      >
+        {loading ? t("loading") : ""}
+      </p>
       <div ref={containerRef} className="h-full w-full" aria-label={t("title")} />
-      <details className="absolute end-2 top-2 z-10 rounded-xl border border-basalt/10 bg-surface/95 p-2 text-sm shadow-sm">
-        <summary className="flex min-h-10 cursor-pointer items-center px-1 font-semibold">
+      {/* end = physical LEFT in RTL — the same corner maplibre puts its 48px
+          zoom/geolocate stack, so inset past it. */}
+      <details className="absolute end-[4.5rem] top-2 z-10 rounded-2xl border border-basalt/10 bg-surface/95 p-2.5 shadow-lg">
+        <summary className="press flex min-h-12 cursor-pointer items-center gap-1 rounded-lg px-2 text-base font-semibold">
           {t("legend")}
         </summary>
-        <ul className="mt-1 space-y-1 px-1">
+        <ul className="mt-1 space-y-2 px-2 pb-1 text-base">
           {CATEGORY_ORDER.filter((c) => c !== "other").map((c) => (
             <li key={c} className="flex items-center gap-2">
               <span

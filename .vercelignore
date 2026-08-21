@@ -1,0 +1,6 @@
+# The Vercel CLI does NOT respect .gitignore — list heavy/secret paths here.
+# Media is served from Supabase Storage; none of it belongs in the deploy.
+my_data
+public/media
+.next
+.env*

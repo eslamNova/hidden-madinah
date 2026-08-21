@@ -9,7 +9,18 @@ import type { MediaRow } from "@/lib/queries";
  * Native video player: poster, preload="none", playsInline, oversized play
  * button, never autoplay (elderly-first media rules).
  */
-export function VideoPlayer({ media, title }: { media: MediaRow; title: string }) {
+export function VideoPlayer({
+  media,
+  title,
+  onPlay,
+  onEnded,
+}: {
+  media: Pick<MediaRow, "url" | "thumb_url">;
+  title: string;
+  /** Optional hooks for hosts that react to playback (the tour's auto-advance). */
+  onPlay?: () => void;
+  onEnded?: () => void;
+}) {
   const t = useTranslations("place");
   const videoRef = useRef<HTMLVideoElement>(null);
   const [started, setStarted] = useState(false);
@@ -23,6 +34,8 @@ export function VideoPlayer({ media, title }: { media: MediaRow; title: string }
         preload="none"
         playsInline
         controls={started}
+        onPlay={onPlay}
+        onEnded={onEnded}
         className="aspect-video w-full"
       />
       {!started && (

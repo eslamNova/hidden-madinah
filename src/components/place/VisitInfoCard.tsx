@@ -32,10 +32,22 @@ export function VisitInfoCard({ place }: { place: PublicPlaceView }) {
   const t = useTranslations("place");
   const tCommon = useTranslations("common");
 
+  // Every row guards itself; when all of them are empty, hide the whole card
+  // instead of rendering a bordered box holding nothing but its heading.
+  const hasContent =
+    place.distanceKm != null ||
+    place.driveTimeMin != null ||
+    !!place.howToGet ||
+    place.transportOptions.length > 0 ||
+    !!place.transportNote ||
+    !!place.bestTime ||
+    !!place.openStatus;
+  if (!hasContent) return null;
+
   return (
     <section
       aria-label={t("visitInfo")}
-      className="rounded-2xl border border-basalt/10 bg-surface p-5 shadow-sm"
+      className="card-elevated p-5 sm:p-6"
     >
       <h2 className="mb-2 text-2xl">{t("visitInfo")}</h2>
 
@@ -67,11 +79,14 @@ export function VisitInfoCard({ place }: { place: PublicPlaceView }) {
                   {option.min_sar != null &&
                     option.max_sar != null &&
                     (option.min_sar > 0 || option.max_sar > 0 ? (
-                      <span className="ltr-nums font-semibold text-primary">
-                        {tCommon("sarRange", {
-                          min: option.min_sar,
-                          max: option.max_sar,
-                        })}
+                      // Only the numeric range sits in the LTR isolate —
+                      // wrapping the whole phrase dragged "ريال" to the
+                      // reading-start side of the numbers.
+                      <span className="font-semibold text-primary">
+                        <span className="ltr-nums">
+                          {option.min_sar}–{option.max_sar}
+                        </span>{" "}
+                        {tCommon("sarUnit")}
                       </span>
                     ) : (
                       <span className="font-semibold text-primary">{t("free")}</span>

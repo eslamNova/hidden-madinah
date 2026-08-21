@@ -52,7 +52,7 @@ export function NearestPlaces({ places }: { places: NearestPlaceInput[] }) {
       <h2 className="text-2xl">{t("nearestTitle")}</h2>
 
       {status === "idle" && (
-        <div className="rounded-2xl border border-basalt/10 bg-surface p-5">
+        <div className="card-elevated p-5">
           <p className="mb-4 text-muted">{t("nearestPrompt")}</p>
           <button
             type="button"
@@ -66,13 +66,13 @@ export function NearestPlaces({ places }: { places: NearestPlaceInput[] }) {
       )}
 
       {status === "loading" && (
-        <p role="status" className="rounded-2xl bg-surface p-5 text-muted">
+        <p role="status" className="card-elevated p-5 text-muted">
           {t("nearestLoading")}
         </p>
       )}
 
       {status === "denied" && (
-        <p role="status" className="rounded-2xl bg-surface p-5 text-muted">
+        <p role="status" className="card-elevated p-5 text-muted">
           {t("nearestDenied")}
         </p>
       )}
@@ -83,7 +83,7 @@ export function NearestPlaces({ places }: { places: NearestPlaceInput[] }) {
             <li key={p.slug}>
               <Link
                 href={`/places/${encodeURIComponent(p.slug)}`}
-                className="flex min-h-14 items-center gap-3 rounded-2xl border border-basalt/10 bg-surface p-4 shadow-sm"
+                className="card-elevated press flex min-h-14 items-center gap-3 p-4"
               >
                 <span
                   aria-hidden="true"

@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ExternalLink, Star } from "lucide-react";
-import { stripVerify, toPublicPlaceView } from "@/lib/content";
+import { coverImage, stripVerify, toPublicPlaceView } from "@/lib/content";
 import { CATEGORY_META, googleMapsUrl } from "@/lib/maps";
+import { variantUrl } from "@/lib/media-spec";
 import { getPlaceBySlug, getPublishedSlugs } from "@/lib/queries";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { FeaturedQuote } from "@/components/place/FeaturedQuote";
 import { Gallery } from "@/components/place/Gallery";
 import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
 import { RelatedPlaces } from "@/components/place/RelatedPlaces";
+import { SeerahAppCard } from "@/components/place/SeerahAppCard";
 import { VisitInfoCard } from "@/components/place/VisitInfoCard";
 import { PlaceMapLazy } from "@/components/map/LazyMaps";
 
@@ -33,9 +35,14 @@ export async function generateMetadata({
   const place = await resolvePlace(slug);
   if (!place) return {};
   const description = stripVerify(place.summary_ar) ?? undefined;
-  const photo = place.media.find((m) => m.type === "photo");
   // Pre-generated 1600 JPEG fallback doubles as the OG image (Arabic-safe).
-  const ogImage = photo ? photo.url.replace(/-1600\.webp$/, "-1600.jpg") : "/og-fallback.jpg";
+  // A video-only place falls back to its poster frame, which exists at 800 only.
+  const cover = coverImage(place.media);
+  const ogImage = !cover
+    ? "/og-fallback.jpg"
+    : cover.singleVariant
+      ? cover.url
+      : variantUrl(cover.url, 1600).replace(/\.webp$/, ".jpg");
   return {
     title: place.name_ar,
     description,
@@ -70,19 +77,31 @@ export default async function PlacePage({
     dateStyle: "long",
   }).format(new Date(view.lastUpdated));
 
-  const heroPhoto = place.media.find((m) => m.type === "photo");
-  const galleryMedia = place.media.filter((m) => m !== heroPhoto);
+  // Hero falls back to a video poster for video-only places. heroPhoto is
+  // derived FROM the picked cover (not an independent predicate) so the
+  // gallery drops exactly the row shown above and the alt text matches it;
+  // a video whose poster is the hero stays in the gallery or it becomes
+  // unplayable.
+  const hero = coverImage(place.media);
+  const heroPhoto =
+    hero && !hero.singleVariant
+      ? place.media.find((m) => m.type === "photo" && (m.thumb_url ?? m.url) === hero.url)
+      : undefined;
+  const galleryMedia = heroPhoto
+    ? place.media.filter((m) => m !== heroPhoto)
+    : place.media;
 
   return (
     <article className="space-y-8 pb-8">
       {/* Full-bleed hero: the photograph introduces the place, title over it. */}
       <header className="relative min-h-[62dvh] overflow-hidden bg-basalt">
-        {heroPhoto ? (
+        {hero ? (
           <PlaceImage
-            media={heroPhoto}
-            alt={heroPhoto.caption_ar ?? place.name_ar}
+            media={hero}
+            alt={stripVerify(heroPhoto?.caption_ar) ?? place.name_ar}
             sizes="100vw"
             priority
+            capMobile
             className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (
@@ -137,7 +156,7 @@ export default async function PlacePage({
         {view.virtue && (
           <section
             aria-label={t("virtue")}
-            className="space-y-3 rounded-2xl border-s-4 border-primary bg-surface p-5"
+            className="space-y-3 rounded-3xl border-s-4 border-primary bg-surface p-5 shadow-[0_1px_2px_rgba(46,46,51,0.05),0_16px_40px_-16px_rgba(46,46,51,0.18)]"
           >
             <h2 className="text-2xl">{t("virtue")}</h2>
             <p className="text-lg leading-loose">{view.virtue}</p>
@@ -173,6 +192,8 @@ export default async function PlacePage({
             )}
           </section>
         )}
+
+        <SeerahAppCard />
 
         <RelatedPlaces slugs={view.relatedSlugs} />
 

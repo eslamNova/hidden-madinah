@@ -48,6 +48,57 @@ export function hasVerifyFlags(place: Partial<Tables<"places">>): boolean {
   return verifyFlaggedFields(place).length > 0 || !!place.admin_notes_ar?.trim();
 }
 
+/** Lean image DTO for cards, heroes and tiles — safe across the RSC boundary. */
+export type CoverImage = {
+  url: string;
+  width: number;
+  height: number;
+  /**
+   * Video posters exist at ONE width, unlike photos (400/800/1600). Sets
+   * PlaceImage to render a bare src: synthesising a srcset here would point at
+   * `-poster-400.jpg` / `-poster-1600.jpg`, which are never generated.
+   */
+  singleVariant?: boolean;
+};
+
+type MediaLike = Pick<
+  Tables<"media">,
+  "type" | "url" | "thumb_url" | "width" | "height"
+>;
+
+/**
+ * Representative still for a place: its first photo, else the first video's
+ * poster frame. Without the fallback a video-only place (بستان المستظل ships
+ * three clips and no stills) renders placeholder art on its card, hero, map
+ * sheet and OG image despite having perfectly good frames in Storage.
+ */
+export function coverImage(media: MediaLike[]): CoverImage | null {
+  const photo = media.find(
+    (m) => m.type === "photo" && m.width && m.height && (m.thumb_url || m.url)
+  );
+  if (photo) {
+    // Either URL works: PlaceImage rewrites the width suffix for the srcset.
+    return {
+      url: photo.thumb_url ?? photo.url,
+      width: photo.width!,
+      height: photo.height!,
+    };
+  }
+  const video = media.find(
+    (m) => m.type === "video" && m.thumb_url && m.width && m.height
+  );
+  if (video) {
+    // width/height on a video row are the POSTER's dimensions (import-media.ts).
+    return {
+      url: video.thumb_url!,
+      width: video.width!,
+      height: video.height!,
+      singleVariant: true,
+    };
+  }
+  return null;
+}
+
 /**
  * Everything a public page may show about a place — [VERIFY] markers already
  * stripped, owner-only columns (admin_notes_ar) dropped. Building this at the

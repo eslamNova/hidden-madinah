@@ -1,8 +1,12 @@
 # دليل المدينة الخفية — Hidden Madinah: state of play
 
-Snapshot taken **2026-07-25**, immediately after the first production deploy.
-Read the "Do these first" section before writing any code — the ordering there
-matters, and getting it wrong silently breaks the live site.
+Snapshot taken **2026-08-03**, after the second production deploy: owner content
+for three places, all media moved to Supabase Storage, video support in the
+import pipeline, and the new cinematic story landing page.
+
+Previous snapshot: 2026-07-25 (first deploy). Of its three blockers, **step 2
+(service key + media to Storage) is fully done**, step 1 (owner account) is
+still open, and step 3 (GitHub auto-deploy) is now safe to do — see below.
 
 ---
 
@@ -15,133 +19,156 @@ matters, and getting it wrong silently breaks the live site.
 | Git repo | <https://github.com/eslamNova/hidden-madinah> (private, branch `master`) |
 | Local code | `C:\Users\IVGeekom\Desktop\2026\Islam\hidden-madinah` |
 | Supabase project | ref `eoicocqjjxskbmctirrb`, region `eu-central-1`, **free tier** |
-| Original photos | `C:\Users\IVGeekom\Desktop\2026\Islam\نحو المدينة\مسجد قباء\` (18 JPGs) |
-| Market research | `C:\Users\IVGeekom\Desktop\2026\Islam\نحو المدينة\research.md` |
+| Owner source material | `my_data/` (git- and vercel-ignored) + `C:\Users\IVGeekom\Desktop\2026\Islam\نحو المدينة\` |
+
+`SUPABASE_SERVICE_ROLE_KEY` **is now present in `.env.local`** (local scripts
+only — never add it to Vercel). Historical gotcha: the first key pasted was the
+*anon* key, which fails storage uploads with "violates row-level security". To
+check which key you have without printing it, decode the JWT's `role` claim —
+it must say `service_role`.
 
 ---
 
-## Do these first (blockers, in this exact order)
+## What happened on 2026-08-03
 
-### 1. Create the owner account — `/admin` is currently unusable
+1. **Owner delivered real content for 3 places** (dropped in `my_data/`:
+   `info.txt` + a photo/video zip per place):
+   - **المساجد السبعة** `al-masajid-al-sabaa` — brand new row, published.
+     Coordinates from the owner's Google Maps link (24.476696, 39.5962394);
+     distance 1.8 km is straight-line Haversine (owner only gave drive time).
+     Cross-linked with `jabal-sala` in both directions.
+   - **مسجد بني أنيف** `masjid-bani-anif` — draft stub filled with owner
+     content and published. Pin from the owner's maps link (24.4356837, 39.6154518).
+   - **بئر غرس** `bir-ghars` — placeholder text fully replaced with owner
+     content (hadiths from سنن ابن ماجه, the غُسل story, 4 PM–midnight hours).
+     **Pin still needs confirming**: the owner's short link resolves to a JS-only
+     page, so the seeded coordinates (24.4497, 39.6233) were kept — plausible
+     (matches "1.5 km from Quba, in Qurban") but unverified. Flagged in
+     `admin_notes_ar`.
+2. **All media moved to Supabase Storage** — 45 rows, zero missing thumbs:
+   quba 18 photos, السبعة مساجد 10 photos + 3 videos, أنيف 5 + 2, غرس 5 + 2.
+   The temporary `/media/%` rows were deleted; `public/media/` and
+   `scripts/import-media-local.ts` (the local bridge) were **deleted** per the
+   old handoff's instruction. Nothing depends on locally-served media anymore.
+3. **`scripts/import-media.ts` now imports videos** (see Scripts below).
+4. **Story landing panels prefer photo-rich places** (`src/app/page.tsx`):
+   featured-with-photos first, then any published place with photos, and
+   photo-less featured places only as placeholder-art fallback. جبل سلع /
+   بئر عثمان automatically reclaim their panels the day they get photos.
+5. **Deployed to production** (CLI deploy, run by the owner) and verified live:
+   the story landing shows the three new places with Storage imagery, and
+   `/places/al-masajid-al-sabaa` renders photos + 3 video players.
 
-There are **zero** rows in `auth.users` and **zero** in `admin_users`. The admin
-area is fully built and correctly gated, but nobody can log in. `create-owner.ts`
-was never run because it needs the service key (see step 2).
-
-### 2. Paste `SUPABASE_SERVICE_ROLE_KEY` into `.env.local`
-
-Supabase Dashboard → Project Settings → API keys → `service_role`. It is
-**only** used by local scripts, and must never be added to Vercel.
-
-Then, in order:
-
-```bash
-# creates the auth user + admin_users row; you choose the password
-npx tsx scripts/create-owner.ts --password "<pick-a-strong-one>"
-
-# uploads the 18 Quba photos to Supabase Storage properly
-npx tsx scripts/import-media.ts --dir "C:\Users\IVGeekom\Desktop\2026\Islam\نحو المدينة\مسجد قباء" --slug masjid-quba
-```
-
-Then delete the 18 temporary local-path rows (they are the ones whose `url`
-starts with `/media/`, as opposed to the new Storage URLs):
-
-```sql
-delete from media where url like '/media/%';
-```
-
-Finally redeploy: `npx vercel --prod`.
-
-### 3. Only *after* step 2 — connect GitHub for auto-deploys
-
-**Why the order matters.** `public/media/` is git-ignored, so the photos are not
-in the repo. The Vercel **CLI** uploads the whole working directory, so it swept
-them up — that is the only reason images work on the live site today. A
-**git-triggered** deploy has no such folder, so every photo would 404 and the
-gallery would fall back to placeholder tiles.
-
-To connect: Vercel dashboard → Project → Settings → Git → Connect, or install the
-Vercel GitHub App on `eslamNova/hidden-madinah`. (`vercel git connect` from the
-CLI fails until the app can see the private repo.)
-
----
-
-## What is built and working
-
-Verified live on production, not just locally.
-
-- **Public pages** — home (photo hero, featured, category tiles, nearest-by-geolocation, routes), `/places` (Arabic search + category/distance/best-time filters), `/places/[slug]` (SSG, photo hero, quote callout, visit-info card, gallery, story, virtue, tips, map, related places), `/map` (full-screen, category pins, bottom sheet), `/routes` + `/routes/[id]` (ordered stops, connecting line, total distance).
-- **Admin CMS** at `/admin` — auth gate, place editor covering every Content Pack field, transport-options editor, draggable map pin with Haversine auto-distance, client-side media upload (EXIF read for pin pre-fill, then canvas resize which strips EXIF), ▲/▼ media reorder, publish toggle, "يحتاج مراجعة" badges. Built and gated, but unusable until step 1 above.
-- **PWA** — installable, Serwist service worker, `/~offline` fallback precached, runtime caching for pages, Supabase images, and map tiles/glyphs.
-- **Accessibility** — elderly-first throughout: 18px base with an in-app أ−/أ+ control (18/20/23px, persisted, no flash), zoom never disabled, ≥48px touch targets, labelled 4-item bottom nav, visible form labels, `prefers-reduced-motion` respected.
-- **SEO** — per-place Arabic titles/descriptions, photo-based OG images, sitemap, robots. Canonical origin resolves from `VERCEL_PROJECT_PRODUCTION_URL`.
+The cinematic landing itself (`src/components/home/StoryLanding.tsx` /
+`StoryPanel.tsx`, plus header/nav/i18n edits) was built by the owner in a
+separate session and shipped in this deploy.
 
 ---
 
 ## Content status
 
-13 places (8 published, 3 featured), 18 photos, 1 route with 3 stops.
+14 places, **10 published**, 3 featured (unchanged: قباء، بئر عثمان، جبل سلع).
 
-| Slug | Name | Category | Published | Photos | km |
-| --- | --- | --- | --- | --- | --- |
-| `masjid-quba` | مسجد قباء | mosque | ✅ featured | **18** | 3.5 |
-| `bir-uthman` | بئر عثمان (بئر رومة) | well | ✅ featured | 0 | 4.7 |
-| `jabal-sala` | جبل سلع | historical_site | ✅ featured | 0 | 0.8 |
-| `masjid-bani-haram` | مسجد بني حرام | mosque | ✅ | 0 | 1.4 |
-| `bir-ghars` | بئر غرس | well | ✅ | 0 | 2.3 |
-| `basatin-quba` | بساتين قباء | garden | ✅ | 0 | 3.5 |
-| `basatin-al-awali` | بساتين العوالي | garden | ✅ | 0 | 3.7 |
-| `hijaz-railway-station` | محطة سكة حديد الحجاز | historical_site | ✅ | 0 | 1.1 |
-| `bir-al-khatam-aris` | بئر الخاتم (بئر أريس) | well | draft | 0 | — |
-| `bustan-al-mustazal` | بستان المستظل | garden | draft | 0 | — |
-| `masjid-bani-anif` | مسجد بني أنيف | mosque | draft | 0 | — |
-| `masjid-al-jumuah` | مسجد الجمعة | mosque | draft | 0 | — |
-| `buyut-al-sahaba-quba` | مواقع بيوت الصحابة | historical_site | draft | 0 | — |
+Places with real owner content: **مسجد قباء، المساجد السبعة، مسجد بني أنيف، بئر غرس**
+(the last three added 2026-08-03). Media: only these four have any.
 
-Only **مسجد قباء** carries the owner's real content and photos. The other seven
-published entries are realistic Arabic placeholders written during the build —
-**they need the owner's review before this site is promoted anywhere.** The five
-drafts are the Content Pack stubs, unpublished and awaiting the owner's info.
+Still carrying **placeholder content written during the build** (needs owner
+review before promotion): بئر عثمان، جبل سلع، مسجد بني حرام، بساتين قباء،
+بساتين العوالي، محطة سكة حديد الحجاز.
 
-### Facts still needing the owner's confirmation
+Remaining **drafts** (Content Pack stubs, unpublished): بئر الخاتم (أريس)،
+بستان المستظل، مسجد الجمعة، مواقع بيوت الصحابة.
 
-Four places carry inline `[VERIFY: …]` markers and eight carry `admin_notes_ar`.
-Both drive the "يحتاج مراجعة" badge in `/admin`. Public pages strip the markers
-and hide any field that becomes empty, so visitors never see unconfirmed text.
+Open verification items: the Quba `[VERIFY]` markers from the previous handoff
+(coordinates conflict, hadith attribution, best-time/open-status placeholders)
+are all still open, plus the بئر غرس pin above. `admin_notes_ar` on the three
+new places records provenance ("المحتوى من مادة المالك 2026-08-03").
 
-Specifically for مسجد قباء:
+---
 
-1. **Coordinates conflict.** The seeded pin is `24.4394, 39.6172` (the widely
-   known Quba Mosque location, consistent with the owner's "10 minutes by car").
-   The owner's shared Google Maps short link resolves to `24.3992514, 39.6440995`
-   — about **5.3 km away**, and ~8 km from the Haram, which contradicts the stated
-   drive time. Probably a mis-tagged POI. The owner should confirm via the admin pin.
-2. **Distance 3.5 km** is the owner's road estimate; Haversine gives ~3.2 km
-   straight-line. Owner values are never overwritten automatically.
-3. **The hadith wording and attribution** in `virtue_ar` were added from general
-   knowledge, *not* from the owner's text. The owner (a specialist) should verify.
-4. **`best_time_ar` and `open_status_ar`** are still placeholders and therefore
-   render as nothing on the public page.
-5. **Taxi prices** (10–15 SAR regular, 20–25 SAR ride-hailing) are the owner's
-   estimates as of 2026-07-24; the page shows `last_updated`.
+## Deployment — read before deploying
 
-Also worth knowing: **none of the 18 photos had GPS EXIF data**, confirming that
-Google Photos strips location on shared-album downloads. Pins must be placed by
-hand in the admin.
+- **`.vercelignore` now exists and matters.** The Vercel CLI does *not*
+  respect `.gitignore`; before this file existed, a deploy tried to upload
+  **696 MB** because `my_data/` (902 MB of owner originals) was swept up. It
+  excludes `my_data`, `public/media`, `.next`, `.env*`.
+- **GitHub auto-deploy is now SAFE to connect.** The old warning (git deploys
+  would 404 every image because `public/media/` was git-ignored) is obsolete —
+  all media is in Supabase Storage. Connecting the Vercel GitHub App to
+  `eslamNova/hidden-madinah` is now purely an improvement.
+- Until that's connected, deploy with `npx vercel --prod` from the repo root.
+- Content edits in the DB do **not** appear on the live site by themselves —
+  pages are SSG with `revalidate = 86400` (24 h). Redeploy (or wait a day).
+
+---
+
+## Scripts
+
+All Supabase scripts need the service key in `.env.local` **and, on Node 20,
+the WebSocket flag** (supabase-js requires it; Node 22+ won't):
+
+```bash
+NODE_OPTIONS=--experimental-websocket npx tsx scripts/import-media.ts --dir "<folder>" --slug <slug> [--dry-run]
+```
+
+| Script | Purpose |
+| --- | --- |
+| `scripts/import-media.ts` | Photos **and videos**. Photos: EXIF → 400/800/1600 WebP + 1600 JPEG → Storage → `media` row. Videos (`.mp4`, needs ffmpeg+ffprobe on PATH): probe → re-encode 720p H.264 (rotation-aware short-side cap, crf 23, faststart, **metadata/GPS stripped**) → ≤800px poster JPEG → `type='video'` row with `duration_seconds`. Errors per-file if compressed output exceeds the bucket's 50 MB limit. Idempotent (keyed on URL ← sha1 of the original file). Storage paths shared with the admin uploader via `src/lib/media-spec.ts` (`videoObjectPath` / `videoPosterPath`). |
+| `scripts/create-owner.ts` | Creates the owner auth user + `admin_users` row. **Still never run** — see blockers. |
+| `scripts/generate-icons.ts` | PWA icons. |
+
+`scripts/import-media-local.ts` no longer exists (deleted with `public/media/`).
+
+Real-world compression results for reference: a 279 MB 8K phone video → 10.7 MB;
+1080p Snapchat clips → 2–5 MB.
+
+---
+
+## Remaining blockers & loose ends
+
+1. **`/admin` is still unusable — the owner account was never created.**
+   `auth.users` and `admin_users` are still empty. Everything it needs is now
+   in place; one command remains (owner picks the password):
+   ```bash
+   NODE_OPTIONS=--experimental-websocket npx tsx scripts/create-owner.ts --password "<strong-password>"
+   ```
+2. **Connect GitHub auto-deploys** (now safe — see Deployment).
+3. **Uncommitted work.** As of this snapshot the working tree holds: the video
+   import pipeline, the landing-page panel logic, `.vercelignore`, deletion of
+   the local-media bridge, `my_data/` gitignore entry, README/HANDOFF updates —
+   plus the owner's landing-page feature (`src/components/home/`, header, nav,
+   i18n, `motion` dependency). None of it is committed.
+4. **بئر غرس pin** — owner should drag the admin pin (or compare with their
+   maps link) to confirm; note the two coordinate-bearing links for أنيف and
+   السبعة مساجد were extracted exactly.
+5. Everything from the old list that still stands: the six placeholder places
+   need owner review; four drafts need content; Quba `[VERIFY]` items; no
+   automated tests; no real mobile-browser pass; no Lighthouse run; the
+   adversarial code review was never re-run.
 
 ---
 
 ## Architecture decisions worth not undoing
 
+(Unchanged from the previous handoff, all still true.)
+
 | Decision | Why |
 | --- | --- |
-| **maplibre-gl pinned to `^5`** | `^5` resolved to 6.0.0, an ESM-only major whose separate worker module the dev server returned as HTML — the map rendered as a blank white box. v5 inlines the worker. **Do not bump to v6 casually.** |
-| **No `next/image`; plain `<img>` with explicit srcset** | Only three variants exist (400/800/1600). A custom loader could not express that and made cards pull the 1600px file (176 kB) on high-DPR phones; they now take the 800px one (51 kB). |
-| **`NEXT_PUBLIC_SITE_URL` unset on Vercel** | `siteUrl()` in `src/lib/constants.ts` falls back to `VERCEL_PROJECT_PRODUCTION_URL`. Set it only for a custom domain — `.env.local` holds `localhost:3000`, which would poison canonical URLs if copied to Vercel. |
-| **`PublicPlaceView` DTO** | Passing raw DB rows to components leaked `[VERIFY]` text and `admin_notes_ar` into the page payload (invisible on screen, readable in source). Everything public now renders from the sanitized view. Keep it that way. |
-| **`/~offline` in `additionalPrecacheEntries`** | Serwist's fallback plugin serves from the precache; without this the offline page failed exactly when needed. |
-| **Admin i18n namespace stripped from the root layout** | Otherwise every public page shipped the admin strings in its payload. |
-| **MapLibre + OpenFreeMap, self-hosted RTL plugin** | No token, no cost. `@mapbox/mapbox-gl-rtl-text` is pinned at **0.2.3** and served from `public/` — 0.3.0 is broken with MapLibre, and a CDN copy would break offline. Without it Arabic labels render as disconnected glyphs. |
+| **maplibre-gl pinned to `^5`** | v6 is ESM-only; its worker chunk broke the dev server (blank map). |
+| **No `next/image`; plain `<img>` + explicit srcset** | Only 400/800/1600 variants exist; a loader made phones pull 1600px files. |
+| **`NEXT_PUBLIC_SITE_URL` unset on Vercel** | Falls back to `VERCEL_PROJECT_PRODUCTION_URL`; setting it wrongly poisons canonicals. |
+| **`PublicPlaceView` DTO** | Keeps `[VERIFY]` text and `admin_notes_ar` out of public page payloads. |
+| **`/~offline` in `additionalPrecacheEntries`** | Serwist fallback must be precached or offline breaks. |
+| **Admin i18n namespace stripped from root layout** | Public pages must not ship admin strings. |
+| **MapLibre + OpenFreeMap, self-hosted RTL plugin 0.2.3** | Free, token-less; 0.3.0 breaks Arabic labels with MapLibre. |
+
+New entries:
+
+| Decision | Why |
+| --- | --- |
+| **Videos re-encoded at import, never uploaded raw** | Bucket caps files at 50 MB / `video/mp4` only; phone originals hit 279 MB. Also strips GPS the same way photo EXIF is stripped. |
+| **Video scale filter uses ffmpeg expressions, not probe dimensions** | ffprobe reports pre-rotation dimensions; portrait phone videos would get squeezed to 406×720 otherwise. |
+| **Story panels pick by photo availability** | A cinematic landing with placeholder full-bleeds looks broken; the featured flag alone doesn't guarantee imagery. |
 
 ---
 
@@ -152,68 +179,22 @@ cd C:\Users\IVGeekom\Desktop\2026\Islam\hidden-madinah
 npm run dev          # http://localhost:3000
 ```
 
-Two Windows gotchas that cost real time during the build:
+Quality gates (all clean as of this snapshot): `npx tsc --noEmit`,
+`npx eslint src scripts --max-warnings=0`, `npm run build`.
 
-- **Orphaned servers keep port 3000.** If the browser shows stale content, check
-  `netstat -ano | findstr :3000` — a leftover `next start` will hold the port and
-  the new dev server silently moves to 3001 while you keep looking at the old one.
-- **`EPERM: … .next\trace`** on start means a previous Node process still holds the
-  folder. Kill stray `node.exe` processes for this project, then `rm -rf .next`.
-
-Quality gates (both currently clean):
-
-```bash
-npx tsc --noEmit
-npx eslint src scripts --max-warnings=0
-npm run build
-```
-
-**Supabase free tier pauses the project after ~1 week of inactivity.** If the site
-starts erroring for no reason, restore it from the Supabase dashboard.
-
----
-
-## Scripts
-
-| Script | Purpose |
-| --- | --- |
-| `scripts/create-owner.ts` | Creates the owner auth user + `admin_users` row. Needs the service key. |
-| `scripts/import-media.ts` | The real pipeline: EXIF → sharp variants → Supabase Storage → `media` rows. Idempotent (keyed on URL); re-running yields 0 new rows. Needs the service key. |
-| `scripts/import-media-local.ts` | **Temporary bridge.** Same processing, but writes to `public/media/` and emits SQL. Delete this script and the folder once step 2 is done. |
-| `scripts/generate-icons.ts` | PWA icons. |
-
-Video compression (documented in `README.md`):
-
-```bash
-ffmpeg -i in.mp4 -vf "scale=-2:720" -c:v libx264 -crf 23 -preset medium \
-  -movflags +faststart -c:a aac -b:a 128k out.mp4
-```
-
----
-
-## Loose ends I did not close
-
-- **The adversarial code review never finished.** It raised 15 candidate findings
-  across correctness, security/privacy, and accessibility, then died on a session
-  limit before verifying any of them, so none are confirmed and none were acted on.
-  Re-running a review pass is worthwhile. The two issues I *did* find and fix by
-  hand were the `[VERIFY]`/admin-notes payload leak and the un-precached offline page.
-- **No automated tests exist.** Everything so far has been verified by building,
-  typechecking, linting, and hitting real URLs.
-- **Nothing has been checked in a real browser at mobile width.** Layout, the
-  pinch-zoom gallery, and the admin flow on a phone are unverified visually.
-- **Lighthouse has not been run** against production.
-- **The first CLI deploy failed** with an opaque Vercel platform error
-  (`Internal Server Error` where JSON was expected) partway through the upload; an
-  unchanged retry succeeded. Appears transient — if it recurs, it is Vercel's side.
+Windows gotchas (unchanged): orphaned servers holding port 3000
+(`netstat -ano | findstr :3000`); `EPERM … .next\trace` → kill stray node,
+`rm -rf .next`. **Supabase free tier pauses after ~1 week idle** — restore from
+the dashboard if the site suddenly errors.
 
 ---
 
 ## Suggested next moves
 
-1. Steps 1–3 above (owner account, photos to Storage, then GitHub auto-deploy).
-2. Owner reviews the seven placeholder places and resolves the Quba `[VERIFY]` items.
-3. Photograph the five draft Quba-area places, then publish them — that turns the
-   "أماكن خفية قريبة" section on the Quba page live, which is the app's whole thesis.
-4. Run a proper review pass and a mobile-browser check before promoting the site.
-5. Grow toward the 30–50 places that `research.md` identifies as the launch threshold.
+1. Create the owner account (blocker 1) — then the owner can review the six
+   placeholder places and fix the بئر غرس pin themselves in `/admin`.
+2. Commit the current working tree and connect GitHub auto-deploys.
+3. Owner photographs/writes the four remaining drafts near Quba — publishing
+   them lights up the "أماكن خفية قريبة" section on the Quba page.
+4. Review pass + mobile-width check + Lighthouse before promoting the site.
+5. Keep growing toward the 30–50 places `research.md` calls the launch threshold.

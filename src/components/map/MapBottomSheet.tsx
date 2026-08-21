@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
+import type { CoverImage } from "@/lib/content";
 import { CATEGORY_META, type PlaceCategory } from "@/lib/maps";
 import { PlaceImage } from "@/components/place/PlaceImage";
 
@@ -13,7 +14,7 @@ export type MapPlacePreview = {
   category: PlaceCategory;
   summary: string | null;
   distanceKm: number | null;
-  thumb: { url: string; width: number; height: number } | null;
+  thumb: CoverImage | null;
 };
 
 /** Bottom sheet preview shown when a map pin is tapped. */
@@ -28,15 +29,22 @@ export function MapBottomSheet({
   const tCommon = useTranslations("common");
   const tPlace = useTranslations("place");
   const closeRef = useRef<HTMLButtonElement>(null);
+  const invokerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!place) return;
+    // Remember the pin that opened the sheet so closing returns focus there —
+    // otherwise a keyboard user is dropped back at the top of the page.
+    invokerRef.current = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      invokerRef.current?.focus();
+    };
   }, [place, onClose]);
 
   if (!place) return null;
@@ -48,9 +56,11 @@ export function MapBottomSheet({
       role="dialog"
       aria-modal="false"
       aria-label={place.name_ar}
-      className="fixed inset-x-0 bottom-[4.5rem] z-50 mx-auto max-w-lg px-2 pb-[env(safe-area-inset-bottom)]"
+      // key replays the entry animation when the user taps a different pin.
+      key={place.slug}
+      className="fixed inset-x-0 bottom-[6.25rem] z-50 mx-auto max-w-lg px-2 pb-[env(safe-area-inset-bottom)]"
     >
-      <div className="rounded-t-3xl border border-basalt/10 bg-surface p-4 shadow-lg">
+      <div className="sheet-in rounded-t-3xl border border-basalt/10 bg-surface p-4 shadow-lg">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             {place.thumb ? (
@@ -87,7 +97,7 @@ export function MapBottomSheet({
             type="button"
             onClick={onClose}
             aria-label={t("closePreview")}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-[1.5px] border-basalt/30 bg-surface text-basalt"
+            className="press flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-[1.5px] border-basalt/30 bg-surface text-basalt"
           >
             <X aria-hidden="true" className="h-5 w-5" />
           </button>
@@ -99,7 +109,7 @@ export function MapBottomSheet({
         )}
         <Link
           href={`/places/${encodeURIComponent(place.slug)}`}
-          className="flex min-h-14 items-center justify-center rounded-2xl bg-primary px-6 text-lg font-semibold text-surface"
+          className="press flex min-h-14 items-center justify-center rounded-2xl bg-primary px-6 text-lg font-semibold text-surface"
         >
           {t("openPlace")}
         </Link>

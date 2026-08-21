@@ -106,15 +106,113 @@ h5 {
   );
 }
 
+/* Card interaction: hover lift on pointer devices, press scale on touch.
+   Fast down-stroke, unhurried release — transform-only, so the global
+   reduced-motion block neutralizes the animation while states still apply. */
 .card-lift {
-  transition:
-    transform 220ms ease,
-    box-shadow 220ms ease;
+  transition: transform 220ms cubic-bezier(0.2, 0, 0, 1);
 }
 @media (hover: hover) {
   .card-lift:hover {
     transform: translateY(-3px);
   }
+}
+.card-lift:active {
+  transform: scale(0.98);
+  transition-duration: 80ms;
+}
+
+/* Shared press feedback for buttons, chips and CTAs (touch-first audience —
+   without this, taps produce zero acknowledgment). */
+.press {
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.press:active {
+  transform: scale(0.97);
+  transition-duration: 60ms;
+}
+
+/* --------------------------------------------------------------------------
+   Scrollbars. Containers with their own affordances (story dots/next button,
+   gallery buttons) hide the widget entirely — scrolling itself is unaffected.
+   The document keeps a THIN brand-tinted bar (long articles need position
+   feedback). No scrollbar-gutter: reserving it would inset the full-bleed
+   landing; the ~7px landing↔page shift on route change is the lesser evil.
+   -------------------------------------------------------------------------- */
+.scrollbar-hidden {
+  scrollbar-width: none;
+}
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-sand)) transparent;
+}
+/* Legacy fallback (Chromium <121 ignores the standard props above; newer
+   Chromium ignores these once standard props apply — intended). */
+html::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+html::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  background-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-sand));
+}
+
+/* --------------------------------------------------------------------------
+   Elevated light theme: soft gradient ground (fixed pseudo-element — one
+   composited layer, never repaints on scroll; background-attachment:fixed is
+   broken on mobile). The surface→sand blend completes by 28vh so every
+   ≥30dvh photo header melts onto pure sand with no seam. bg-sand on <body>
+   stays as the fallback token.
+   -------------------------------------------------------------------------- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 55% at 88% -10%, rgba(200, 162, 75, 0.1) 0%, transparent 60%),
+    radial-gradient(100% 45% at 8% -5%, rgba(31, 92, 61, 0.06) 0%, transparent 55%),
+    linear-gradient(to bottom, var(--color-surface) 0%, var(--color-sand) 28%, var(--color-sand) 100%);
+}
+
+/* Fades a photo header's bottom edge into the page ground. */
+.hero-melt {
+  background-image: linear-gradient(to bottom, transparent, var(--color-sand));
+}
+
+/* The one elevated-surface recipe (no backdrop-blur — glass is faked with
+   near-opaque surface, a refined border and a soft layered shadow). Lives in
+   the components layer so single-property utilities (border-accent/50 on the
+   quote card) can override parts of it. */
+@layer components {
+  .card-elevated {
+    background-color: var(--color-surface);
+    border: 1px solid rgba(46, 46, 51, 0.08);
+    border-radius: 1.5rem;
+    box-shadow:
+      0 1px 2px rgba(46, 46, 51, 0.05),
+      0 16px 40px -16px rgba(46, 46, 51, 0.18);
+  }
+}
+
+/* Maplibre's default controls are 29px — far under the elderly-first 48px
+   floor. Pure CSS resize; the zoom buttons are the control users need most. */
+.maplibregl-ctrl-group button {
+  width: 48px;
+  height: 48px;
+}
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  background-size: 24px;
 }
 
 /* Embedded Latin text / numbers inside RTL copy keep their LTR order. */
@@ -124,10 +222,119 @@ h5 {
   display: inline-block;
 }
 
+/* --------------------------------------------------------------------------
+   Story landing: full-viewport snap panels inside their own scroll container.
+   -------------------------------------------------------------------------- */
+
+/* Full viewport — the landing hides the header; dvh keeps iOS toolbars honest. */
+.story-viewport {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* Off-screen panels skip layout/paint — 7 viewport-sized regions is real
+   rasterizer load on a mid-range GPU. Snap + IntersectionObserver still work. */
+.story-viewport > section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100dvh;
+}
+
+/* Bottom-sheet entry — the iOS sheet curve. Exit stays instant on purpose
+   (immediate dismissal reads as responsiveness, not abruptness). */
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.sheet-in {
+  animation: sheet-in 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Offline banner entry — the layout shift is unavoidable (rare event), but
+   the banner itself arrives deliberately instead of blinking in. */
+@keyframes banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+.banner-in {
+  animation: banner-in 260ms cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+/* "Live" cue on the tour button — a slow light sheen sweeping the surface
+   every few seconds (calmer than any pulse; the reduced-motion block stills
+   it). Apply to an overflow-hidden element. */
+@keyframes tour-sheen {
+  0%,
+  70% {
+    transform: translateX(-130%);
+  }
+  100% {
+    transform: translateX(130%);
+  }
+}
+.tour-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(250, 246, 239, 0.28) 50%,
+    transparent 62%
+  );
+  animation: tour-sheen 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Per-slide dwell progress in the tour — restarted via key, duration set
+   inline, play-state follows the pause button. Fills toward reading
+   direction (RTL: right→left). */
+@keyframes tour-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.tour-progress {
+  transform-origin: right;
+  animation-name: tour-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+/* Scroll hint bounce — CSS keyframes so the reduced-motion block below
+   neutralizes it without JS. */
+@keyframes story-hint-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+.story-hint {
+  animation: story-hint-bounce 1.8s ease-in-out infinite;
+}
+
+/* Two-tone ring: the light halo separates the green outline from dark photos
+   and basalt panels (the green alone is ~1.7:1 on basalt — invisible). */
 :focus-visible {
   outline: 3px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 4px;
+  box-shadow:
+    0 0 0 2px var(--color-surface),
+    0 0 0 7px rgba(250, 246, 239, 0.35);
 }
 
 @media (prefers-reduced-motion: reduce) {
