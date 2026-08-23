@@ -57,6 +57,9 @@ export function StoryPanel({
   reduceMotion,
   revealed,
   contentClassName = "justify-end",
+  // "controls": clear the floating next button (default). "dock": last panel —
+  // no next button, so only the dock needs clearing and the stack gets ~4rem back.
+  bottom = "controls",
   children,
 }: {
   ref?: Ref<HTMLElement>;
@@ -68,6 +71,7 @@ export function StoryPanel({
   reduceMotion: boolean;
   revealed: boolean;
   contentClassName?: string;
+  bottom?: "controls" | "dock";
   children: ReactNode;
 }) {
   // Always motion-managed so the SSR'd "hidden" styles are guaranteed to be
@@ -117,7 +121,11 @@ export function StoryPanel({
           off the top of the overflow-hidden panel. */}
       <m.div
         {...reveal}
-        className={`relative flex h-full flex-col px-5 pb-[max(10.5rem,min(12.5rem,32dvh))] pt-[min(4rem,6dvh)] ${contentClassName}`}
+        className={`relative flex h-full flex-col px-5 pt-[min(4rem,6dvh)] ${
+          bottom === "dock"
+            ? "pb-[max(6.5rem,min(8rem,18dvh))]"
+            : "pb-[max(10.5rem,min(12.5rem,32dvh))]"
+        } ${contentClassName}`}
       >
         <div className="scrollbar-hidden mx-auto max-h-full w-full max-w-3xl space-y-4 overflow-y-auto">
           {children}

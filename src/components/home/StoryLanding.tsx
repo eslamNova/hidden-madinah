@@ -372,6 +372,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
               category={data.hero?.category ?? "mosque"}
               reduceMotion={reduceMotion}
               revealed={visited.has(closingIdx)}
+              bottom="dock"
             >
               <StoryItem>
                 <p className="font-wordmark text-2xl text-accent">
@@ -387,12 +388,12 @@ export function StoryLanding({ data }: { data: StoryData }) {
                 </h2>
               </StoryItem>
               <StoryItem className="pt-1">
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-col gap-3">
                   {/* The tour leads the farewell too — same sheen CTA as the
                       opening panel, so the story ends where it can restart. */}
                   <Link
                     href="/tour"
-                    className="tour-sheen press relative flex min-h-14 items-center justify-center gap-3 overflow-hidden rounded-2xl bg-paper px-7 text-lg font-semibold text-primary-dark shadow-lg"
+                    className="tour-sheen press relative flex min-h-14 items-center justify-center gap-3 overflow-hidden rounded-2xl bg-paper px-7 text-lg font-semibold text-primary-dark shadow-lg sm:self-start"
                   >
                     <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
                       <Play
@@ -403,27 +404,31 @@ export function StoryLanding({ data }: { data: StoryData }) {
                     </span>
                     {t("tourCta")}
                   </Link>
-                  <Link
-                    href="/places"
-                    className="press flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-paper px-8 text-lg font-semibold text-primary-dark shadow-lg"
-                  >
-                    <Compass aria-hidden="true" className="h-6 w-6" />
-                    {t("heroCta")}
-                  </Link>
-                  {/* No backdrop-blur: the panel's scrims already guarantee
-                      legibility, and blur over scrolling imagery costs frames. */}
-                  <Link
-                    href="/map"
-                    className="press flex min-h-14 items-center justify-center rounded-2xl border-[1.5px] border-paper/70 px-8 text-lg font-semibold text-paper"
-                  >
-                    {t("heroMapCta")}
-                  </Link>
+                  {/* Secondary pair shares one row so the stack fits above the
+                      dock with the companion card still in view. */}
+                  <div className="grid grid-cols-2 gap-3 sm:flex">
+                    <Link
+                      href="/places"
+                      className="press flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-paper px-4 text-lg font-semibold text-primary-dark shadow-lg sm:px-8"
+                    >
+                      <Compass aria-hidden="true" className="h-6 w-6 shrink-0" />
+                      {t("heroCta")}
+                    </Link>
+                    {/* No backdrop-blur: the panel's scrims already guarantee
+                        legibility, and blur over scrolling imagery costs frames. */}
+                    <Link
+                      href="/map"
+                      className="press flex min-h-14 items-center justify-center rounded-2xl border-[1.5px] border-paper/70 px-4 text-lg font-semibold text-paper sm:px-8"
+                    >
+                      {t("heroMapCta")}
+                    </Link>
+                  </div>
                 </div>
               </StoryItem>
-              <StoryItem className="pt-4">
+              <StoryItem className="pt-3">
                 {/* Companion app, compact dark variant — the farewell is
                     "continue your journey", and «سيرة» is where it continues. */}
-                <div className="flex flex-col gap-3 rounded-2xl border border-paper/15 bg-basalt/60 p-4 sm:flex-row sm:items-center sm:gap-4">
+                <div className="flex flex-col gap-2.5 rounded-2xl border border-paper/15 bg-basalt/60 p-3.5 sm:flex-row sm:items-center sm:gap-4 sm:p-4">
                   <span
                     aria-hidden="true"
                     className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/20 text-accent"
