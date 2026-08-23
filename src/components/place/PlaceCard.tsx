@@ -38,6 +38,12 @@ export function toPlaceCardData(p: PlaceWithMedia): PlaceCardData {
 /**
  * Gallery tile: the photograph is the card. Category, name and distance sit on
  * a dark scrim over the image so the grid reads as photography, not as forms.
+ *
+ * The photo is absolutely positioned and fills whatever height the card ends up
+ * at; the caption sits in normal flow BELOW a photo-band spacer, with no
+ * line-clamp. Long names (مسجد العُصْبة (مسجد النور) وبئر الهجين) therefore
+ * lengthen the card instead of being cut off — at any أ+ font step. Grid
+ * siblings stretch to the tallest card in the row, so the rows stay level.
  */
 export function PlaceCard({
   place,
@@ -49,23 +55,28 @@ export function PlaceCard({
   priority?: boolean;
 }) {
   const t = useTranslations("common");
-  const aspect = compact ? "aspect-[16/10]" : "aspect-[4/5]";
+  // Clean band of photograph above the caption — the card's minimum height.
+  const photoBand = compact ? "aspect-[16/9]" : "aspect-[5/4]";
 
   return (
     <Link
       href={`/places/${encodeURIComponent(place.slug)}`}
-      className="card-lift group relative block overflow-hidden rounded-2xl bg-basalt shadow-md"
+      className="card-lift group relative flex h-full flex-col justify-end overflow-hidden rounded-2xl bg-basalt shadow-md"
     >
       {place.thumb ? (
         <PlaceImage
           media={place.thumb}
           alt={place.name_ar}
           sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 260px"
-          className={`${aspect} w-full object-cover`}
+          className="absolute inset-0 h-full w-full object-cover"
           priority={priority}
         />
       ) : (
-        <PlaceholderImage category={place.category} className={`${aspect} w-full`} />
+        // Wrapper supplies the absolute positioning: PlaceholderImage's own
+        // `relative` class would win the conflict (same as StoryPanel).
+        <div aria-hidden="true" className="absolute inset-0">
+          <PlaceholderImage category={place.category} className="h-full w-full" />
+        </div>
       )}
 
       {/* Soft dark veil over the whole photo + the bottom scrim: light text
@@ -86,11 +97,17 @@ export function PlaceCard({
         </span>
       )}
 
+      {/* Photo-led minimum height: the band of photograph above the caption. */}
+      <div aria-hidden="true" className={`w-full shrink-0 ${photoBand}`} />
+
       {/* Title + two info chips only — the card is a photograph, not a form.
-          line-clamp keeps the START of long names visible (they were clipping
-          from the top on narrow mobile columns). */}
-      <div className="absolute inset-x-0 bottom-0 space-y-2 p-4">
-        <h3 className="line-clamp-2 text-xl leading-snug text-paper drop-shadow-sm sm:text-2xl">
+          In flow (not absolute) and unclamped, so the name is always complete;
+          `relative` lifts it above the two absolute scrim layers. */}
+      <div className="relative space-y-2 p-4">
+        {/* text-lg on the narrow 2-up mobile grid: at the أ+ max step text-xl
+            forces mid-word breaks in long names (المستظـل). break-words stays
+            as the last-resort guard against overflow. */}
+        <h3 className="break-words text-lg leading-snug text-paper drop-shadow-sm sm:text-xl lg:text-2xl">
           {place.name_ar}
         </h3>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-paper/90">

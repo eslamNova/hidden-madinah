@@ -93,7 +93,9 @@ export function NearestPlaces({ places }: { places: NearestPlaceInput[] }) {
                   <CategoryIcon category={p.category} className="h-6 w-6" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-lg font-semibold">{p.name_ar}</span>
+                  {/* No truncate: long names (مسجد العُصْبة …) wrap instead of
+                      ending in an ellipsis; the row grows past its min-h-14. */}
+                  <span className="block text-lg font-semibold">{p.name_ar}</span>
                   <span className="block text-base text-muted">
                     {t("nearestKm", { km: p.km })}
                   </span>

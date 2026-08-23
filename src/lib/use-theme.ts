@@ -4,8 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import { THEME_STORAGE_KEY, type Theme } from "@/lib/constants";
 
 function readTheme(): Theme {
-  if (typeof document === "undefined") return "light";
-  return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  // Dark is the default (see the pre-paint script in layout.tsx).
+  if (typeof document === "undefined") return "dark";
+  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
 }
 
 /**

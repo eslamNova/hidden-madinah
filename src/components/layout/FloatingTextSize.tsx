@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Moon, Sun } from "lucide-react";
 import { TextSizeControl } from "@/components/TextSizeControl";
-import { useTheme } from "@/lib/use-theme";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 /**
@@ -27,10 +26,6 @@ export function FloatingTextSize() {
   const rootRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
-  const [theme] = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const dark = mounted && theme === "dark";
 
   useEffect(() => {
     if (!open) return;
@@ -81,16 +76,15 @@ export function FloatingTextSize() {
         aria-controls={panelId}
         className={`press flex h-12 items-center gap-1.5 rounded-full border px-3.5 shadow-lg ${shell}`}
       >
-        {/* Two symbols so the button reads as "text size + theme" at a glance. */}
+        {/* Two symbols so the button reads as "text size + theme" at a glance.
+            Both theme icons render; globals.css hides the wrong one off
+            data-theme, so the pill is never wrong on the first paint. */}
         <span aria-hidden="true" className="text-xl font-bold leading-none">
           أ
         </span>
         <span aria-hidden="true" className="h-4 w-px bg-current/25" />
-        {dark ? (
-          <Sun aria-hidden="true" className="h-5 w-5" />
-        ) : (
-          <Moon aria-hidden="true" className="h-5 w-5" />
-        )}
+        <Sun aria-hidden="true" className="theme-dark-only h-5 w-5" />
+        <Moon aria-hidden="true" className="theme-light-only h-5 w-5" />
       </button>
       <div
         id={panelId}

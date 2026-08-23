@@ -39,6 +39,17 @@ html[data-theme="dark"] {
   --color-brand-dark: #a6e3c2;
 }
 
+/* Theme-dependent icons (the ☀/🌙 in the floating pill and its toggle). Driven
+   by CSS, not React state: data-theme is set pre-paint, so the correct icon is
+   on screen from the first frame — a `mounted` flag would flash the wrong one
+   now that dark is the default. */
+html[data-theme="dark"] .theme-light-only {
+  display: none;
+}
+html:not([data-theme="dark"]) .theme-dark-only {
+  display: none;
+}
+
 /* Elderly-first type scale: rem everywhere; the in-app control moves the root. */
 html {
   font-size: 18px;

@@ -11,7 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     dir: "rtl",
     lang: "ar",
-    background_color: "#faf6ef",
+    // Dark is the app's default theme — the splash must not flash sand.
+    background_color: "#141418",
     theme_color: "#1f5c3d",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
