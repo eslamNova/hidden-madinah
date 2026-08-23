@@ -112,14 +112,44 @@ Installable; Serwist service worker precaches the shell and `/~offline`, runtime
 
 Project `eslamnovas-projects/hidden-madinah`, repo <https://github.com/eslamNova/hidden-madinah> (private, branch `master`).
 
+### The standard release flow
+
+Run from the repo root (Git Bash):
+
 ```bash
+# 1. Verify the code
+npx tsc --noEmit
+npx eslint src scripts --max-warnings=0
+
+# 2. Clean build — ALWAYS clean: Next's fetch cache in .next/cache can serve
+#    day-old database data under the 24h revalidate
+rm -rf .next && npm run build
+
+# 3. (optional) check it locally — http://localhost:3000, hard-refresh
+npx next start          # Ctrl+C to stop
+
+# 4. Deploy to production
 npx vercel --prod
+
+# 5. Save the work
+git add -A
+git commit -m "what changed"
+git push origin master
 ```
 
-- **`.vercelignore` matters:** the CLI ignores `.gitignore`; without it a deploy tries to upload `my_data/` (~1 GB of owner originals).
-- Vercel env: only `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `REVALIDATE_SECRET`. `NEXT_PUBLIC_SITE_URL` deliberately unset (canonicals fall back to `VERCEL_PROJECT_PRODUCTION_URL`); the service key never goes to Vercel.
-- All media is served from Supabase Storage — deploys carry no photos, so **connecting the GitHub repo for auto-deploys is now safe** (see Future work).
-- Content edits appear after a redeploy or `POST /api/revalidate` (pages are SSG, 24h revalidate).
+Good to know:
+
+- **Vercel builds on its own servers** with fresh database data — step 2 is a safety check, not what ships. If step 2 passes, step 4 will too.
+- **Content-only changes** (edits in `/admin`, newly imported media) still need a deploy to appear: pages are static for 24 h. Just run step 4.
+- **Media never rides the deploy** — it lives in Supabase Storage. `.vercelignore` keeps `my_data/` (~1 GB of originals) out; without it the CLI would try to upload it, because the CLI ignores `.gitignore`.
+- **Installed PWAs** pick up a new version on the next launch (close and reopen the app).
+- **Shortcut:** connecting the GitHub repo in Vercel (Project → Settings → Git) turns step 5 into the deploy — every push deploys itself and steps 3–4 disappear. This is safe now that no media lives in the repo.
+- If `vercel --prod` prints a JSON error blob, just re-run it — transient upload hiccups on this uplink are common and the second attempt goes through.
+
+### Vercel configuration
+
+- Env vars: only `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `REVALIDATE_SECRET`. `NEXT_PUBLIC_SITE_URL` is deliberately unset (canonicals fall back to `VERCEL_PROJECT_PRODUCTION_URL`); the service key never goes to Vercel.
+- Content edits also appear after `POST /api/revalidate` (with `REVALIDATE_SECRET`) without a full deploy.
 
 ## Scripts reference
 
