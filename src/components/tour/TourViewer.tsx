@@ -86,13 +86,21 @@ function TourVideo({
         poster={slide.poster?.url}
         muted={muted}
         playsInline
-        preload={near ? "auto" : "none"}
+        // "metadata", not "auto": auto downloads the ENTIRE mp4 for the previous
+        // and next slides — the single biggest egress cost of the tour. Metadata
+        // is a few kB (dimensions/duration, warm connection); the full stream
+        // starts only when the slide actually plays.
+        preload={near ? "metadata" : "none"}
         onPlaying={() => {
           setBlocked(false);
           onStarted();
         }}
         onEnded={onEnded}
         onLoadedData={onReady}
+        // With preload="metadata" loadeddata may not fire until playback; if
+        // autoplay is blocked, metadata is enough to drop the loader and let
+        // the poster-dwell clock run instead of stalling on the spinner.
+        onLoadedMetadata={onReady}
         onError={onReady}
         className="absolute inset-0 h-full w-full object-cover"
       />
