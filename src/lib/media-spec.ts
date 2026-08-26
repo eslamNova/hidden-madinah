@@ -10,6 +10,14 @@ export const WEBP_QUALITY = 80;
 export const JPEG_QUALITY = 82;
 export const MEDIA_BUCKET = "media";
 
+/**
+ * Public base for media URLs — the R2 custom domain (zero egress), mirroring
+ * the Supabase `media` bucket key-for-key. Objects are uploaded to Supabase
+ * first, then synced to R2; anything that emits this base must only do so for
+ * objects that exist in R2 (see README release flow).
+ */
+export const MEDIA_PUBLIC_BASE = "https://media.mazarat-madinah.com";
+
 /** Storage object path convention: places/{placeId}/{base}-{width}.{ext} */
 export function mediaObjectPath(
   placeId: string,

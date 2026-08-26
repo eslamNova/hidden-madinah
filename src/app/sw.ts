@@ -52,10 +52,12 @@ const serwist = new Serwist({
         plugins: [new ExpirationPlugin({ maxEntries: 600, maxAgeSeconds: 14 * DAY })],
       }),
     },
-    // Supabase Storage images (not videos — range requests stay network-only).
+    // Media images — R2 custom domain, plus legacy Supabase Storage URLs still
+    // in old caches/tabs (not videos — range requests stay network-only).
     {
       matcher: ({ url }) =>
-        url.pathname.includes("/storage/v1/object/public/media/") &&
+        (url.hostname === "media.mazarat-madinah.com" ||
+          url.pathname.includes("/storage/v1/object/public/media/")) &&
         !url.pathname.endsWith(".mp4"),
       handler: new CacheFirst({
         cacheName: "media-images",
