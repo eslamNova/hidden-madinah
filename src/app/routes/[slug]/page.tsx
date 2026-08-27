@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { coverImage, stripVerify } from "@/lib/content";
 import { haversineKm } from "@/lib/geo";
-import { getRouteIds, getRouteWithStops } from "@/lib/queries";
+import { getRouteSlugById, getRouteSlugs, getRouteWithStops } from "@/lib/queries";
 import { PageHero } from "@/components/layout/PageHero";
 import { PlaceCard, toPlaceCardData } from "@/components/place/PlaceCard";
 import type { RouteMapStop } from "@/components/map/RouteMap";
@@ -11,18 +11,20 @@ import { RouteMapLazy } from "@/components/map/LazyMaps";
 
 export const revalidate = 86400;
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function generateStaticParams() {
-  const ids = await getRouteIds();
-  return ids.map((id) => ({ id }));
+  const slugs = await getRouteSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
-  const route = await getRouteWithStops(id);
+  const { slug } = await params;
+  const route = await getRouteWithStops(decodeURIComponent(slug));
   // Route descriptions are owner content — strip [VERIFY] like place fields.
   return route
     ? { title: route.title_ar, description: stripVerify(route.description_ar) ?? undefined }
@@ -32,11 +34,19 @@ export async function generateMetadata({
 export default async function RouteDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { id } = await params;
-  const route = await getRouteWithStops(id);
-  if (!route) notFound();
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
+  const route = await getRouteWithStops(slug);
+  if (!route) {
+    // Routes used to be addressed by UUID — 308 old shared links to the slug.
+    if (UUID_RE.test(slug)) {
+      const target = await getRouteSlugById(slug);
+      if (target) permanentRedirect(`/routes/${encodeURIComponent(target)}`);
+    }
+    notFound();
+  }
 
   const t = await getTranslations("routes");
   const description = stripVerify(route.description_ar);

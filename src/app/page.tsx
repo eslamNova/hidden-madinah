@@ -100,6 +100,7 @@ export default async function HomePage() {
     }),
     routes: routes.slice(0, 2).map((r) => ({
       id: r.id,
+      slug: r.slug,
       title_ar: r.title_ar,
       stopsCount: r.stops.length,
       photo: coverImage(r.stops.flatMap((s) => s.media)),

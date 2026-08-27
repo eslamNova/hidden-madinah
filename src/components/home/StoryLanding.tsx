@@ -40,6 +40,7 @@ export type StoryCategory = {
 
 export type StoryRoute = {
   id: string;
+  slug: string;
   title_ar: string;
   stopsCount: number;
   photo: StoryPhoto;
@@ -330,7 +331,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                     {data.routes.map((r) => (
                       <Link
                         key={r.id}
-                        href={`/routes/${r.id}`}
+                        href={`/routes/${encodeURIComponent(r.slug)}`}
                         className="card-lift relative block overflow-hidden rounded-2xl bg-basalt shadow-md"
                       >
                         {r.photo ? (

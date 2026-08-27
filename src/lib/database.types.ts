@@ -204,18 +204,21 @@ export type Database = {
           cover_url: string | null
           description_ar: string | null
           id: string
+          slug: string
           title_ar: string
         }
         Insert: {
           cover_url?: string | null
           description_ar?: string | null
           id?: string
+          slug: string
           title_ar: string
         }
         Update: {
           cover_url?: string | null
           description_ar?: string | null
           id?: string
+          slug?: string
           title_ar?: string
         }
         Relationships: []

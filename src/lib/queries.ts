@@ -107,11 +107,11 @@ export async function getRoutesWithStops(): Promise<RouteWithStops[]> {
   }));
 }
 
-export async function getRouteWithStops(id: string): Promise<RouteWithStops | null> {
+export async function getRouteWithStops(slug: string): Promise<RouteWithStops | null> {
   const { data, error } = await publicClient
     .from("routes")
     .select("*, route_places(sort_order, places(*, media(*)))")
-    .eq("id", id)
+    .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
   if (!data) return null;
@@ -122,8 +122,19 @@ export async function getRouteWithStops(id: string): Promise<RouteWithStops | nu
   return { ...route, stops };
 }
 
-export async function getRouteIds(): Promise<string[]> {
-  const { data, error } = await publicClient.from("routes").select("id");
+/** Old /routes/<uuid> links redirect: id → slug (null when the id is unknown). */
+export async function getRouteSlugById(id: string): Promise<string | null> {
+  const { data, error } = await publicClient
+    .from("routes")
+    .select("slug")
+    .eq("id", id)
+    .maybeSingle();
   if (error) throw error;
-  return (data ?? []).map((r) => r.id);
+  return data?.slug ?? null;
+}
+
+export async function getRouteSlugs(): Promise<string[]> {
+  const { data, error } = await publicClient.from("routes").select("slug");
+  if (error) throw error;
+  return (data ?? []).map((r) => r.slug);
 }

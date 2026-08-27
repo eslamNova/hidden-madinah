@@ -42,7 +42,7 @@ export default async function RoutesPage() {
             return (
               <Link
                 key={r.id}
-                href={`/routes/${r.id}`}
+                href={`/routes/${encodeURIComponent(r.slug)}`}
                 className="card-lift relative block overflow-hidden rounded-2xl bg-basalt shadow-md"
               >
                 {cover ? (

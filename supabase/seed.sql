@@ -207,15 +207,18 @@ on conflict (slug) do update set
   related_place_slugs = excluded.related_place_slugs,
   admin_notes_ar = excluded.admin_notes_ar;
 
--- Curated route: fixed UUID so re-seeding stays idempotent.
-insert into routes (id, title_ar, description_ar, cover_url) values
+-- Curated route: fixed UUID so re-seeding stays idempotent; the slug is the
+-- public URL (/routes/quba-wells).
+insert into routes (id, slug, title_ar, description_ar, cover_url) values
 (
   '11111111-1111-4111-8111-111111111111',
+  'quba-wells',
   'جولة قباء والآبار',
   'جولة نصف يوم تبدأ من مسجد قباء أول مسجد في الإسلام، ثم بئر غرس ذات الأثر النبوي، وتُختم بمشي هادئ بين بساتين قباء قبل الغروب.',
   null
 )
 on conflict (id) do update set
+  slug = excluded.slug,
   title_ar = excluded.title_ar,
   description_ar = excluded.description_ar,
   cover_url = excluded.cover_url;
