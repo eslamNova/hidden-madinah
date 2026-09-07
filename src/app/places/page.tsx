@@ -14,6 +14,7 @@ import {
   PlacesExplorer,
   type ExplorerPlace,
 } from "@/components/place/PlacesExplorer";
+import { TelegramCard } from "@/components/place/TelegramCard";
 
 export const revalidate = 86400;
 
@@ -64,6 +65,7 @@ export default async function PlacesPage() {
         </Suspense>
         {/* Geolocation on explicit request only (moved from the story landing). */}
         <NearestPlaces places={nearestInput} />
+        <TelegramCard />
       </div>
     </>
   );

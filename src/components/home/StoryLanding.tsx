@@ -10,8 +10,9 @@ import {
   Compass,
   Play,
   Route as RouteIcon,
+  Send,
 } from "lucide-react";
-import { SEERAH_APP } from "@/lib/constants";
+import { SEERAH_APP, TELEGRAM_CHANNEL } from "@/lib/constants";
 import {
   LazyMotion,
   MotionConfig,
@@ -67,6 +68,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
   const tPlaces = useTranslations("places");
   const tRoutes = useTranslations("routes");
   const tSeerah = useTranslations("seerah");
+  const tTelegram = useTranslations("telegram");
   const reduceMotion = useReducedMotion() ?? false;
   const baseId = useId();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -459,6 +461,21 @@ export function StoryLanding({ data }: { data: StoryData }) {
                     </a>
                   </div>
                 </div>
+              </StoryItem>
+              <StoryItem className="pt-2">
+                {/* Channel invite, one slim row on purpose — the closing panel
+                    already carries three CTAs and the companion card, and the
+                    whole stack has to clear the dock on a 667px screen. */}
+                <a
+                  href={TELEGRAM_CHANNEL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="press inline-flex min-h-12 items-center gap-2.5 rounded-2xl border border-paper/20 bg-basalt/50 px-4 text-paper"
+                >
+                  <Send aria-hidden="true" className="h-5 w-5 shrink-0 text-accent" />
+                  <span className="text-sm font-semibold">{tTelegram("short")}</span>
+                  <ChevronLeft aria-hidden="true" className="h-4 w-4 shrink-0 opacity-60" />
+                </a>
               </StoryItem>
             </StoryPanel>
           </div>
