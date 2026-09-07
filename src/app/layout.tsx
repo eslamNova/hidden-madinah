@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Amiri, Cairo, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import { SiteAnalytics } from "@/components/analytics/SiteAnalytics";
 import { FloatingTextSize } from "@/components/layout/FloatingTextSize";
 import { ImmersiveBody } from "@/components/layout/ImmersiveBody";
 import { BottomNav } from "@/components/layout/BottomNav";
@@ -115,6 +117,12 @@ export default async function RootLayout({
             {children}
           </main>
           <BottomNav />
+          {/* Cookieless, so it needs no consent and runs for everyone. This is
+              the count we quote — first-party path, so ad blockers can't
+              silently shave it the way they do gtag. */}
+          <Analytics />
+          {/* GA4 + its notice; both no-ops until NEXT_PUBLIC_GA_ID is set. */}
+          <SiteAnalytics />
         </NextIntlClientProvider>
       </body>
     </html>

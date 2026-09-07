@@ -51,3 +51,6 @@ my_data/
 
 .vercel
 .env*
+
+# Claude Code local session config (machine-specific paths)
+.claude/

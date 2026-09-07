@@ -2,6 +2,7 @@ import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import {
   CacheFirst,
   ExpirationPlugin,
+  NetworkOnly,
   Serwist,
   StaleWhileRevalidate,
 } from "serwist";
@@ -27,6 +28,17 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: [
+    // Analytics must never touch a cache. defaultCache's cross-origin
+    // NetworkFirst rule would otherwise hold the gtag loader and any GET
+    // /g/collect beacon, and a beacon replayed from cache while offline is a
+    // hit that never happened — exactly the number we'd be showing partners.
+    {
+      matcher: ({ url }) =>
+        url.hostname === "www.googletagmanager.com" ||
+        url.hostname.endsWith("google-analytics.com") ||
+        url.pathname.startsWith("/_vercel/insights/"),
+      handler: new NetworkOnly(),
+    },
     // OpenFreeMap glyphs (includes the Arabic font PBF ranges) — long-lived.
     {
       matcher: ({ url }) =>
