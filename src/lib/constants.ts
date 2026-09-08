@@ -26,14 +26,13 @@ export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID ?? "";
 export const REVALIDATE_SECONDS = 86400;
 
 /**
- * Public contact address for the privacy notice. Left empty on purpose — the
- * contact section is hidden until a real inbox is set here, rather than
- * shipping a placeholder on a page that is a legal statement.
+ * Public contact address shown on the privacy notice. Empty hides the section
+ * — a legal page carries a real inbox or none at all, never a placeholder.
  */
-export const CONTACT_EMAIL = "";
+export const CONTACT_EMAIL = "islam.a.i@outlook.com";
 
 /** Shown on /privacy so visitors can see when the notice last changed. */
-export const PRIVACY_UPDATED = "1 سبتمبر 2026";
+export const PRIVACY_UPDATED = "8 سبتمبر 2026";
 
 /**
  * Companion app «سيرة» (free Seerah audio journey) — recommended on place
