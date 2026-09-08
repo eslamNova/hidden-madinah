@@ -28,6 +28,14 @@ An Arabic-first, RTL, installable web app (PWA) that guides visitors to the less
 
 Light, elevated look: soft surface→sand gradient ground (`body::before`), photo-led page headers that melt into the body (`PageHero` + `.hero-melt`), elevated cards (`.card-elevated`), floating dock navigation (no top navbar), floating أ text-size control, iOS-feel motion (`.press` tap feedback, sheet slide-up, image fade-in, sheen CTA) — all `backdrop-blur`-free over scrolling content, all respecting `prefers-reduced-motion`. Cosmetic scrollbars hidden (`.scrollbar-hidden`); the document scrollbar is thin and brand-tinted.
 
+**Typeface — thmanyah (licensed, read before touching `src/fonts/`).** The app runs on the thmanyah typeface: thmanyah Sans for headings and body (400/500/700), thmanyah Serif Display for the wordmark and featured quotes (700, deliberately not preloaded). Self-hosted via `next/font/local` from `src/fonts/`.
+
+The licence (`my_data/Thmanyah-Font-Family.zip` → `LICENSE.pdf`; the Arabic text prevails) forbids hosting the font for download, hotlinking, and *modification*. Self-hosting for on-site rendering was granted in writing by thmanyah (Khalid, 2026-09-08) on the conditions that we publish no direct download link and block hotlinking. Therefore:
+
+- **Never subset, convert or otherwise process these files** — subsetting is modification (تعديل/تكييف) and is not covered by the grant. `next/font/local` ships local files byte-for-byte; keep it that way.
+- The CORS rule in `next.config.ts` narrows `Access-Control-Allow-Origin` on `/_next/static/media/*.woff2` to the production origin. Vercel's default is `*`, which is precisely what allows hotlinking — do not remove that rule. If the production domain ever changes, update it there too.
+- `next/font/local` emits content-hashed filenames, so there is no guessable path and no download link.
+
 ### iOS specifics
 
 `viewport-fit=cover` lets the landing and tours extend under the notch/home bar; immersive routes mark `<html data-immersive>` so the page ground behind them is dark (no sand bands in safe areas or overscroll). Videos need a tap (iOS never autoplays; neither do we).

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Amiri, Cairo, IBM_Plex_Sans_Arabic } from "next/font/google";
+import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { Analytics } from "@vercel/analytics/next";
@@ -11,26 +11,38 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { OfflineBanner } from "@/components/layout/OfflineBanner";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/constants";
 
-const cairo = Cairo({
-  subsets: ["arabic", "latin"],
-  variable: "--font-cairo",
+// Thmanyah typeface, self-hosted with written permission from thmanyah
+// Publishing & Distribution (Khalid, 2026-09-08): self-hosting on our own
+// server/CDN for rendering is licensed; publishing a direct download link or
+// allowing hotlinking from other projects is not — see the CORS rule in
+// next.config.ts. The files are shipped byte-for-byte: next/font/local does
+// not subset local fonts, and the licence forbids modifying them (تعديل /
+// تكييف), so no subsetting pass may ever be added here.
+//
+// One family for headings and body (the old Cairo/IBM Plex pair were both
+// sans anyway); the serif display carries the wordmark, as Amiri did.
+const thmanyahSans = localFont({
+  src: [
+    { path: "../fonts/thmanyahsans-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/thmanyahsans-Medium.woff2", weight: "500", style: "normal" },
+    { path: "../fonts/thmanyahsans-Bold.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-thmanyah-sans",
   display: "swap",
 });
 
-const plexArabic = IBM_Plex_Sans_Arabic({
-  weight: ["400", "500", "600", "700"],
-  subsets: ["arabic", "latin"],
-  variable: "--font-plex-arabic",
+const thmanyahSerif = localFont({
+  src: [
+    {
+      path: "../fonts/thmanyahserifdisplay-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-thmanyah-serif",
   display: "swap",
-});
-
-const amiri = Amiri({
-  weight: ["400", "700"],
-  subsets: ["arabic", "latin"],
-  variable: "--font-amiri",
-  display: "swap",
-  // Wordmark + featured quotes only — ~248kB of woff2 that should not race
-  // the hero image on 4G. display:swap covers the late arrival.
+  // Wordmark + featured quotes only — 80kB that should not race the hero
+  // image on 4G, exactly as Amiri was treated before it.
   preload: false,
 });
 
@@ -97,7 +109,7 @@ export default async function RootLayout({
       dir="rtl"
       // data-font-step / data-theme are set pre-paint by the inline script.
       suppressHydrationWarning
-      className={`${cairo.variable} ${plexArabic.variable} ${amiri.variable}`}
+      className={`${thmanyahSans.variable} ${thmanyahSerif.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: fontStepScript }} />
