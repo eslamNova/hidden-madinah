@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { CoverImage } from "@/lib/content";
 import type { PlaceCategory } from "@/lib/maps";
 import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
+import { TelegramIconLink } from "@/components/layout/TelegramIconLink";
 
 /**
  * Compact photo-led page header — the place-page hero's little sibling
@@ -50,6 +51,10 @@ export async function PageHero({
       <div aria-hidden="true" className="warm-wash absolute inset-0" />
       <div aria-hidden="true" className="scrim-hero absolute inset-0" />
       <div aria-hidden="true" className="hero-melt absolute inset-x-0 bottom-0 h-12" />
+
+      {/* Mirrors the floating أ control across the header; pt-20 below already
+          reserves this band, so it never crowds the title. */}
+      <TelegramIconLink className="absolute end-2 top-[max(env(safe-area-inset-top),0.5rem)] z-10" />
 
       <div className="relative flex min-h-[30dvh] flex-col justify-end px-4 pb-14 pt-20 md:min-h-[34dvh]">
         <div className={`mx-auto w-full space-y-2 ${innerClassName}`}>

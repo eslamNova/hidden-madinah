@@ -15,6 +15,7 @@ import { RelatedPlaces } from "@/components/place/RelatedPlaces";
 import { SeerahAppCard } from "@/components/place/SeerahAppCard";
 import { VisitInfoCard } from "@/components/place/VisitInfoCard";
 import { PlaceMapLazy } from "@/components/map/LazyMaps";
+import { TelegramIconLink } from "@/components/layout/TelegramIconLink";
 
 export const revalidate = 86400;
 
@@ -114,6 +115,9 @@ export default async function PlacePage({
         )}
         <div aria-hidden="true" className="warm-wash absolute inset-0" />
         <div aria-hidden="true" className="scrim-hero absolute inset-0" />
+
+        {/* pt-24 below already reserves this band. */}
+        <TelegramIconLink className="absolute end-2 top-[max(env(safe-area-inset-top),0.5rem)] z-10" />
 
         <div className="relative flex min-h-[62dvh] flex-col justify-end px-5 pb-8 pt-24">
           <div className="mx-auto w-full max-w-3xl space-y-3">

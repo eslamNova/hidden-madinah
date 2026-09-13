@@ -22,6 +22,7 @@ import {
 import { CATEGORY_META, type PlaceCategory } from "@/lib/maps";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
+import { TelegramIconLink } from "@/components/layout/TelegramIconLink";
 import { StoryItem, StoryPanel, type StoryPhoto } from "./StoryPanel";
 
 export type StoryPlace = {
@@ -479,6 +480,12 @@ export function StoryLanding({ data }: { data: StoryData }) {
               </StoryItem>
             </StoryPanel>
           </div>
+
+          {/* Channel icon, pinned over the story rather than inside a panel:
+              the landing's only other Telegram link is on the closing panel,
+              which most visitors never reach. Physical top-LEFT, mirroring the
+              floating أ control. */}
+          <TelegramIconLink className="absolute end-2 top-[max(env(safe-area-inset-top),0.5rem)] z-10" />
 
           {/* Floating controls over the scroll container. No backdrop-blur —
               re-blurring the moving photos every frame is what mid-range GPUs
