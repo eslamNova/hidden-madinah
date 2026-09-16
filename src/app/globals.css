@@ -251,12 +251,18 @@ html[data-immersive] body::before {
 }
 
 /* Maplibre's default controls are 29px — far under the elderly-first 48px
-   floor. Pure CSS resize; the zoom buttons are the control users need most. */
-.maplibregl-ctrl-group button {
+   floor. Pure CSS resize; the zoom buttons are the control users need most.
+
+   The doubled `.maplibregl-ctrl.maplibregl-ctrl-group` is load-bearing, not
+   redundant: maplibre's own rule is `.maplibregl-ctrl-group button` (0,1,1),
+   identical to ours, and its stylesheet is injected AFTER this one — so at
+   equal specificity it won the tie and the buttons silently rendered at 29px.
+   Matching both classes on the parent (0,2,1) wins regardless of order. */
+.maplibregl-ctrl.maplibregl-ctrl-group button {
   width: 48px;
   height: 48px;
 }
-.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+.maplibregl-ctrl.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
   background-size: 24px;
 }
 
