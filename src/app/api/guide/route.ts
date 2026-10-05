@@ -6,7 +6,7 @@ import { REFERRAL_LINE, REFUSAL, TYPE_RE, systemPrompt, type AnswerType } from "
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 /**
  * POST /api/guide — the AI guide. Streams NDJSON:
