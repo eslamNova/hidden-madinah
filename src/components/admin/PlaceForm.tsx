@@ -225,7 +225,7 @@ export function PlaceForm({
             type="text"
             dir="ltr"
             required
-            pattern="[a-z0-9-]+"
+            pattern="[a-z0-9\-]+"
             value={form.slug}
             onChange={set("slug")}
             className={inputClass}

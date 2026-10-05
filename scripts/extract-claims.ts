@@ -49,7 +49,7 @@ type Extracted = {
 
 const THEMES = ["mercy", "forgiveness", "humility", "loyalty", "neighbourliness", "courage", "patience", "brotherhood", "generosity", "worship"];
 const TOPIC_SLUGS = new Set(["nabawi"]);
-const BATCH_CHARS = 11000;
+const BATCH_CHARS = 60000; // one request per place: free-tier quotas count requests, not tokens
 
 const SYSTEM = `أنت باحث مساعد في السيرة النبوية وتاريخ المدينة المنورة، تعمل تحت إشراف مراجع شرعي.
 مهمتك: استخراج معلومات ذرّية موثّقة من نص «وفاء الوفاء بأخبار دار المصطفى» للسمهودي (ت 911هـ)، تخدم زائر الموضع المذكور.
@@ -173,7 +173,7 @@ async function main() {
     const totalChars = corpus.passages.reduce((n, p) => n + p.text.length, 0);
     const parts = batches(corpus.passages);
     // Budget claims by how much source text the place has (bigger chapters → more claims).
-    const maxPerBatch = Math.max(4, Math.min(10, Math.round(30 / parts.length) + 2));
+    const maxPerBatch = Math.max(12, Math.min(30, Math.round(totalChars / 1500)));
     console.log(`${slug}: ${corpus.passages.length} paragraphs, ${totalChars} chars, ${parts.length} batch(es)`);
 
     const rows: TablesInsert<"claims">[] = [];

@@ -19,6 +19,8 @@ export async function reviewClaimAction(input: ClaimReviewInput): Promise<Action
     const patch: TablesUpdate<"claims"> = {
       status: input.status,
       reviewed_at: input.status === "pending" ? null : new Date().toISOString(),
+      // The English text is shown beside the Arabic and approved with it.
+      en_reviewed: input.status === "verified",
     };
     if (input.text_ar !== undefined) {
       const text = input.text_ar.trim();
@@ -45,7 +47,7 @@ export async function approveClaimsAction(ids: number[]): Promise<ActionResult<{
     if (ids.length === 0) return { ok: true, data: { count: 0 } };
     const { error } = await supabase
       .from("claims")
-      .update({ status: "verified", reviewed_at: new Date().toISOString() })
+      .update({ status: "verified", reviewed_at: new Date().toISOString(), en_reviewed: true })
       .in("id", ids);
     if (error) return { ok: false, error: error.message };
     revalidatePath("/", "layout");

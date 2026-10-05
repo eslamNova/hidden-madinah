@@ -142,6 +142,13 @@ function ClaimCard({
         />
       </label>
 
+      {claim.text_en && (
+        <p dir="ltr" lang="en" className="rounded-xl bg-sand/30 p-3 text-start leading-relaxed">
+          <span className="block text-xs font-semibold text-muted" dir="rtl">{t("englishText")}</span>
+          {claim.text_en}
+        </p>
+      )}
+
       {claim.quote_ar && (
         <blockquote className="border-s-4 border-accent ps-3 leading-relaxed text-muted">
           «{claim.quote_ar}»

@@ -112,7 +112,14 @@ export async function POST(request: Request) {
         }
       } catch (err) {
         console.error("guide model error", err);
-        full = `${lang === "ar" ? "تعذّر الوصول إلى المرشد الآن. حاول بعد قليل." : "The guide is unavailable right now. Please try again shortly."}\n<<type:refuse>>`;
+        if (full.replace(TYPE_RE, "").trim().length > 40) {
+          // The stream broke after a usable answer: keep it and let the
+          // citation guard below judge it like any other answer.
+          if (!TYPE_RE.test(full)) full += "\n<<type:answer>>";
+        } else {
+          full = `${lang === "ar" ? "تعذّر الوصول إلى المرشد الآن. حاول بعد قليل." : "The guide is unavailable right now. Please try again shortly."}\n<<type:refuse>>`;
+          emitted = Number.MAX_SAFE_INTEGER; // force a clean `replace` below
+        }
       }
 
       // ── Guard ────────────────────────────────────────────────────────────
@@ -132,6 +139,7 @@ export async function POST(request: Request) {
         text = `${REFUSAL[lang]}\n${REFERRAL_LINE[lang]}`;
         replace = text;
       }
+      if (emitted === Number.MAX_SAFE_INTEGER) replace = text;
       if (!replace && emitted < text.length) send({ t: "d", v: text.slice(emitted) });
 
       const citations: CitationInfo[] = valid.map((id) => ctx.claims.get(id)!);
