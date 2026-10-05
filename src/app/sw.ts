@@ -39,6 +39,12 @@ const serwist = new Serwist({
         url.pathname.startsWith("/_vercel/insights/"),
       handler: new NetworkOnly(),
     },
+    // Our own API (AI guide, planner, logging) is per-request and streamed: a
+    // cached answer would be a stale or someone else's reply.
+    {
+      matcher: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/api/"),
+      handler: new NetworkOnly(),
+    },
     // OpenFreeMap glyphs (includes the Arabic font PBF ranges) — long-lived.
     {
       matcher: ({ url }) =>
