@@ -77,6 +77,13 @@ async function main() {
       continue;
     }
 
+    // Claims already reviewed (verified/rejected) for this place: a draft
+    // quoting the same passage would duplicate the reviewer's decision.
+    const reviewedQ = db.from("claims").select("quote_ar").neq("status", "pending");
+    const { data: reviewed } = await (isTopic ? reviewedQ.is("place_id", null).eq("topic", slug) : reviewedQ.eq("place_id", pid!));
+    const reviewedQuotes = (reviewed ?? []).map((r) => squash(r.quote_ar ?? "")).filter((q) => q.length >= 20);
+    let duplicates = 0;
+
     const rows: TablesInsert<"claims">[] = [];
     const problems: string[] = [];
     drafts.forEach((d, i) => {
@@ -89,6 +96,10 @@ async function main() {
       const q = squash(d.quote_ar ?? "");
       if (q.length < 20) return problems.push(`${where}: quote too short`);
       if (!squash(p.text).includes(q)) return problems.push(`${where}: quote not found verbatim: «${d.quote_ar.slice(0, 60)}…»`);
+      if (reviewedQuotes.some((r) => r.includes(q) || q.includes(r))) {
+        duplicates++;
+        return;
+      }
       rows.push({
         place_id: pid ?? null,
         topic: isTopic ? slug : null,
@@ -111,7 +122,7 @@ async function main() {
 
     totalOk += rows.length;
     totalBad += problems.length;
-    console.log(`${slug}: ${rows.length} valid, ${problems.length} rejected`);
+    console.log(`${slug}: ${rows.length} valid, ${problems.length} rejected, ${duplicates} already reviewed`);
     for (const pr of problems) console.log(`   ✗ ${pr}`);
     if (dryRun) continue;
 

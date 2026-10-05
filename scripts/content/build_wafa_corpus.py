@@ -54,7 +54,9 @@ PLACES: dict[str, list[tuple[int, int]]] = {
     # Uhud: the battle (year 3), virtue of Uhud and its martyrs, 'Aynayn, Uhud entry.
     "jabal-al-rumah": [(212, 225), (674, 686), (822, 823), (934, 934)],
     # Khandaq (year 5), Masjid al-Fath and the mosques around it, Khandaq and Sal' entries.
-    "al-masajid-al-sabaa": [(228, 235), (606, 613), (882, 883), (905, 906)],
+    # 884 appended last (not merged into 882–883) so existing paragraph indexes stay stable:
+    # it holds Ibn Sa'd's report of the Prophet ﷺ digging with his own hands.
+    "al-masajid-al-sabaa": [(228, 235), (606, 613), (882, 883), (905, 906), (884, 884)],
     "masjid-al-qiblatayn": [(208, 209), (614, 615)],
     # Masjid al-'Usba / al-Nur and Bir al-Hujaym.
     "masjid-al-usba": [(640, 640), (837, 838), (928, 929), (971, 971)],
