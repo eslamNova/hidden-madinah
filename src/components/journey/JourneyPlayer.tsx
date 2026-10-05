@@ -18,6 +18,7 @@ import {
 } from "@/lib/visits";
 import { JourneyQuiz, score } from "./JourneyQuiz";
 import { StopView } from "./StopView";
+import { TestimonialForm } from "./TestimonialForm";
 
 type Step = "intro" | "pre" | number | "post" | "done";
 
@@ -383,6 +384,10 @@ function Completion({
           {t("thanks")}
         </p>
       )}
+
+      {/* Separate from the anonymous score above: this one is published (after
+          review) and carries what the visitor chooses to write. */}
+      <TestimonialForm journeySlug={journey.slug} lang={journey.lang} preview={preview} />
 
       <div className="flex flex-wrap gap-3">
         <button type="button" onClick={share} className="flex min-h-12 items-center gap-2 rounded-2xl border-[1.5px] border-primary px-5 font-semibold text-brand">

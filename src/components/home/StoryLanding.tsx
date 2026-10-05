@@ -23,7 +23,9 @@ import { CATEGORY_META, type PlaceCategory } from "@/lib/maps";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
 import { TelegramIconLink } from "@/components/layout/TelegramIconLink";
+import type { Testimonial } from "@/lib/testimonials";
 import { StoryItem, StoryPanel, type StoryPhoto } from "./StoryPanel";
+import { Testimonials } from "./Testimonials";
 
 export type StoryPlace = {
   slug: string;
@@ -54,6 +56,8 @@ export type StoryData = {
   featured: StoryFeatured[];
   categories: StoryCategory[];
   routes: StoryRoute[];
+  /** Approved visitor testimonials; the panel is left out when there are none. */
+  testimonials: Testimonial[];
   closingPhoto: StoryPhoto;
 };
 
@@ -79,10 +83,12 @@ export function StoryLanding({ data }: { data: StoryData }) {
   const [visited, setVisited] = useState<Set<number>>(() => new Set([0]));
 
   const hasRoutes = data.routes.length > 0;
+  const hasVoices = data.testimonials.length > 0;
   const featuredStart = 1;
   const categoriesIdx = featuredStart + data.featured.length;
   const routesIdx = hasRoutes ? categoriesIdx + 1 : -1;
-  const closingIdx = categoriesIdx + (hasRoutes ? 2 : 1);
+  const voicesIdx = hasVoices ? categoriesIdx + (hasRoutes ? 2 : 1) : -1;
+  const closingIdx = categoriesIdx + 1 + (hasRoutes ? 1 : 0) + (hasVoices ? 1 : 0);
   const total = closingIdx + 1;
 
   useEffect(() => {
@@ -364,6 +370,29 @@ export function StoryLanding({ data }: { data: StoryData }) {
                       </Link>
                     ))}
                   </div>
+                </StoryItem>
+              </StoryPanel>
+            )}
+
+            {/* Visitors' own words, just before the invitation — approved
+                testimonials only; no panel at all until there is one. */}
+            {hasVoices && (
+              <StoryPanel
+                ref={refAt(voicesIdx)}
+                labelledBy={headingId(voicesIdx)}
+                plain
+                reduceMotion={reduceMotion}
+                revealed={visited.has(voicesIdx)}
+                contentClassName="justify-center"
+              >
+                <StoryItem>
+                  <h2 id={headingId(voicesIdx)} className="text-3xl text-paper">
+                    {t("testimonials.title")}
+                  </h2>
+                  <span aria-hidden="true" className="gold-rule mt-2 block h-px w-16" />
+                </StoryItem>
+                <StoryItem className="pt-2">
+                  <Testimonials items={data.testimonials} />
                 </StoryItem>
               </StoryPanel>
             )}

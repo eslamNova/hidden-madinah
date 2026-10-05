@@ -16,6 +16,7 @@ import { RelatedPlaces } from "@/components/place/RelatedPlaces";
 import { SeerahAppCard } from "@/components/place/SeerahAppCard";
 import { GuideChat } from "@/components/guide/GuideChat";
 import { QrCheckin } from "@/components/place/QrCheckin";
+import { DistanceToHere } from "@/components/place/DistanceToHere";
 import { VisitInfoCard } from "@/components/place/VisitInfoCard";
 import { PlaceMapLazy } from "@/components/map/LazyMaps";
 import { TelegramIconLink } from "@/components/layout/TelegramIconLink";
@@ -167,7 +168,17 @@ export async function PlaceView({ lang, params }: { lang: Lang; params: Params }
 
         {view.quote && <FeaturedQuote quote={view.quote} source={view.quoteSource} />}
 
-        <VisitInfoCard place={view} />
+        {/* "How far am I from here?" sits right on top of the visit info,
+            grouped with it; keyed by slug so a client-side move to another
+            place starts fresh (no distance or QR state carried over). */}
+        {view.lat != null && view.lng != null ? (
+          <div className="space-y-3">
+            <DistanceToHere key={place.slug} name={place.name_ar} lat={view.lat} lng={view.lng} />
+            <VisitInfoCard place={view} />
+          </div>
+        ) : (
+          <VisitInfoCard place={view} />
+        )}
 
         {galleryMedia.length > 0 && (
           <section aria-label={t("gallery")} className="space-y-3">

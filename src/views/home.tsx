@@ -9,6 +9,7 @@ import {
 } from "@/lib/queries";
 import { HERO_IMAGES } from "@/lib/hero-images";
 import { CATEGORY_ORDER } from "@/lib/maps";
+import { getVerifiedTestimonials } from "@/lib/testimonials";
 import {
   StoryLanding,
   type StoryData,
@@ -26,8 +27,12 @@ export async function homeMetadata(lang: Lang): Promise<Metadata> {
 
 export async function HomeView({ lang }: { lang: Lang }) {
   const tTour = await getTranslations("tour");
-  const places = await getPublishedPlaces(lang);
-  const routes = await getRoutesWithStops(lang);
+  // Testimonials never throw: the landing renders without them.
+  const [places, routes, testimonials] = await Promise.all([
+    getPublishedPlaces(lang),
+    getRoutesWithStops(lang),
+    getVerifiedTestimonials(lang),
+  ]);
 
   const featured = places.filter((p) => p.featured);
 
@@ -116,6 +121,7 @@ export async function HomeView({ lang }: { lang: Lang }) {
       stopsCount: r.stops.length,
       photo: coverImage(r.stops.flatMap((s) => s.media)),
     })),
+    testimonials,
     closingPhoto,
   };
 

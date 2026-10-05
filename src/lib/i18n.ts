@@ -11,7 +11,7 @@ export const langOf = (locale: string | null | undefined): Lang => (locale?.star
 export const INTL_LOCALE: Record<Lang, string> = { ar: "ar-u-nu-latn", en: "en" };
 
 /** Public paths that have an English twin under /en (admin and API never do). */
-const HAS_EN = /^\/(?:$|places(?:\/|$)|journeys(?:\/|$)|plan\/?$|my-journey\/?$|map\/?$|routes(?:\/|$)|tour\/?$|privacy\/?$)/;
+const HAS_EN = /^\/(?:$|places(?:\/|$)|journeys(?:\/|$)|stories\/?$|plan\/?$|my-journey\/?$|map\/?$|routes(?:\/|$)|tour\/?$|privacy\/?$)/;
 
 const splitHref = (href: string): [string, string] => {
   const i = href.search(/[?#]/);

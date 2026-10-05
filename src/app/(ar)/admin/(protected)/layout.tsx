@@ -37,6 +37,9 @@ export default async function AdminProtectedLayout({
           <Link href="/admin/journeys" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
             {t("navJourneys")}
           </Link>
+          <Link href="/admin/testimonials" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
+            {t("navTestimonials")}
+          </Link>
           <Link href="/admin/qr" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
             {t("navQr")}
           </Link>

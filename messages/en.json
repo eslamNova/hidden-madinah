@@ -58,6 +58,14 @@
       "panelOf": "Panel {current} of {total}",
       "openPlace": "Discover this place",
       "closingTitle": "Start your journey through Madinah's historic sites"
+    },
+    "testimonials": {
+      "title": "What visitors say",
+      "listLabel": "Approved visitor testimonials",
+      "swipeHint": "Swipe sideways to read more",
+      "readAll": "Read it all",
+      "showLess": "Show less",
+      "anonymous": "A visitor"
     }
   },
   "places": {
@@ -125,6 +133,23 @@
       "garden": "Garden",
       "historical_site": "Historic site",
       "other": "Place"
+    },
+    "howFar": {
+      "title": "Distance from where you are",
+      "button": "How far am I from here?",
+      "locating": "Finding your location…",
+      "again": "Check again",
+      "retry": "Try again",
+      "privacy": "Worked out on your device only — your location is never sent or saved.",
+      "walk": "You are <b>{distance}</b> from {name} — about <b>{min, plural, one {# minute} other {# minutes}}</b> on foot.",
+      "drive": "You are <b>{distance}</b> from {name} — about <b>{min, plural, one {# minute} other {# minutes}}</b> by car.",
+      "far": "You seem to be far from Madinah right now — <b>{distance}</b> from {name}. Try again once you are in Madinah.",
+      "atPlace": "<b>You are practically here</b> — just steps from {name}.",
+      "here": "<b>You are here</b> — at {name}.",
+      "approx": "Your location is approximate, so the real distance may differ a little.",
+      "denied": "Location permission was turned down, so we can't work out the distance. You can allow it in your browser settings and try again.",
+      "unavailable": "We couldn't find your location just now. Check that location is switched on in your phone, then try again.",
+      "unsupported": "This browser can't share your location, so we can't work out the distance."
     }
   },
   "map": {
@@ -216,7 +241,8 @@
       "Device and browser type",
       "The link that brought you to us",
       "Questions sent to the “AI Guide” and its answers — their text is stored without a name, IP address or location, to improve the quality of the answers and measure their accuracy",
-      "Your quiz results from before and after a journey, and your rating of the journey — only if you tap “Send result”, and without any personal data"
+      "Your quiz results from before and after a journey, and your rating of the journey — only if you tap “Send result”, and without any personal data",
+      "Your opinion of a journey and your name if you type it (optional) — sent only if you agree to its publication, published only after review, and shown with your name as typed or as “Visitor”. To have it removed, email us at the address below."
     ],
     "neverTitle": "What we do not collect",
     "neverBody": "We do not ask for or store any of the following about visitors to the site:",
@@ -374,7 +400,37 @@
     "notInEnglish": "This journey is not available in English yet. You can take it in Arabic now.",
     "openArabic": "Open the Arabic version",
     "listNotInEnglish": "The journeys are being translated into English. You can take them in Arabic now.",
-    "moreInArabic": "More journeys are available in Arabic."
+    "moreInArabic": "More journeys are available in Arabic.",
+    "filterLabel": "Filter journeys",
+    "filterAll": "All",
+    "filterCount": "{count, plural, one {Showing # journey} other {Showing # journeys}}",
+    "tagsLabel": "Journey tags",
+    "tags": {
+      "first-time": "First visit",
+      "family": "Family",
+      "evening": "Evening",
+      "seasonal": "Seasonal",
+      "ramadan": "Ramadan",
+      "hajj": "Hajj"
+    },
+    "storiesCardTitle": "Human stories",
+    "storiesCardText": "Humane moments from the Seerah, set in the places of Madinah, with their sources.",
+    "testimonial": {
+      "title": "Share your thoughts",
+      "intro": "Tell us what this journey meant to you. After review, we may publish it on the home page.",
+      "bodyLabel": "Your thoughts on the journey",
+      "bodyHint": "Between {min} and {max} characters.",
+      "tooShort": "Please write at least {min} characters.",
+      "tooLong": "The text is longer than {max} characters. Please shorten it.",
+      "nameLabel": "Your name (optional)",
+      "nameHint": "Shown with your words exactly as you type it. Leave it empty to appear as “A visitor”.",
+      "consent": "I agree to my words being published on the site after review",
+      "consentRequired": "Please tick the consent box so we can publish your words.",
+      "privacy": "We send only what you type here, plus which journey it is about and its language. No email, no phone number, no location.",
+      "submit": "Send my thoughts",
+      "sending": "Sending…",
+      "thanks": "Thank you! Your words reached us and will appear on the site after review."
+    }
   },
   "plan": {
     "title": "Plan your visit",
@@ -461,5 +517,39 @@
     "legBack": "Back to the starting point: {leg}",
     "openMapsPart": "Google Maps — part {n}",
     "listSeparator": ", "
+  },
+  "stories": {
+    "title": "Human stories",
+    "subtitle": "Human moments from the life of the Prophet ﷺ and his Companions in Madinah — mercy, humility and loyalty — each with its source.",
+    "intro": "These stories come from Wafa al-Wafa, al-Samhudi's history of Madinah. A story appears here only after a specialist has reviewed it and checked where it is in the book. Choose a theme to read its stories, or open the place a story is linked to.",
+    "filterLabel": "Browse stories by theme",
+    "all": "All",
+    "count": "{count, plural, =0 {No stories} one {# story} other {# stories}}",
+    "countTheme": "{theme}: {count, plural, one {# story} other {# stories}}",
+    "themesLabel": "Themes of this story",
+    "placeLink": "Read about the place: {name}",
+    "source": "Wafa al-Wafa, vol. {vol}, p. {page}",
+    "empty": "No stories have been approved yet. Each story is added once a specialist has reviewed it and its source.",
+    "emptyCta": "Browse the places",
+    "notInEnglish": "The English translations of these stories have not been reviewed yet.",
+    "moreInArabic": "More stories are available in Arabic.",
+    "openArabic": "Read them in Arabic",
+    "journeysCta": "Follow these stories on the ground with our Journeys",
+    "topics": {
+      "nabawi": "The Prophet's Mosque",
+      "hijra": "The Hijra"
+    },
+    "themes": {
+      "mercy": "Mercy",
+      "humility": "Humility",
+      "brotherhood": "Brotherhood",
+      "loyalty": "Loyalty",
+      "patience": "Patience",
+      "generosity": "Generosity",
+      "courage": "Courage",
+      "worship": "Worship",
+      "forgiveness": "Forgiveness",
+      "neighbourliness": "Neighbourliness"
+    }
   }
 }
