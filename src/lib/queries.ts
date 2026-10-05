@@ -224,3 +224,52 @@ export async function getJourney(slug: string, client: SupabaseLike = publicClie
     claims,
   };
 }
+
+// ── Trip planner ────────────────────────────────────────────────────────────
+
+/**
+ * Published places with the practical fields the planner needs, plus one
+ * verified, cited fact each (a human moment or virtue first, level A first,
+ * then the shortest) — the planner shows sources, never generated text.
+ */
+export async function getPlannerPlaces(): Promise<import("@/lib/planner/solver").PlannerPlace[]> {
+  const { data: places, error } = await publicClient
+    .from("places")
+    .select("id, slug, name_ar, category, lat, lng, featured, visit_minutes, has_stairs, walking_effort")
+    .eq("is_published", true);
+  if (error) throw error;
+  const { data: claims, error: claimsErr } = await publicClient
+    .from("claims")
+    .select("place_id, text_ar, vol, page, kind, content_level")
+    .eq("status", "verified")
+    .not("place_id", "is", null);
+  if (claimsErr && !isMissingTable(claimsErr)) throw claimsErr;
+
+  const rank = (c: { kind: string; content_level: string; text_ar: string }) =>
+    (c.kind === "humane" ? 0 : c.kind === "virtue" ? 1 : 2) * 10 + (c.content_level === "A" ? 0 : 5) + c.text_ar.length / 1000;
+  const best = new Map<string, { text_ar: string; vol: number | null; page: number | null; score: number }>();
+  for (const c of claims ?? []) {
+    if (!c.place_id) continue;
+    const score = rank(c);
+    const prev = best.get(c.place_id);
+    if (!prev || score < prev.score) best.set(c.place_id, { text_ar: c.text_ar, vol: c.vol, page: c.page, score });
+  }
+
+  return (places ?? [])
+    .filter((p) => p.lat != null && p.lng != null)
+    .map((p) => {
+      const fact = best.get(p.id);
+      return {
+        slug: p.slug,
+        name: p.name_ar,
+        category: p.category,
+        lat: Number(p.lat),
+        lng: Number(p.lng),
+        featured: p.featured,
+        visitMinutes: p.visit_minutes,
+        hasStairs: p.has_stairs,
+        walkingEffort: (p.walking_effort as "low" | "medium" | "high" | null) ?? null,
+        fact: fact ? { text: fact.text_ar, vol: fact.vol, page: fact.page } : null,
+      };
+    });
+}

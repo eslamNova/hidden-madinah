@@ -40,6 +40,12 @@ export default async function AdminProtectedLayout({
           <Link href="/admin/qr" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
             {t("navQr")}
           </Link>
+          <Link href="/admin/practical" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
+            {t("navPractical")}
+          </Link>
+          <Link href="/admin/hotel" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
+            {t("navHotel")}
+          </Link>
         </nav>
         <form action={signOutAction}>
           <button

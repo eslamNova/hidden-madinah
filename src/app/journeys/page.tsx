@@ -17,6 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function JourneysPage() {
   const t = await getTranslations("journey");
+  const tp = await getTranslations("plan");
   const journeys = await getPublishedJourneys();
   const day = Math.floor(Date.now() / 86_400_000);
   const heroPhoto =
@@ -27,9 +28,14 @@ export default async function JourneysPage() {
   return (
     <>
       <PageHero photo={heroPhoto} title={t("listTitle")} subtitle={t("listSubtitle")}>
-        <Link href="/my-journey" className="mt-2 inline-flex min-h-11 items-center rounded-full bg-paper/15 px-4 font-medium text-paper">
-          {t("myJourney")}
-        </Link>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Link href="/plan" className="inline-flex min-h-11 items-center rounded-full bg-accent px-4 font-semibold text-basalt">
+            {tp("cta")}
+          </Link>
+          <Link href="/my-journey" className="inline-flex min-h-11 items-center rounded-full bg-paper/15 px-4 font-medium text-paper">
+            {t("myJourney")}
+          </Link>
+        </div>
       </PageHero>
       <div className="mx-auto max-w-3xl space-y-5 px-4 pb-8 pt-8">
         {journeys.length === 0 ? (
