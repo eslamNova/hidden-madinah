@@ -15,7 +15,7 @@ import {
   type PlannerPlace,
   type StartKey,
 } from "@/lib/planner/solver";
-import type { ParsedRequest } from "@/lib/planner/parse";
+import { parseRequestFallback, type ParsedRequest } from "@/lib/planner/parse";
 
 const MINUTES = [30, 60, 90, 120, 180, 240] as const;
 const COMPANIONS: Companions[] = ["alone", "family", "elderly", "kids"];
@@ -93,30 +93,40 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
     );
   };
 
+  const apply = (p: ParsedRequest, source: string) => {
+    setForm((f) => ({
+      minutes: p.minutes ?? f.minutes,
+      companions: p.companions ?? f.companions,
+      mobility: p.mobility ?? (p.companions === "elderly" ? "limited" : f.mobility),
+      interests: p.interests.length ? p.interests : f.interests,
+      start: p.start ?? (f.start === "custom" && custom ? "custom" : f.start),
+      mode: p.mode ?? f.mode,
+    }));
+    setUnderstood({ parsed: p, source });
+  };
+
   async function understand() {
     const q = text.trim();
     if (!q || parsing) return;
+    // Instant answer from the on-device keyword reader; the AI then refines
+    // it if it replies in time. A slow or failed AI never blocks the plan.
+    apply(parseRequestFallback(q), "keywords");
     setParsing(true);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12_000);
     try {
       const res = await fetch("/api/plan/parse", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ text: q }),
+        signal: ctrl.signal,
       });
-      const data = (await res.json()) as { parsed?: ParsedRequest; source?: string };
-      if (data.parsed) {
-        const p = data.parsed;
-        setForm((f) => ({
-          minutes: p.minutes ?? f.minutes,
-          companions: p.companions ?? f.companions,
-          mobility: p.mobility ?? (p.companions === "elderly" ? "limited" : f.mobility),
-          interests: p.interests.length ? p.interests : f.interests,
-          start: p.start ?? (f.start === "custom" && custom ? "custom" : f.start),
-          mode: p.mode ?? f.mode,
-        }));
-        setUnderstood({ parsed: p, source: data.source ?? "ai" });
-      }
+      const data = res.ok ? ((await res.json().catch(() => null)) as { parsed?: ParsedRequest; source?: string } | null) : null;
+      if (data?.parsed && data.source === "ai") apply(data.parsed, "ai");
+    } catch {
+      // Timed out or offline: the keyword result already filled the form.
     } finally {
+      clearTimeout(timer);
       setParsing(false);
     }
   }
@@ -167,11 +177,12 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
           className="flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 text-lg font-semibold text-paper disabled:opacity-50"
         >
           {parsing && <Loader2 aria-hidden="true" className="h-5 w-5 animate-spin" />}
-          {parsing ? t("understanding") : t("understand")}
+          {t("understand")}
         </button>
         {understood && (
-          <p role="status" className="text-sm text-muted">
-            {understood.source === "ai" ? t("understoodAi") : t("understoodKeywords")}
+          <p role="status" className="flex items-center gap-2 text-sm text-muted">
+            {parsing && <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />}
+            {parsing ? t("refining") : understood.source === "ai" ? t("understoodAi") : t("understoodKeywords")}
           </p>
         )}
       </section>

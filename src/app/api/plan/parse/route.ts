@@ -14,6 +14,7 @@ export const maxDuration = 30;
 
 const hits = new Map<string, number[]>();
 const PER_MINUTE = 6;
+const AI_BUDGET_MS = 8_000;
 
 export async function POST(request: Request) {
   let text = "";
@@ -36,12 +37,18 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { data } = await generateJson<Partial<ParsedRequest>>({
-      tier: "fast",
-      system: PARSE_SYSTEM,
-      prompt: text,
-      schema: PARSE_SCHEMA,
-    });
+    // Hard budget for the AI: free-tier fallbacks can take longer than the
+    // platform allows, and a visitor shouldn't wait more than a few seconds
+    // for something the keyword parser can answer instantly.
+    const { data } = await Promise.race([
+      generateJson<Partial<ParsedRequest>>({
+        tier: "fast",
+        system: PARSE_SYSTEM,
+        prompt: text,
+        schema: PARSE_SCHEMA,
+      }),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("ai_timeout")), AI_BUDGET_MS)),
+    ]);
     const parsed = sanitizeParsed(data);
     // The keyword parser fills anything the model left unknown.
     const kw = parseRequestFallback(text);
