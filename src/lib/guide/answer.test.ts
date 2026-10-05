@@ -73,8 +73,19 @@ test("history questions in English are not practical", () => {
     "What happened nearly a year later?",
     "Who was buried here?",
     "Is there a hadith about the virtue of this mosque?",
+    // Transport, price and opening words inside a question about the past.
+    "Did the Prophet walk to Quba?",
+    "Was the mosque open to women in the Prophet's time?",
+    "Did the Ansar ride out to meet him?",
+    "What price did the Prophet pay for the land?",
   ];
   for (const q of history) assert.ok(!isPracticalQuestion(q), q);
+});
+
+test("visit phrasings stay practical even next to a history word", () => {
+  for (const q of ["How far is it from where the Prophet prayed?", "Can I walk to the Prophet's Mosque from here?", "Is it open on Friday?", "Can we take a taxi from the Haram?"]) {
+    assert.ok(isPracticalQuestion(q), q);
+  }
 });
 
 test("parsing: markers and grouped citations", () => {

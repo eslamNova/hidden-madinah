@@ -112,8 +112,9 @@ export function MapView({ pins }: { pins: MapPin[] }) {
       <div ref={containerRef} className="h-full w-full" aria-label={t("title")} />
       {/* end = the corner maplibre puts its 48px zoom/geolocate stack in
           (physical left in RTL, right in LTR — see mapControlCorner), so
-          inset past it. */}
-      <details className="absolute end-[4.5rem] top-2 z-10 rounded-2xl border border-ink/10 bg-surface/95 p-2.5 shadow-lg">
+          inset past it; and below the floating text-size/language row, which
+          spans most of a phone's width. Rem-based so it follows the A+ steps. */}
+      <details className="absolute end-[4.5rem] top-[calc(max(env(safe-area-inset-top),0.5rem)+3.5rem)] z-10 rounded-2xl border border-ink/10 bg-surface/95 p-2.5 shadow-lg">
         <summary className="press flex min-h-12 cursor-pointer items-center gap-1 rounded-lg px-2 text-base font-semibold">
           {t("legend")}
         </summary>

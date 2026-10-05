@@ -27,6 +27,7 @@ export function LanguageSwitch({ className = "" }: { className?: string }) {
       lang={other}
       aria-label={t("switchLanguageLabel")}
       onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
         const extra = window.location.search + window.location.hash;
         if (extra) {
           e.preventDefault();

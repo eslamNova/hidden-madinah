@@ -118,8 +118,30 @@ const PRACTICAL_EN_RE = new RegExp(
   "i"
 );
 
+// Phrasings that only make sense about a visit, even next to a history word
+// ("How far is it from where the Prophet prayed?").
+const VISIT_EN_RE = new RegExp(
+  [
+    String.raw`\bhow\s+(?:far|close|near)\b`,
+    String.raw`\b(?:is|are)\s+(?:it|this|that|they|these)\s+(?:far|close|near|open)\b`,
+    String.raw`\bhow\s+(?:long|much\s+time)\s+(?:does|do|will|would|should|can|to)\b`,
+    String.raw`\bhow\s+(?:do|can|should|would)\s+(?:i|we)\s+(?:get|go|reach)\b`,
+    String.raw`\b(?:can|could|should|may)\s+(?:i|we)\b`,
+    String.raw`\bget(?:ting)?\s+there\b`,
+    String.raw`\bdistances?\b`,
+    String.raw`\bwhat\s+time\s+does\s+it\s+(?:open|close)\b`,
+    String.raw`\bhow\s+much\s+(?:is|does|will|would)\s+(?:a|the|it)\b`,
+    String.raw`\b(?:nearest|nearby|closest|near\s+me|next\s+stop)\b`,
+  ].join("|"),
+  "i"
+);
+const HISTORY_EN_RE =
+  /\b(?:prophet|messenger|companions?|sahaba|caliph|abu\s+bakr|umar|uthman|ali|muhajirun|ansar|hijrah?|battle|revelation|did|was|were|happened|story|history|built|founded)\b/i;
+
 export function isPracticalQuestion(question: string): boolean {
-  return PRACTICAL_AR_RE.test(question) || PRACTICAL_EN_RE.test(question);
+  if (PRACTICAL_AR_RE.test(question)) return true;
+  if (!PRACTICAL_EN_RE.test(question)) return false;
+  return VISIT_EN_RE.test(question) || !HISTORY_EN_RE.test(question);
 }
 
 /**

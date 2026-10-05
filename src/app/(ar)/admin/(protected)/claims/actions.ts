@@ -19,8 +19,11 @@ export async function reviewClaimAction(input: ClaimReviewInput): Promise<Action
     const patch: TablesUpdate<"claims"> = {
       status: input.status,
       reviewed_at: input.status === "pending" ? null : new Date().toISOString(),
-      // The English text is shown beside the Arabic and approved with it.
-      en_reviewed: input.status === "verified",
+      // The English text is shown beside the Arabic and approved with it —
+      // unless the Arabic was just edited: then the English was translated
+      // from the old wording, so it stays hidden on English pages until it
+      // is re-translated and reviewed.
+      en_reviewed: input.status === "verified" && input.text_ar === undefined,
     };
     if (input.text_ar !== undefined) {
       const text = input.text_ar.trim();

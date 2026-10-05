@@ -68,7 +68,9 @@ export function FloatingTextSize() {
   return (
     <div
       ref={rootRef}
-      className="fixed start-2 top-[max(env(safe-area-inset-top),0.5rem)] z-40 flex items-center gap-2"
+      // The row is wider than its visible buttons (the closed panel keeps its
+      // width), so the wrapper ignores taps and only the controls take them.
+      className="pointer-events-none fixed start-2 top-[max(env(safe-area-inset-top),0.5rem)] z-40 flex items-center gap-2"
     >
       <button
         ref={toggleRef}
@@ -77,7 +79,7 @@ export function FloatingTextSize() {
         aria-label={t("controlsLabel")}
         aria-expanded={open}
         aria-controls={panelId}
-        className={`press flex h-12 items-center gap-1.5 rounded-full border px-3.5 shadow-lg ${shell}`}
+        className={`press pointer-events-auto flex h-12 items-center gap-1.5 rounded-full border px-3.5 shadow-lg ${shell}`}
       >
         {/* Two symbols so the button reads as "text size + theme" at a glance.
             Both theme icons render; globals.css hides the wrong one off
@@ -90,12 +92,12 @@ export function FloatingTextSize() {
         <Moon aria-hidden="true" className="theme-light-only h-5 w-5" />
       </button>
       {/* Before the panel: the closed panel keeps its (invisible) width. */}
-      {!open && <LanguageSwitch className={shell} />}
+      {!open && <LanguageSwitch className={`pointer-events-auto ${shell}`} />}
       <div
         id={panelId}
         className={`rounded-full border p-1.5 shadow-lg transition-[opacity,transform] duration-200 ease-out ${shell} ${
           open
-            ? "translate-x-0 opacity-100"
+            ? "pointer-events-auto translate-x-0 opacity-100"
             : "pointer-events-none opacity-0 ltr:-translate-x-2 rtl:translate-x-2"
         }`}
         // Keep the controls out of the tab order while visually hidden.

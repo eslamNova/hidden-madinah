@@ -107,6 +107,7 @@ export async function POST(request: Request) {
       send({ t: "p", s: "facts", n: ctx.claims.size });
       let full = "";
       let emitted = 0;
+      let unavailable = false;
       try {
         for await (const delta of streamText({
           tier: "fast",
@@ -133,6 +134,7 @@ export async function POST(request: Request) {
         } else {
           full = `${UNAVAILABLE[lang]}\n<<type:refuse>>`;
           emitted = Number.MAX_SAFE_INTEGER; // force a clean `replace` below
+          unavailable = true;
         }
       }
 
@@ -140,7 +142,10 @@ export async function POST(request: Request) {
       // Judged on content, not on the model's own label (see guardAnswer).
       // The same rules on both languages' pages; only the refusal and
       // referral wording follows the reply language.
-      const { type, text, valid } = guardAnswer({ raw: full, question, allowed: ctx.claims, lang });
+      // A model outage is not a missing source: say so, don't refuse.
+      const { type, text, valid } = unavailable
+        ? { type: "refuse" as const, text: UNAVAILABLE[lang], valid: [] as number[] }
+        : guardAnswer({ raw: full, question, allowed: ctx.claims, lang });
 
       // Finish the stream in `full` coordinates: if the final text simply
       // continues what was already shown, send the rest; otherwise replace.

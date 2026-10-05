@@ -58,7 +58,7 @@ export const rootViewport: Viewport = {
 // Applies the persisted font step and theme before first paint (no FOUC).
 // Theme: dark is the default. A stored choice still wins on return visits;
 // the OS prefers-color-scheme is deliberately NOT consulted.
-const fontStepScript = `try{var d=document.documentElement,s=localStorage.getItem("hm-font-step");if(s==="1"||s==="2"){d.dataset.fontStep=s}var t=localStorage.getItem("hm-theme");if(t!=="dark"&&t!=="light"){t="dark"}d.dataset.theme=t}catch(e){}`;
+export const fontStepScript = `try{var d=document.documentElement,s=localStorage.getItem("hm-font-step");if(s==="1"||s==="2"){d.dataset.fontStep=s}var t=localStorage.getItem("hm-theme");if(t!=="dark"&&t!=="light"){t="dark"}d.dataset.theme=t}catch(e){}`;
 
 export async function SiteDocument({ lang, children }: { lang: Lang; children: React.ReactNode }) {
   // Admin strings stay out of public pages' RSC payload; the admin layout
