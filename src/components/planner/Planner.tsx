@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { BookOpen, Car, Footprints, Hotel, Loader2, LocateFixed, Map as MapIcon, Share2, Sparkles, TriangleAlert } from "lucide-react";
+import { BookOpen, Car, Footprints, Hotel, Loader2, LocateFixed, Map as MapIcon, Share2, Sparkles, TriangleAlert, Undo2 } from "lucide-react";
 import { formatDistance, type LatLng } from "@/lib/geo";
 import {
   solvePlan,
@@ -12,66 +12,106 @@ import {
   type Interest,
   type Mobility,
   type Mode,
+  type PlanLeg,
+  type PlanWarning,
   type PlannerPlace,
   type StartKey,
 } from "@/lib/planner/solver";
 import { parseRequestFallback, type ParsedRequest } from "@/lib/planner/parse";
 
-const MINUTES = [30, 60, 90, 120, 180, 240] as const;
+const MINUTES = [30, 60, 90, 120, 180, 240, 360] as const;
 const COMPANIONS: Companions[] = ["alone", "family", "elderly", "kids"];
 const INTERESTS: Interest[] = ["mosques", "battles", "wells_gardens"];
 const STARTS: Exclude<StartKey, "custom">[] = ["nabawi", "quba", "uhud"];
+
+/** The hotel (from a QR card) and the visitor's own location are separate choices. */
+type StartChoice = Exclude<StartKey, "custom"> | "hotel" | "here";
 
 type Form = {
   minutes: number;
   companions: Companions;
   mobility: Mobility;
   interests: Interest[];
-  start: StartKey;
+  start: StartChoice;
   mode: Mode | null;
 };
 
 const DEFAULT_FORM: Form = { minutes: 120, companions: "alone", mobility: "good", interests: [], start: "nabawi", mode: null };
 
-/** Google Maps directions for the whole route (origin → waypoints → last stop). */
-function mapsUrl(start: LatLng, stops: LatLng[], mode: Mode): string {
+// Hotel links are printed on cards and can be edited by anyone: only accept
+// a point in Madinah and a short plain-text name.
+const MADINAH = { lat: [24.2, 24.8], lng: [39.3, 39.9] } as const;
+const inMadinah = (p: LatLng) => p.lat >= MADINAH.lat[0] && p.lat <= MADINAH.lat[1] && p.lng >= MADINAH.lng[0] && p.lng <= MADINAH.lng[1];
+const cleanName = (s: string | null) => {
+  const name = (s ?? "").normalize("NFC").replace(/[^\p{L}\p{N}\p{M} '&.-]/gu, " ").replace(/\s+/g, " ").trim().slice(0, 40);
+  return name.length > 1 ? name : null;
+};
+
+/** Google Maps allows only 3 waypoints on phones: longer routes are split into parts. */
+const MAX_WAYPOINTS = 3;
+function mapsUrls(start: LatLng, stops: LatLng[], mode: Mode): string[] {
   const fmt = (p: LatLng) => `${p.lat},${p.lng}`;
-  const params = new URLSearchParams({
-    api: "1",
-    origin: fmt(start),
-    destination: fmt(stops[stops.length - 1]),
-    travelmode: mode === "walk" ? "walking" : "driving",
-  });
-  if (stops.length > 1) params.set("waypoints", stops.slice(0, -1).map(fmt).join("|"));
-  return `https://www.google.com/maps/dir/?${params}`;
+  const urls: string[] = [];
+  let origin = start;
+  for (let i = 0; i < stops.length; i += MAX_WAYPOINTS + 1) {
+    const part = stops.slice(i, i + MAX_WAYPOINTS + 1);
+    const params = new URLSearchParams({
+      api: "1",
+      origin: fmt(origin),
+      destination: fmt(part[part.length - 1]),
+      travelmode: mode === "walk" ? "walking" : "driving",
+    });
+    if (part.length > 1) params.set("waypoints", part.slice(0, -1).map(fmt).join("|"));
+    urls.push(`https://www.google.com/maps/dir/?${params}`);
+    origin = part[part.length - 1];
+  }
+  return urls;
+}
+
+/** Form → form with what the visitor's request said; unsaid fields keep their value. */
+function applyParsed(f: Form, p: ParsedRequest): Form {
+  return {
+    minutes: p.minutes ?? f.minutes,
+    companions: p.companions ?? f.companions,
+    // Same default as tapping the "elderly" chip — visible and editable below.
+    mobility: p.mobility ?? (p.companions === "elderly" ? "limited" : f.mobility),
+    interests: p.interests.length ? p.interests : f.interests,
+    start: p.start ?? f.start,
+    mode: p.mode ?? f.mode,
+  };
 }
 
 export function Planner({ places }: { places: PlannerPlace[] }) {
   const t = useTranslations("plan");
   const [form, setForm] = useState<Form>(DEFAULT_FORM);
-  const [custom, setCustom] = useState<{ point: LatLng; label: string | null; kind: "hotel" | "location" } | null>(null);
+  const [hotel, setHotel] = useState<{ point: LatLng; label: string | null } | null>(null);
+  const [here, setHere] = useState<LatLng | null>(null);
   const [text, setText] = useState("");
   const [parsing, setParsing] = useState(false);
-  const [understood, setUnderstood] = useState<{ parsed: ParsedRequest; source: string } | null>(null);
+  const [understood, setUnderstood] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState(false);
   const [shared, setShared] = useState(false);
 
   // Hotel mode: /plan?from=24.47,39.61&name=… (QR card at a hotel reception).
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
-    const from = sp.get("from")?.split(",").map(Number);
-    if (from && from.length === 2 && from.every(Number.isFinite)) {
-      setCustom({ point: { lat: from[0], lng: from[1] }, label: sp.get("name")?.slice(0, 80) ?? null, kind: "hotel" });
-      setForm((f) => ({ ...f, start: "custom" }));
-    }
+    const from = sp.get("from")?.split(",").map((n) => Number(n.trim()));
+    if (from?.length !== 2 || !from.every(Number.isFinite)) return;
+    const point = { lat: from[0], lng: from[1] };
+    if (!inMadinah(point)) return;
+    setHotel({ point, label: cleanName(sp.get("name")) });
+    setForm((f) => ({ ...f, start: "hotel" }));
   }, []);
 
+  const startPoint = form.start === "hotel" ? hotel?.point ?? null : form.start === "here" ? here : null;
   const constraints: Constraints = {
     ...form,
-    startPoint: form.start === "custom" ? custom?.point ?? null : null,
-    startLabel: form.start === "custom" ? custom?.label ?? null : null,
+    start: form.start === "hotel" || form.start === "here" ? "custom" : form.start,
+    startPoint,
+    startLabel: form.start === "hotel" ? hotel?.label ?? null : null,
   };
-  const plan = useMemo(() => solvePlan(places, constraints), [places, constraints.minutes, constraints.companions, constraints.mobility, constraints.interests.join(), constraints.start, constraints.mode, custom]); // eslint-disable-line react-hooks/exhaustive-deps
+  const plan = useMemo(() => solvePlan(places, constraints), [places, constraints.minutes, constraints.companions, constraints.mobility, constraints.interests.join(), constraints.start, constraints.mode, startPoint?.lat, startPoint?.lng, constraints.startLabel]); // eslint-disable-line react-hooks/exhaustive-deps
   const bySlug = useMemo(() => new Map(places.map((p) => [p.slug, p])), [places]);
 
   const set = <K extends keyof Form>(key: K, value: Form[K]) => setForm((f) => ({ ...f, [key]: value }));
@@ -79,30 +119,25 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
     set("interests", form.interests.includes(i) ? form.interests.filter((x) => x !== i) : [...form.interests, i]);
 
   const useMyLocation = () => {
-    if (!navigator.geolocation) return;
+    setLocationError(false);
+    if (!navigator.geolocation) {
+      setLocationError(true);
+      return;
+    }
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const round = (n: number) => Math.round(n * 1000) / 1000;
-        setCustom({ point: { lat: round(pos.coords.latitude), lng: round(pos.coords.longitude) }, label: null, kind: "location" });
-        set("start", "custom");
+        setHere({ lat: round(pos.coords.latitude), lng: round(pos.coords.longitude) });
+        set("start", "here");
         setLocating(false);
       },
-      () => setLocating(false),
+      () => {
+        setLocating(false);
+        setLocationError(true);
+      },
       { timeout: 10_000, maximumAge: 300_000 }
     );
-  };
-
-  const apply = (p: ParsedRequest, source: string) => {
-    setForm((f) => ({
-      minutes: p.minutes ?? f.minutes,
-      companions: p.companions ?? f.companions,
-      mobility: p.mobility ?? (p.companions === "elderly" ? "limited" : f.mobility),
-      interests: p.interests.length ? p.interests : f.interests,
-      start: p.start ?? (f.start === "custom" && custom ? "custom" : f.start),
-      mode: p.mode ?? f.mode,
-    }));
-    setUnderstood({ parsed: p, source });
   };
 
   async function understand() {
@@ -110,7 +145,11 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
     if (!q || parsing) return;
     // Instant answer from the on-device keyword reader; the AI then refines
     // it if it replies in time. A slow or failed AI never blocks the plan.
-    apply(parseRequestFallback(q), "keywords");
+    // The AI's reading replaces the keyword one (not layered on top), so a
+    // keyword misread doesn't survive the AI saying "not mentioned".
+    const before = form;
+    setForm(applyParsed(before, parseRequestFallback(q)));
+    setUnderstood("keywords");
     setParsing(true);
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 12_000);
@@ -122,7 +161,10 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
         signal: ctrl.signal,
       });
       const data = res.ok ? ((await res.json().catch(() => null)) as { parsed?: ParsedRequest; source?: string } | null) : null;
-      if (data?.parsed && data.source === "ai") apply(data.parsed, "ai");
+      if (data?.parsed && data.source === "ai") {
+        setForm(applyParsed(before, data.parsed));
+        setUnderstood("ai");
+      }
     } catch {
       // Timed out or offline: the keyword result already filled the form.
     } finally {
@@ -143,15 +185,42 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
     }
   };
 
+  const warningText = (w: PlanWarning) => {
+    switch (w.kind) {
+      case "stairs": {
+        const alt = w.alternative ? bySlug.get(w.alternative) : null;
+        return alt ? t("warnStairsAlt", { alt: alt.name }) : t("warnStairs");
+      }
+      case "effort":
+        return t("warnEffort");
+      case "stairs_unknown":
+        return t("warnStairsUnknown");
+      case "access_unknown":
+        return t("warnUnknown");
+      default:
+        return null;
+    }
+  };
+
+  const legText = (leg: PlanLeg) =>
+    leg.mode === "walk"
+      ? t("legWalk", { min: leg.minutes, distance: formatDistance(leg.km) })
+      : t("legCar", { min: leg.minutes, distance: formatDistance(leg.km), from: leg.fareSar?.[0] ?? 0, to: leg.fareSar?.[1] ?? 0 });
+
   const chip = (active: boolean) =>
     `min-h-11 rounded-full border px-4 py-2 font-medium ${active ? "border-primary bg-primary text-paper" : "border-ink/15 bg-surface"}`;
 
+  const summary =
+    plan.stops.length === 0 ? t("noPlan") : t("summary", { count: plan.stops.length, total: plan.totalMinutes, mode: plan.mode });
+  const maps = mapsUrls(plan.start.point, plan.stops.map((s) => s.place), plan.mode);
+  const customMinutes = !(MINUTES as readonly number[]).includes(form.minutes);
+
   return (
     <div className="space-y-8">
-      {custom?.kind === "hotel" && (
+      {form.start === "hotel" && hotel && (
         <p className="flex items-center gap-2 rounded-2xl bg-primary/10 p-4 font-medium text-brand-dark">
           <Hotel aria-hidden="true" className="h-5 w-5" />
-          {custom.label ? t("hotelWelcome", { name: custom.label }) : t("hotelWelcomeGeneric")}
+          {hotel.label ? t("hotelWelcome", { name: hotel.label }) : t("hotelWelcomeGeneric")}
         </p>
       )}
 
@@ -182,7 +251,7 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
         {understood && (
           <p role="status" className="flex items-center gap-2 text-sm text-muted">
             {parsing && <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />}
-            {parsing ? t("refining") : understood.source === "ai" ? t("understoodAi") : t("understoodKeywords")}
+            {parsing ? t("refining") : understood === "ai" ? t("understoodAi") : t("understoodKeywords")}
           </p>
         )}
       </section>
@@ -199,6 +268,9 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
                 {t(`minutes.${m}`)}
               </button>
             ))}
+            {customMinutes && (
+              <span className={chip(true)}>{t("minutesOther", { min: form.minutes })}</span>
+            )}
           </div>
         </fieldset>
 
@@ -250,9 +322,14 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
                 {t(`starts.${s}`)}
               </button>
             ))}
-            {custom && (
-              <button type="button" aria-pressed={form.start === "custom"} onClick={() => set("start", "custom")} className={chip(form.start === "custom")}>
-                {custom.kind === "hotel" ? custom.label ?? t("starts.hotel") : t("starts.location")}
+            {hotel && (
+              <button type="button" aria-pressed={form.start === "hotel"} onClick={() => set("start", "hotel")} className={chip(form.start === "hotel")}>
+                {hotel.label ?? t("starts.hotel")}
+              </button>
+            )}
+            {here && (
+              <button type="button" aria-pressed={form.start === "here"} onClick={() => set("start", "here")} className={chip(form.start === "here")}>
+                {t("starts.location")}
               </button>
             )}
             <button type="button" onClick={useMyLocation} disabled={locating} className={`${chip(false)} flex items-center gap-2`}>
@@ -260,6 +337,11 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
               {t("myLocation")}
             </button>
           </div>
+          {locationError && (
+            <p role="alert" className="text-sm text-red-700">
+              {t("locationError")}
+            </p>
+          )}
         </fieldset>
 
         <fieldset className="space-y-2">
@@ -275,37 +357,38 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
       </section>
 
       {/* ── The plan ───────────────────────────────────────────────────── */}
-      <section className="space-y-5" aria-labelledby="plan-title" aria-live="polite">
+      {/* One short announcement per change, not the whole list. */}
+      <p role="status" className="sr-only">
+        {summary}
+      </p>
+      <section className="space-y-5" aria-labelledby="plan-title">
         <h2 id="plan-title" className="text-2xl">{t("planTitle")}</h2>
         {plan.stops.length === 0 ? (
-          <p className="rounded-2xl bg-surface p-5 text-lg">{t("noPlan")}</p>
+          <p className="rounded-2xl bg-surface p-5 text-lg">{summary}</p>
         ) : (
           <>
             <p className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl bg-primary p-4 text-lg text-paper">
               <span className="flex items-center gap-2">
                 {plan.mode === "walk" ? <Footprints aria-hidden="true" className="h-5 w-5" /> : <Car aria-hidden="true" className="h-5 w-5" />}
-                {t("summary", { count: plan.stops.length, total: plan.totalMinutes, mode: plan.mode })}
+                {summary}
               </span>
             </p>
 
             <ol className="space-y-4">
               {plan.stops.map((s, i) => {
-                const warning = plan.warnings.find((w) => "slug" in w && w.slug === s.place.slug);
-                const alt = warning?.kind === "stairs" && warning.alternative ? bySlug.get(warning.alternative) : null;
+                const notes = plan.warnings
+                  .filter((w) => "slug" in w && w.slug === s.place.slug)
+                  .map(warningText)
+                  .filter((x): x is string => !!x);
                 return (
                   <li key={s.place.slug} className="space-y-3 rounded-2xl border border-ink/10 bg-surface p-4 shadow-sm">
                     <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
                       {s.leg.minutes === 0 ? (
                         <span>{t("legHere")}</span>
-                      ) : s.leg.mode === "walk" ? (
-                        <span className="flex items-center gap-1">
-                          <Footprints aria-hidden="true" className="h-4 w-4" />
-                          {t("legWalk", { min: s.leg.minutes, distance: formatDistance(s.leg.km) })}
-                        </span>
                       ) : (
                         <span className="flex items-center gap-1">
-                          <Car aria-hidden="true" className="h-4 w-4" />
-                          {t("legCar", { min: s.leg.minutes, distance: formatDistance(s.leg.km), from: s.leg.fareSar?.[0] ?? 0, to: s.leg.fareSar?.[1] ?? 0 })}
+                          {s.leg.mode === "walk" ? <Footprints aria-hidden="true" className="h-4 w-4" /> : <Car aria-hidden="true" className="h-4 w-4" />}
+                          {legText(s.leg)}
                         </span>
                       )}
                     </p>
@@ -329,38 +412,40 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
                         </span>
                       </p>
                     )}
-                    {warning && (
-                      <p className="flex gap-2 rounded-xl border-[1.5px] border-accent/60 p-3 text-sm leading-relaxed">
+                    {notes.map((note) => (
+                      <p key={note} className="flex gap-2 rounded-xl border-[1.5px] border-accent/60 p-3 text-sm leading-relaxed">
                         <TriangleAlert aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                        <span>
-                          {warning.kind === "stairs"
-                            ? alt
-                              ? t("warnStairsAlt", { alt: alt.name })
-                              : t("warnStairs")
-                            : warning.kind === "effort"
-                              ? t("warnEffort")
-                              : t("warnUnknown")}
-                        </span>
+                        <span>{note}</span>
                       </p>
-                    )}
+                    ))}
                   </li>
                 );
               })}
             </ol>
 
+            {plan.returnLeg && plan.returnLeg.minutes > 0 && (
+              <p className="flex items-center gap-2 rounded-2xl border border-ink/10 bg-surface p-4 text-muted">
+                <Undo2 aria-hidden="true" className="h-5 w-5 shrink-0" />
+                {t("legBack", { leg: legText(plan.returnLeg) })}
+              </p>
+            )}
+
             {plan.warnings.some((w) => w.kind === "long_walk") && <p className="text-sm text-muted">{t("warnLongWalk")}</p>}
-            {plan.stops.some((s) => s.leg.fareSar) && <p className="text-sm text-muted">{t("fareNote")}</p>}
+            {(plan.stops.some((s) => s.leg.fareSar) || plan.returnLeg?.fareSar) && <p className="text-sm text-muted">{t("fareNote")}</p>}
 
             <div className="flex flex-wrap gap-3">
-              <a
-                href={mapsUrl(plan.start.point, plan.stops.map((s) => s.place), plan.mode)}
-                target="_blank"
-                rel="noreferrer"
-                className="flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 font-semibold text-paper"
-              >
-                <MapIcon aria-hidden="true" className="h-5 w-5" />
-                {t("openMaps")}
-              </a>
+              {maps.map((url, i) => (
+                <a
+                  key={url}
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 font-semibold text-paper"
+                >
+                  <MapIcon aria-hidden="true" className="h-5 w-5" />
+                  {maps.length === 1 ? t("openMaps") : t("openMapsPart", { n: i + 1 })}
+                </a>
+              ))}
               <button type="button" onClick={share} className="flex min-h-12 items-center gap-2 rounded-2xl border-[1.5px] border-primary px-5 font-semibold text-brand">
                 <Share2 aria-hidden="true" className="h-5 w-5" />
                 {shared ? t("shared") : t("share")}

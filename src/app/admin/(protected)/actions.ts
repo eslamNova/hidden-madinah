@@ -23,6 +23,9 @@ function revalidatePublic(slug?: string | null) {
   revalidatePath("/places");
   revalidatePath("/map");
   revalidatePath("/routes");
+  // Place names, coordinates and publish state also feed the planner and journeys.
+  revalidatePath("/plan");
+  revalidatePath("/journeys", "layout");
   if (slug) revalidatePath(`/places/${slug}`);
 }
 

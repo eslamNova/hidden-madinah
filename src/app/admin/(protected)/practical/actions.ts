@@ -11,8 +11,8 @@ export type PracticalInput = {
   has_stairs: boolean | null;
   walking_effort: "low" | "medium" | "high" | null;
   wheelchair_ok: boolean | null;
-  /** null = unknown · "always" · [from, to] as "HH:MM" */
-  hours: null | "always" | [string, string];
+  /** null = unknown · "always" · [from, to] as "HH:MM" · undefined = leave as stored (the editor shows only the first range) */
+  hours?: null | "always" | [string, string];
 };
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -37,7 +37,7 @@ export async function savePracticalAction(input: PracticalInput): Promise<Action
         has_stairs: input.has_stairs,
         walking_effort: input.walking_effort,
         wheelchair_ok: input.wheelchair_ok,
-        opening_hours,
+        ...(input.hours === undefined ? {} : { opening_hours }),
       })
       .eq("id", input.id);
     if (error) return { ok: false, error: error.message };

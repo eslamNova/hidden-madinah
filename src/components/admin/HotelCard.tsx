@@ -15,7 +15,20 @@ export function HotelCard({ origin }: { origin: string }) {
 
   const la = Number(lat);
   const ln = Number(lng);
-  const valid = name.trim().length > 1 && Number.isFinite(la) && Number.isFinite(ln) && Math.abs(la) <= 90 && Math.abs(ln) <= 180 && lat !== "" && lng !== "";
+  const hasPoint = lat.trim() !== "" && lng.trim() !== "" && Number.isFinite(la) && Number.isFinite(ln);
+  // Same box the planner accepts for ?from= — a swapped or mistyped pair is caught here, not on the printed card.
+  const inMadinah = hasPoint && la >= 24.2 && la <= 24.8 && ln >= 39.3 && ln <= 39.9;
+  const valid = name.trim().length > 1 && inMadinah;
+
+  /** Accept a pasted "24.4672, 39.6111" (as copied from Google Maps) in either field. */
+  const setCoord = (which: "lat" | "lng", value: string) => {
+    const pair = value.match(/^\s*(-?\d+(?:\.\d+)?)\s*[,،]\s*(-?\d+(?:\.\d+)?)\s*$/);
+    if (pair) {
+      setLat(pair[1]);
+      setLng(pair[2]);
+    } else if (which === "lat") setLat(value);
+    else setLng(value);
+  };
   const url = valid
     ? `${origin}/plan?${new URLSearchParams({ from: `${la.toFixed(5)},${ln.toFixed(5)}`, name: name.trim() })}`
     : null;
@@ -38,17 +51,22 @@ export function HotelCard({ origin }: { origin: string }) {
       <div className="grid gap-3 sm:grid-cols-3 print:hidden">
         <label className="space-y-1 text-sm font-medium sm:col-span-3">
           {t("name")}
-          <input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} className={input} />
+          <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} className={input} />
         </label>
         <label className="space-y-1 text-sm font-medium">
           {t("lat")}
-          <input value={lat} onChange={(e) => setLat(e.target.value)} inputMode="decimal" dir="ltr" placeholder="24.4672" className={input} />
+          <input value={lat} onChange={(e) => setCoord("lat", e.target.value)} inputMode="decimal" dir="ltr" placeholder="24.4672" className={input} />
         </label>
         <label className="space-y-1 text-sm font-medium">
           {t("lng")}
-          <input value={lng} onChange={(e) => setLng(e.target.value)} inputMode="decimal" dir="ltr" placeholder="39.6111" className={input} />
+          <input value={lng} onChange={(e) => setCoord("lng", e.target.value)} inputMode="decimal" dir="ltr" placeholder="39.6111" className={input} />
         </label>
         <div className="flex items-end">{svg && <PrintButton label={tq("print")} />}</div>
+        {hasPoint && !inMadinah && (
+          <p role="alert" className="text-sm text-red-700 sm:col-span-3">
+            {t("outside")}
+          </p>
+        )}
       </div>
 
       {svg && (

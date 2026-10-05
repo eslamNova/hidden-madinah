@@ -1,5 +1,5 @@
 import { generateJson } from "@/lib/ai/gemini";
-import { PARSE_SCHEMA, PARSE_SYSTEM, parseRequestFallback, sanitizeParsed, type ParsedRequest } from "@/lib/planner/parse";
+import { PARSE_SCHEMA, PARSE_SYSTEM, malformedFields, parseRequestFallback, sanitizeParsed, type ParsedRequest } from "@/lib/planner/parse";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -49,18 +49,14 @@ export async function POST(request: Request) {
       }),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("ai_timeout")), AI_BUDGET_MS)),
     ]);
-    const parsed = sanitizeParsed(data);
-    // The keyword parser fills anything the model left unknown.
+    const parsed: ParsedRequest = sanitizeParsed(data);
+    // The model's explicit "unknown" stands; the keyword reader only fills
+    // fields the model returned in a shape we couldn't use.
     const kw = parseRequestFallback(text);
+    const merged = { ...parsed } as Record<keyof ParsedRequest, unknown>;
+    for (const key of malformedFields(data as Record<string, unknown>)) merged[key] = kw[key];
     return Response.json({
-      parsed: {
-        minutes: parsed.minutes ?? kw.minutes,
-        companions: parsed.companions ?? kw.companions,
-        mobility: parsed.mobility ?? kw.mobility,
-        interests: parsed.interests.length ? parsed.interests : kw.interests,
-        start: parsed.start ?? kw.start,
-        mode: parsed.mode ?? kw.mode,
-      } satisfies ParsedRequest,
+      parsed: merged as ParsedRequest,
       source: "ai",
     });
   } catch (err) {

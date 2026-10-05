@@ -31,9 +31,17 @@ function PracticalCard({ row }: { row: PracticalRow }) {
   const [v, setV] = useState(row);
   const [busy, start] = useTransition();
   const [status, setStatus] = useState<"idle" | "saved" | "error">("idle");
+  // Stored hours can be richer than this editor (several ranges, weekdays):
+  // only send them when the admin actually changed the hours.
+  const [hoursTouched, setHoursTouched] = useState(false);
   const set = <K extends keyof PracticalRow>(k: K, value: PracticalRow[K]) => {
     setV((x) => ({ ...x, [k]: value }));
     setStatus("idle");
+  };
+
+  const setHours = (h: PracticalRow["hours"]) => {
+    setHoursTouched(true);
+    set("hours", h);
   };
 
   const save = () =>
@@ -45,7 +53,7 @@ function PracticalCard({ row }: { row: PracticalRow }) {
         has_stairs: v.has_stairs,
         walking_effort: v.walking_effort,
         wheelchair_ok: v.wheelchair_ok,
-        hours: v.hours,
+        hours: hoursTouched ? v.hours : undefined,
       });
       setStatus(res.ok ? "saved" : "error");
     });
@@ -104,7 +112,7 @@ function PracticalCard({ row }: { row: PracticalRow }) {
           {t("hours")}
           <select
             value={hoursMode}
-            onChange={(e) => set("hours", e.target.value === "always" ? "always" : e.target.value === "range" ? ["05:00", "22:00"] : null)}
+            onChange={(e) => setHours( e.target.value === "always" ? "always" : e.target.value === "range" ? ["05:00", "22:00"] : null)}
             className={select}
           >
             <option value="">{t("unknown")}</option>
@@ -118,11 +126,11 @@ function PracticalCard({ row }: { row: PracticalRow }) {
           <div className="flex items-end gap-2">
             <label className="flex-1 space-y-1 text-sm font-medium">
               {t("from")}
-              <input type="time" value={v.hours[0]} onChange={(e) => set("hours", [e.target.value, (v.hours as [string, string])[1]])} className={select} />
+              <input type="time" value={v.hours[0]} onChange={(e) => setHours( [e.target.value, (v.hours as [string, string])[1]])} className={select} />
             </label>
             <label className="flex-1 space-y-1 text-sm font-medium">
               {t("to")}
-              <input type="time" value={v.hours[1]} onChange={(e) => set("hours", [(v.hours as [string, string])[0], e.target.value])} className={select} />
+              <input type="time" value={v.hours[1]} onChange={(e) => setHours( [(v.hours as [string, string])[0], e.target.value])} className={select} />
             </label>
           </div>
         )}
