@@ -86,6 +86,7 @@ export async function POST(request: Request) {
   const started = Date.now();
   const encoder = new TextEncoder();
   let usage: Usage = { inputTokens: 0, outputTokens: 0, cachedTokens: 0 };
+  let usedModel = modelFor("fast");
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -98,6 +99,7 @@ export async function POST(request: Request) {
           system: systemPrompt(ctx.factsBlock, ctx.practicalBlock),
           contents: [...history, { role: "user", parts: [{ text: question }] }],
           onUsage: (u) => (usage = u),
+          onModel: (m) => (usedModel = m),
         })) {
           full += delta;
           // Hold back the tail so the trailing <<type:…>> marker never reaches the screen.
@@ -143,7 +145,7 @@ export async function POST(request: Request) {
         answer: text,
         cited_claim_ids: valid,
         refused: type === "refuse",
-        model: modelFor("fast"),
+        model: usedModel,
         input_tokens: usage.inputTokens,
         output_tokens: usage.outputTokens,
         cached_tokens: usage.cachedTokens,

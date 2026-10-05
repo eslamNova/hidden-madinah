@@ -1,4 +1,9 @@
-import { GoogleGenAI, type GenerateContentConfig, type GenerateContentResponseUsageMetadata } from "@google/genai";
+import {
+  GoogleGenAI,
+  ThinkingLevel,
+  type GenerateContentConfig,
+  type GenerateContentResponseUsageMetadata,
+} from "@google/genai";
 
 /**
  * Thin Gemini wrapper shared by the API routes and the offline content
@@ -28,6 +33,31 @@ export function modelFor(tier: ModelTier): string {
   return name;
 }
 
+/**
+ * Primary model plus fallbacks (GEMINI_FALLBACK_MODELS, comma-separated).
+ * Free-tier Flash models return 503 "high demand" in bursts; a capacity error
+ * moves the call to the next model instead of failing the visitor.
+ */
+export function modelChain(tier: ModelTier): string[] {
+  const fallbacks = (process.env.GEMINI_FALLBACK_MODELS ?? "gemini-3.6-flash,gemini-3-flash-preview")
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean);
+  return [...new Set([modelFor(tier), ...fallbacks])];
+}
+
+const isCapacityError = (err: unknown) =>
+  /"code":\s*(429|500|503)|UNAVAILABLE|RESOURCE_EXHAUSTED|overloaded/i.test(err instanceof Error ? err.message : String(err));
+
+/**
+ * Visitor-facing calls think at LOW: measured on gemini-3.8-flash, a short
+ * Seerah answer drops from ~10s (default dynamic thinking) to ~2s with the
+ * same quality on grounded questions. Offline work keeps the model default.
+ */
+function tierConfig(tier: ModelTier): GenerateContentConfig {
+  return tier === "fast" ? { thinkingConfig: { thinkingLevel: ThinkingLevel.LOW } } : {};
+}
+
 export type Usage = {
   inputTokens: number;
   outputTokens: number;
@@ -54,15 +84,32 @@ export async function generateJson<T>(opts: {
   prompt: string;
   schema: Record<string, unknown>;
   config?: GenerateContentConfig;
-}): Promise<{ data: T; usage: Usage }> {
+}): Promise<{ data: T; usage: Usage; model: string }> {
+  let lastErr: unknown;
+  for (const model of modelChain(opts.tier)) {
+    try {
+      return { ...(await generateJsonOnce<T>(model, opts)), model };
+    } catch (err) {
+      lastErr = err;
+      if (!isCapacityError(err)) throw err;
+    }
+  }
+  throw lastErr;
+}
+
+async function generateJsonOnce<T>(
+  model: string,
+  opts: { tier: ModelTier; system: string; prompt: string; schema: Record<string, unknown>; config?: GenerateContentConfig }
+): Promise<{ data: T; usage: Usage }> {
   const res = await gemini().models.generateContent({
-    model: modelFor(opts.tier),
+    model,
     contents: opts.prompt,
     config: {
       systemInstruction: opts.system,
       responseMimeType: "application/json",
       responseJsonSchema: opts.schema,
       temperature: 0.2,
+      ...tierConfig(opts.tier),
       ...opts.config,
     },
   });
@@ -81,12 +128,27 @@ export async function* streamText(opts: {
   contents: Parameters<GoogleGenAI["models"]["generateContentStream"]>[0]["contents"];
   config?: GenerateContentConfig;
   onUsage?: (usage: Usage) => void;
+  onModel?: (model: string) => void;
 }): AsyncGenerator<string> {
-  const stream = await gemini().models.generateContentStream({
-    model: modelFor(opts.tier),
-    contents: opts.contents,
-    config: { systemInstruction: opts.system, temperature: 0.2, ...opts.config },
-  });
+  // Fallback only applies before the first chunk: once text has reached the
+  // visitor we can't switch models mid-sentence.
+  let stream: AsyncGenerator<import("@google/genai").GenerateContentResponse> | undefined;
+  let lastErr: unknown;
+  for (const model of modelChain(opts.tier)) {
+    try {
+      stream = await gemini().models.generateContentStream({
+        model,
+        contents: opts.contents,
+        config: { systemInstruction: opts.system, temperature: 0.2, ...tierConfig(opts.tier), ...opts.config },
+      });
+      opts.onModel?.(model);
+      break;
+    } catch (err) {
+      lastErr = err;
+      if (!isCapacityError(err)) throw err;
+    }
+  }
+  if (!stream) throw lastErr;
   let lastMeta: GenerateContentResponseUsageMetadata | undefined;
   for await (const chunk of stream) {
     if (chunk.usageMetadata) lastMeta = chunk.usageMetadata;
