@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { BookOpen, LocateFixed, Send, Sparkles } from "lucide-react";
+import { BookOpen, Check, Loader2, LocateFixed, Send, Sparkles } from "lucide-react";
 import type { CitationInfo } from "@/lib/guide/context";
 
 type Turn = {
@@ -11,6 +11,8 @@ type Turn = {
   type?: string;
   citations?: CitationInfo[];
   pending?: boolean;
+  stage?: "search" | "facts";
+  facts?: number;
 };
 
 type Props = {
@@ -44,6 +46,16 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
   const listRef = useRef<HTMLOListElement>(null);
+  const [elapsed, setElapsed] = useState(0);
+
+  // Seconds counter while an answer is on its way (free-tier models can take 10–20s).
+  useEffect(() => {
+    if (!busy) return;
+    setElapsed(0);
+    const started = Date.now();
+    const id = setInterval(() => setElapsed(Math.floor((Date.now() - started) / 1000)), 1000);
+    return () => clearInterval(id);
+  }, [busy]);
 
   const suggestions = [t("suggestStory"), t("suggestNext"), t("suggestElderly")];
 
@@ -102,9 +114,12 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
         for (const line of lines) {
           if (!line.trim()) continue;
           const evt = JSON.parse(line) as
+            | { t: "p"; s: "search" | "facts"; n?: number }
             | { t: "d"; v: string }
             | { t: "m"; type: string; citations: CitationInfo[]; replace?: string };
-          if (evt.t === "d") {
+          if (evt.t === "p") {
+            update({ stage: evt.s, facts: evt.n });
+          } else if (evt.t === "d") {
             text += evt.v;
             update({ text });
           } else {
@@ -145,7 +160,7 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
             ) : (
               <li key={i} className="me-4 space-y-3 rounded-2xl bg-sand/60 px-4 py-3">
                 {tn.pending && !tn.text ? (
-                  <p className="animate-pulse text-muted">{t("thinking")}</p>
+                  <Progress stage={tn.stage} facts={tn.facts} elapsed={elapsed} />
                 ) : (
                   <p className="whitespace-pre-line text-lg leading-relaxed">{withRefs(tn.text, tn.citations)}</p>
                 )}
@@ -232,5 +247,32 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
         {location ? t("locationOn") : locating ? t("locating") : t("shareLocation")}
       </button>
     </section>
+  );
+}
+
+/** Three-step progress shown until the first words of the answer arrive. */
+function Progress({ stage, facts, elapsed }: { stage?: "search" | "facts"; facts?: number; elapsed: number }) {
+  const t = useTranslations("guide");
+  const steps = [
+    { done: stage === "facts", label: stage === "facts" ? t("stepFound", { count: facts ?? 0 }) : t("stepSearch") },
+    { done: false, label: t("stepWriting"), active: stage === "facts" },
+  ];
+  return (
+    <div role="status" className="space-y-2 text-muted">
+      <ol className="space-y-1">
+        {steps.map((st, i) => (
+          <li key={i} className={`flex items-center gap-2 ${st.done || st.active || i === 0 ? "" : "opacity-50"}`}>
+            {st.done ? (
+              <Check aria-hidden="true" className="h-4 w-4 text-brand" />
+            ) : (
+              <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+            )}
+            <span>{st.label}</span>
+            {i === 1 && st.active && <span className="ltr-nums text-sm">({elapsed}s)</span>}
+          </li>
+        ))}
+      </ol>
+      {elapsed >= 8 && <p className="text-sm">{t("slowNote")}</p>}
+    </div>
   );
 }

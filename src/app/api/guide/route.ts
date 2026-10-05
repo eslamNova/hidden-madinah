@@ -10,6 +10,7 @@ export const maxDuration = 60;
 
 /**
  * POST /api/guide — the AI guide. Streams NDJSON:
+ *   {"t":"p","s":"search"} / {"t":"p","s":"facts","n":12}  progress
  *   {"t":"d","v":"<text delta>"}                       …repeated
  *   {"t":"m","type":"answer|practical|refuse|refer","citations":[…],"replace"?:"…"}
  * `replace` means the server guard rewrote the answer (e.g. a historical
@@ -71,13 +72,6 @@ export async function POST(request: Request) {
     body.location && Number.isFinite(body.location.lat) && Number.isFinite(body.location.lng)
       ? { lat: Number(body.location.lat), lng: Number(body.location.lng) }
       : undefined;
-  const ctx = await buildGuideContext({
-    place: typeof body.place === "string" ? body.place : undefined,
-    journey: typeof body.journey === "string" ? body.journey : undefined,
-    stop: typeof body.stop === "number" ? body.stop : undefined,
-    location,
-  });
-
   const history = (Array.isArray(body.history) ? body.history : [])
     .filter((h) => (h.role === "user" || h.role === "model") && typeof h.text === "string")
     .slice(-6)
@@ -91,6 +85,16 @@ export async function POST(request: Request) {
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const send = (obj: unknown) => controller.enqueue(encoder.encode(JSON.stringify(obj) + "\n"));
+      // Progress events let the chat show what is happening while the
+      // (free-tier) model works: searching → N verified facts → writing.
+      send({ t: "p", s: "search" });
+      const ctx = await buildGuideContext({
+        place: typeof body.place === "string" ? body.place : undefined,
+        journey: typeof body.journey === "string" ? body.journey : undefined,
+        stop: typeof body.stop === "number" ? body.stop : undefined,
+        location,
+      });
+      send({ t: "p", s: "facts", n: ctx.claims.size });
       let full = "";
       let emitted = 0;
       try {
