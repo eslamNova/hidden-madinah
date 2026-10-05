@@ -31,7 +31,7 @@ export function BottomNav() {
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 px-3 print:hidden pb-[max(env(safe-area-inset-bottom),0.75rem)]"
-      aria-label={t("home")}
+      aria-label={t("label")}
     >
       <ul
         className={`mx-auto flex max-w-md items-stretch gap-1 rounded-[1.75rem] border p-1.5 shadow-lg ${

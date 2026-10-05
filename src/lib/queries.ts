@@ -171,12 +171,15 @@ export async function getPublishedJourneys(): Promise<(JourneyRow & { stops: Jou
     .order("sort_order");
   if (isMissingTable(error)) return [];
   if (error) throw error;
-  return (data ?? []).map(({ journey_stops, ...j }) => ({
-    ...j,
-    stops: [...(journey_stops ?? [])]
-      .sort((a, b) => a.sort_order - b.sort_order)
-      .map(({ places, ...s }) => ({ ...s, place: places && places.is_published ? sortMedia(places) : null })),
-  }));
+  return (data ?? [])
+    .map(({ journey_stops, ...j }) => ({
+      ...j,
+      stops: [...(journey_stops ?? [])]
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map(({ places, ...s }) => ({ ...s, place: places && places.is_published ? sortMedia(places) : null })),
+    }))
+    // RLS hides unreviewed stops; a journey with none visible isn't ready.
+    .filter((j) => j.stops.length > 0);
 }
 
 export async function getJourneySlugs(): Promise<string[]> {
@@ -200,7 +203,14 @@ export async function getJourney(slug: string, client: SupabaseLike = publicClie
   const stops = [...(journey_stops ?? [])]
     .sort((a, b) => a.sort_order - b.sort_order)
     .map(({ places, ...s }) => ({ ...s, place: places ? sortMedia(places) : null }));
-  const ids = [...new Set(stops.flatMap((s) => s.claim_ids ?? []))];
+  // Stop citations plus quiz explanations (a quiz may explain with a claim
+  // whose stop is hidden from this reader).
+  const ids = [
+    ...new Set([
+      ...stops.flatMap((s) => s.claim_ids ?? []),
+      ...(quiz_items ?? []).flatMap((q) => (q.explanation_claim_id != null ? [q.explanation_claim_id] : [])),
+    ]),
+  ];
   const claims = new Map<number, ClaimRow>();
   if (ids.length) {
     const { data: rows, error: claimsErr } = await client.from("claims").select(PUBLIC_CLAIM_COLUMNS).in("id", ids);

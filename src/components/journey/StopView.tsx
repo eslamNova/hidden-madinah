@@ -15,31 +15,45 @@ export function StopView({
   total,
   journeySlug,
   lang,
+  preview = false,
+  kids,
+  onKidsChange,
 }: {
   stop: PlayerStop;
   total: number;
   journeySlug: string;
   lang: "ar" | "en";
+  /** Reviewer preview: check-ins stay in memory, never on the device. */
+  preview?: boolean;
+  kids: boolean;
+  onKidsChange: (kids: boolean) => void;
 }) {
   const t = useTranslations("journey");
-  const [kids, setKids] = useState(false);
   const [here, setHere] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
 
   useEffect(() => {
+    if (preview) return;
     const sync = () => setHere(!!stop.placeSlug && readVisits().some((v) => v.slug === stop.placeSlug));
     sync();
     window.addEventListener(VISITS_EVENT, sync);
     return () => window.removeEventListener(VISITS_EVENT, sync);
-  }, [stop.placeSlug]);
+  }, [stop.placeSlug, preview]);
 
   const script = kids && stop.scriptKids ? stop.scriptKids : stop.script;
+  const access = [
+    stop.hasStairs === true && { key: "stairs", warn: true, text: t("hasStairs") },
+    stop.hasStairs === false && { key: "nostairs", warn: false, text: t("noStairs") },
+    stop.walkingEffort && { key: "effort", warn: stop.walkingEffort === "high", text: t(`effort.${stop.walkingEffort}`) },
+    stop.visitMin && { key: "visit", warn: false, text: t("visitMinutes", { min: stop.visitMin }) },
+  ].filter((x): x is { key: string; warn: boolean; text: string } => !!x);
 
   return (
-    <article className="space-y-5" aria-labelledby={`stop-${stop.order}`}>
+    <article className="space-y-5" aria-labelledby={`stop-${stop.index}`}>
       <header className="space-y-1">
-        <p className="font-semibold text-brand">{t("stopOf", { n: stop.order, total })}</p>
-        <h2 id={`stop-${stop.order}`} className="text-2xl leading-snug">
+        <p className="font-semibold text-brand">{t("stopOf", { n: stop.index, total })}</p>
+        {/* Focus target after every step change (JourneyPlayer). */}
+        <h2 id={`stop-${stop.index}`} tabIndex={-1} data-step-heading className="text-2xl leading-snug outline-none">
           {stop.title}
         </h2>
       </header>
@@ -54,7 +68,7 @@ export function StopView({
 
       {stop.scriptKids && (
         <label className="flex min-h-11 items-center gap-3 font-medium">
-          <input type="checkbox" checked={kids} onChange={(e) => setKids(e.target.checked)} className="h-5 w-5" />
+          <input type="checkbox" checked={kids} onChange={(e) => onKidsChange(e.target.checked)} className="h-5 w-5" />
           {t("kidsVersion")}
         </label>
       )}
@@ -96,7 +110,10 @@ export function StopView({
         <button
           type="button"
           disabled={here}
-          onClick={() => addVisit(stop.placeSlug!, "journey")}
+          onClick={() => {
+            if (preview) setHere(true);
+            else addVisit(stop.placeSlug!, "journey");
+          }}
           className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-[1.5px] border-primary px-5 text-lg font-semibold text-brand disabled:border-transparent disabled:bg-primary/10"
         >
           <CheckCircle2 aria-hidden="true" className="h-5 w-5" />
@@ -104,15 +121,14 @@ export function StopView({
         </button>
       )}
 
-      {(stop.hasStairs !== null || stop.walkingEffort || stop.visitMin) && (
+      {access.length > 0 && (
         <ul className="space-y-1 text-muted">
-          {stop.hasStairs === true && (
-            <li className="flex items-center gap-2">
-              <TriangleAlert aria-hidden="true" className="h-4 w-4 text-accent" />
-              {t("hasStairs")}
+          {access.map((a) => (
+            <li key={a.key} className="flex items-center gap-2">
+              {a.warn && <TriangleAlert aria-hidden="true" className="h-4 w-4 shrink-0 text-accent" />}
+              {a.text}
             </li>
-          )}
-          {stop.visitMin && <li>{t("visitMinutes", { min: stop.visitMin })}</li>}
+          ))}
         </ul>
       )}
 

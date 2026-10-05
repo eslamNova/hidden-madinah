@@ -33,6 +33,9 @@ export function ClaimReviewList({
       return next;
     });
   const visible = claims.filter((c) => !hidden.has(c.id));
+  // Selection only ever refers to claims still on screen (a card approved on
+  // its own must not linger in "approve selected").
+  const effective = new Set([...selected].filter((id) => visible.some((c) => c.id === id)));
 
   if (visible.length === 0) {
     return <p className="rounded-2xl border border-ink/10 bg-surface p-4">{t("none")}</p>;
@@ -47,7 +50,7 @@ export function ClaimReviewList({
     });
 
   const approveSelected = () => {
-    const ids = [...selected];
+    const ids = [...effective];
     setHiddenFor(ids, true);
     setSelected(new Set());
     setMessage(null);
@@ -66,20 +69,20 @@ export function ClaimReviewList({
           <button
             type="button"
             onClick={() =>
-              setSelected(selected.size === visible.length ? new Set() : new Set(visible.map((c) => c.id)))
+              setSelected(effective.size === visible.length ? new Set() : new Set(visible.map((c) => c.id)))
             }
             className="min-h-11 rounded-xl border-[1.5px] border-ink/30 px-4 font-medium"
           >
-            {selected.size === visible.length ? t("selectNone") : t("selectAll")}
+            {effective.size === visible.length ? t("selectNone") : t("selectAll")}
           </button>
           <button
             type="button"
-            disabled={selected.size === 0 || pending}
+            disabled={effective.size === 0 || pending}
             onClick={approveSelected}
             className="flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 font-semibold text-paper disabled:opacity-50"
           >
             {pending ? <Loader2 aria-hidden="true" className="h-5 w-5 animate-spin" /> : <Check aria-hidden="true" className="h-5 w-5" />}
-            {t("approveSelected", { count: selected.size })}
+            {t("approveSelected", { count: effective.size })}
           </button>
           {message && <span role="status" className="text-sm text-muted">{message}</span>}
         </div>
@@ -90,7 +93,7 @@ export function ClaimReviewList({
           <ClaimCard
             key={c.id}
             claim={c}
-            checked={selected.has(c.id)}
+            checked={effective.has(c.id)}
             onToggle={status === "pending" ? () => toggle(c.id) : undefined}
             onHide={(hide) => setHiddenFor([c.id], hide)}
           />

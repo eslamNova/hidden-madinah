@@ -15,11 +15,14 @@ export function JourneyQuiz({
   phase,
   initial,
   onDone,
+  onBack,
 }: {
   quiz: PlayerQuiz[];
   phase: "pre" | "post";
   initial?: number[];
   onDone: (answers: number[]) => void;
+  /** Post-quiz only: back to the last stop. */
+  onBack?: () => void;
 }) {
   const t = useTranslations("journey");
   const [answers, setAnswers] = useState<number[]>(initial ?? quiz.map(() => -1));
@@ -29,7 +32,7 @@ export function JourneyQuiz({
   return (
     <section className="space-y-5" aria-labelledby="quiz-title">
       <div className="space-y-1">
-        <h2 id="quiz-title" className="text-2xl">
+        <h2 id="quiz-title" tabIndex={-1} data-step-heading className="text-2xl outline-none">
           {phase === "pre" ? t("preTitle") : t("postTitle")}
         </h2>
         <p className="text-muted">{phase === "pre" ? t("preIntro") : t("postIntro")}</p>
@@ -104,6 +107,11 @@ export function JourneyQuiz({
             className="min-h-12 rounded-2xl bg-primary px-6 text-lg font-semibold text-paper disabled:opacity-50"
           >
             {phase === "pre" ? t("startJourney") : t("finish")}
+          </button>
+        )}
+        {onBack && (
+          <button type="button" onClick={onBack} className="min-h-12 rounded-2xl border-[1.5px] border-ink/30 px-5 font-medium">
+            {t("previous")}
           </button>
         )}
         {phase === "pre" && (

@@ -21,6 +21,9 @@ export type StopSource = {
 };
 
 export type PlayerStop = {
+  /** Position shown to the visitor (1…n), independent of hidden stops. */
+  index: number;
+  /** Database sort_order — what the guide API uses to find the stop. */
   order: number;
   title: string;
   placeSlug: string | null;
@@ -90,6 +93,7 @@ export function toPlayerJourney(j: JourneyFull, lang: Lang = "ar"): PlayerJourne
         grading: c.grading,
       }));
     return {
+      index: i + 1,
       order: s.sort_order,
       title: titles[i],
       placeSlug: s.place?.slug ?? null,

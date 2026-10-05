@@ -45,8 +45,13 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
   const [busy, setBusy] = useState(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState(false);
   const listRef = useRef<HTMLOListElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [elapsed, setElapsed] = useState(0);
+  // Screen readers hear each finished answer once — not every streamed
+  // fragment, and not the seconds counter.
+  const [announce, setAnnounce] = useState("");
 
   // Seconds counter while an answer is on its way (free-tier models can take 10–20s).
   useEffect(() => {
@@ -60,7 +65,11 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
   const suggestions = [t("suggestStory"), t("suggestNext"), t("suggestElderly")];
 
   const shareLocation = () => {
-    if (!navigator.geolocation) return;
+    setLocationError(false);
+    if (!navigator.geolocation) {
+      setLocationError(true);
+      return;
+    }
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -69,10 +78,22 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
         setLocation({ lat: round(pos.coords.latitude), lng: round(pos.coords.longitude) });
         setLocating(false);
       },
-      () => setLocating(false),
+      () => {
+        setLocating(false);
+        setLocationError(true);
+      },
       { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 }
     );
   };
+
+  // Grow the question box with its content (up to ~5 lines).
+  const autoGrow = (el: HTMLTextAreaElement) => {
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+  };
+  useEffect(() => {
+    if (inputRef.current) autoGrow(inputRef.current);
+  }, [input]);
 
   async function ask(question: string) {
     const q = question.trim();
@@ -107,28 +128,37 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
       const decoder = new TextDecoder();
       let buffer = "";
       let text = "";
+      let finished = false;
+      const handle = (line: string) => {
+        if (!line.trim()) return;
+        const evt = JSON.parse(line) as
+          | { t: "p"; s: "search" | "facts"; n?: number }
+          | { t: "d"; v: string }
+          | { t: "m"; type: string; citations: CitationInfo[]; replace?: string };
+        if (evt.t === "p") {
+          update({ stage: evt.s, facts: evt.n });
+        } else if (evt.t === "d") {
+          text += evt.v;
+          update({ text });
+        } else {
+          finished = true;
+          update({ text: evt.replace ?? text, type: evt.type, citations: evt.citations, pending: false });
+          setAnnounce(evt.replace ?? text);
+        }
+      };
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() ?? "";
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          const evt = JSON.parse(line) as
-            | { t: "p"; s: "search" | "facts"; n?: number }
-            | { t: "d"; v: string }
-            | { t: "m"; type: string; citations: CitationInfo[]; replace?: string };
-          if (evt.t === "p") {
-            update({ stage: evt.s, facts: evt.n });
-          } else if (evt.t === "d") {
-            text += evt.v;
-            update({ text });
-          } else {
-            update({ text: evt.replace ?? text, type: evt.type, citations: evt.citations, pending: false });
-          }
-        }
+        lines.forEach(handle);
       }
+      buffer += decoder.decode();
+      if (buffer.trim()) handle(buffer);
+      // The connection ended without the final event: never leave the turn
+      // spinning — keep what arrived, or say it failed.
+      if (!finished) update({ text: text || t("error"), pending: false, type: text ? undefined : "refuse" });
     } catch {
       update({ text: t("error"), pending: false, type: "refuse" });
     } finally {
@@ -153,7 +183,7 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
       </div>
 
       {turns.length > 0 && (
-        <ol ref={listRef} className="space-y-3" aria-live="polite">
+        <ol ref={listRef} className="space-y-3">
           {turns.map((tn, i) =>
             tn.role === "user" ? (
               <li key={i} className="ms-8 rounded-2xl bg-primary px-4 py-3 text-paper">
@@ -216,6 +246,7 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
           <span className="sr-only">{t("inputLabel")}</span>
           <textarea
             value={input}
+            ref={inputRef}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -223,7 +254,7 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
                 void ask(input);
               }
             }}
-            rows={1}
+            rows={2}
             maxLength={600}
             placeholder={t("placeholder")}
             className="min-h-12 w-full resize-none rounded-2xl border border-ink/15 bg-sand/40 px-4 py-3 text-lg"
@@ -248,6 +279,14 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
         <LocateFixed aria-hidden="true" className="h-4 w-4" />
         {location ? t("locationOn") : locating ? t("locating") : t("shareLocation")}
       </button>
+      {locationError && (
+        <p role="alert" className="text-sm">
+          {t("locationError")}
+        </p>
+      )}
+      <p role="status" className="sr-only">
+        {announce}
+      </p>
     </section>
   );
 }
@@ -270,7 +309,11 @@ function Progress({ stage, facts, elapsed }: { stage?: "search" | "facts"; facts
               <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
             )}
             <span>{st.label}</span>
-            {i === 1 && st.active && <span className="ltr-nums text-sm">({elapsed}s)</span>}
+            {i === 1 && st.active && (
+              <span aria-hidden="true" className="ltr-nums text-sm">
+                ({elapsed}s)
+              </span>
+            )}
           </li>
         ))}
       </ol>

@@ -37,7 +37,7 @@ export default async function QrSheetPage() {
       </div>
       <ul className="grid grid-cols-2 gap-4 print:gap-2">
         {cards.map((c) => (
-          <li key={c.slug} className="break-inside-avoid space-y-2 rounded-2xl border-2 border-ink/20 bg-white p-4 text-center text-black">
+          <li key={c.slug} className="break-inside-avoid space-y-2 rounded-2xl border-2 border-dashed border-gray-400 bg-white p-4 text-center text-black">
             <p className="text-lg font-bold">{c.name_ar}</p>
             {c.name_en && <p className="text-sm">{c.name_en}</p>}
             <div className="mx-auto w-40" dangerouslySetInnerHTML={{ __html: c.svg }} />

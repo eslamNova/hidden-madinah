@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Check, Eye, X } from "lucide-react";
+import { Check, Eye, Loader2, X } from "lucide-react";
 import {
   approveStopAction,
   setJourneyPublishedAction,
@@ -40,15 +40,37 @@ export function JourneyReview({ journey }: { journey: ReviewJourney }) {
   const router = useRouter();
   const [busy, start] = useTransition();
   const [error, setError] = useState(false);
-  const run = (fn: () => Promise<{ ok: boolean }>) =>
+  // Optimistic: a status flips the moment its button is pressed, with a
+  // spinner on that button; the server refresh follows in the background and
+  // the override is dropped if the action fails.
+  const [acting, setActing] = useState<string | null>(null);
+  const [overrides, setOverrides] = useState<Record<string, string>>({});
+  const run = (key: string, optimistic: Record<string, string>, fn: () => Promise<{ ok: boolean }>) => {
+    setActing(key);
+    setError(false);
+    setOverrides((o) => ({ ...o, ...optimistic }));
     start(async () => {
       const res = await fn();
-      setError(!res.ok);
+      if (!res.ok) {
+        setError(true);
+        setOverrides((o) => {
+          const next = { ...o };
+          Object.keys(optimistic).forEach((k) => delete next[k]);
+          return next;
+        });
+      }
       router.refresh();
+      setActing(null);
     });
+  };
+  const spin = (key: string, Idle: typeof Check) =>
+    acting === key ? <Loader2 aria-hidden="true" className="h-5 w-5 animate-spin" /> : <Idle aria-hidden="true" className="h-5 w-5" />;
+  const stopStatus = (s: ReviewJourney["stops"][number]) => overrides[`stop:${s.id}`] ?? s.status;
+  const quizStatus = (q: ReviewJourney["quiz"][number]) => overrides[`quiz:${q.id}`] ?? q.status;
+  const published = overrides.published ? overrides.published === "true" : journey.published;
 
-  const verifiedStops = journey.stops.filter((s) => s.status === "verified").length;
-  const verifiedQuiz = journey.quiz.filter((q) => q.status === "verified").length;
+  const verifiedStops = journey.stops.filter((s) => stopStatus(s) === "verified").length;
+  const verifiedQuiz = journey.quiz.filter((q) => quizStatus(q) === "verified").length;
   const ready = verifiedStops === journey.stops.length && journey.stops.length > 0;
 
   return (
@@ -63,13 +85,18 @@ export function JourneyReview({ journey }: { journey: ReviewJourney }) {
         </Link>
         <button
           type="button"
-          disabled={busy || (!journey.published && !ready)}
-          onClick={() => run(() => setJourneyPublishedAction({ slug: journey.slug, published: !journey.published }))}
-          className="min-h-11 rounded-xl bg-primary px-4 font-semibold text-paper disabled:opacity-50"
+          disabled={busy || (!published && !ready)}
+          onClick={() =>
+            run("publish", { published: String(!published) }, () =>
+              setJourneyPublishedAction({ slug: journey.slug, published: !published })
+            )
+          }
+          className="flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 font-semibold text-paper disabled:opacity-50"
         >
-          {journey.published ? t("unpublish") : t("publish")}
+          {acting === "publish" && <Loader2 aria-hidden="true" className="h-5 w-5 animate-spin" />}
+          {published ? t("unpublish") : t("publish")}
         </button>
-        {!ready && !journey.published && <span className="text-sm text-muted">{t("publishHint")}</span>}
+        {!ready && !published && <span className="text-sm text-muted">{t("publishHint")}</span>}
         {error && <span role="alert">{t("error")}</span>}
       </div>
 
@@ -77,14 +104,15 @@ export function JourneyReview({ journey }: { journey: ReviewJourney }) {
 
       <ol className="space-y-5">
         {journey.stops.map((s) => {
-          const pendingClaims = s.claims.filter((c) => c.status !== "verified").length;
+          const status = stopStatus(s);
+          const pendingClaims = status === "verified" ? 0 : s.claims.filter((c) => c.status !== "verified").length;
           return (
             <li key={s.id} className="space-y-3 rounded-2xl border border-ink/10 bg-surface p-4">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-lg font-semibold">
                   <span className="ltr-nums">{s.order}.</span> {s.title}
                 </h3>
-                <span className={`rounded-full px-3 py-1 text-sm ${badge(s.status)}`}>{t(`status.${s.status}`)}</span>
+                <span className={`rounded-full px-3 py-1 text-sm ${badge(status)}`}>{t(`status.${status}`)}</span>
               </div>
               {s.script ? (
                 <>
@@ -108,33 +136,45 @@ export function JourneyReview({ journey }: { journey: ReviewJourney }) {
                     </ul>
                   </details>
                   <div className="flex flex-wrap gap-2">
-                    {s.status !== "verified" && (
+                    {status !== "verified" && (
                       <button
                         type="button"
                         disabled={busy}
-                        onClick={() => run(() => approveStopAction({ stopId: s.id, journeySlug: journey.slug, withClaims: true }))}
+                        onClick={() =>
+                          run(`approve:${s.id}`, { [`stop:${s.id}`]: "verified" }, () =>
+                            approveStopAction({ stopId: s.id, journeySlug: journey.slug, withClaims: true })
+                          )
+                        }
                         className="flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 font-semibold text-paper disabled:opacity-50"
                       >
-                        <Check aria-hidden="true" className="h-5 w-5" />
+                        {spin(`approve:${s.id}`, Check)}
                         {pendingClaims ? t("approveWithClaims", { count: pendingClaims }) : t("approveStop")}
                       </button>
                     )}
-                    {s.status !== "rejected" && (
+                    {status !== "rejected" && (
                       <button
                         type="button"
                         disabled={busy}
-                        onClick={() => run(() => setStopStatusAction({ stopId: s.id, journeySlug: journey.slug, status: "rejected" }))}
+                        onClick={() =>
+                          run(`reject:${s.id}`, { [`stop:${s.id}`]: "rejected" }, () =>
+                            setStopStatusAction({ stopId: s.id, journeySlug: journey.slug, status: "rejected" })
+                          )
+                        }
                         className="flex min-h-11 items-center gap-2 rounded-xl border-[1.5px] border-ink/30 px-4 font-medium disabled:opacity-50"
                       >
-                        <X aria-hidden="true" className="h-5 w-5" />
+                        {spin(`reject:${s.id}`, X)}
                         {t("reject")}
                       </button>
                     )}
-                    {s.status !== "pending" && (
+                    {status !== "pending" && (
                       <button
                         type="button"
                         disabled={busy}
-                        onClick={() => run(() => setStopStatusAction({ stopId: s.id, journeySlug: journey.slug, status: "pending" }))}
+                        onClick={() =>
+                          run(`pending:${s.id}`, { [`stop:${s.id}`]: "pending" }, () =>
+                            setStopStatusAction({ stopId: s.id, journeySlug: journey.slug, status: "pending" })
+                          )
+                        }
                         className="min-h-11 px-3 font-medium underline disabled:opacity-50"
                       >
                         {t("backToPending")}
@@ -157,10 +197,14 @@ export function JourneyReview({ journey }: { journey: ReviewJourney }) {
             <button
               type="button"
               disabled={busy}
-              onClick={() => run(() => setQuizStatusAction({ ids: journey.quiz.map((q) => q.id), journeySlug: journey.slug, status: "verified" }))}
+              onClick={() =>
+                run("quiz", Object.fromEntries(journey.quiz.map((q) => [`quiz:${q.id}`, "verified"])), () =>
+                  setQuizStatusAction({ ids: journey.quiz.map((q) => q.id), journeySlug: journey.slug, status: "verified" })
+                )
+              }
               className="flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 font-semibold text-paper disabled:opacity-50"
             >
-              <Check aria-hidden="true" className="h-5 w-5" />
+              {spin("quiz", Check)}
               {t("approveQuiz")}
             </button>
           </div>
@@ -169,7 +213,7 @@ export function JourneyReview({ journey }: { journey: ReviewJourney }) {
               <li key={q.id} className="space-y-1">
                 <p className="font-semibold">
                   <span className="ltr-nums">{i + 1}.</span> {q.question}{" "}
-                  <span className={`rounded-full px-2 py-0.5 text-sm font-normal ${badge(q.status)}`}>{t(`status.${q.status}`)}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-sm font-normal ${badge(quizStatus(q))}`}>{t(`status.${quizStatus(q)}`)}</span>
                 </p>
                 <ul className="ms-5 list-disc text-sm">
                   {q.options.map((o, oi) => (

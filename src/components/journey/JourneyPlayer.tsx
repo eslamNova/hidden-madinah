@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, Clock, PartyPopper, RotateCcw, Share2 } from "lucide-react";
@@ -38,31 +38,57 @@ export function JourneyPlayer({
   const [step, setStep] = useState<Step>("intro");
   const [progress, setProgress] = useState<JourneyProgress | null>(null);
   const [resumable, setResumable] = useState<JourneyProgress | null>(null);
+  const [kids, setKids] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const mounted = useRef(false);
   const hasQuiz = journey.quiz.length > 0;
   const lang = journey.lang;
   const Next = lang === "ar" ? ArrowLeft : ArrowRight;
   const Prev = lang === "ar" ? ArrowRight : ArrowLeft;
 
+  // The reviewer's preview never reads or writes the device's real progress.
   useEffect(() => {
+    if (preview) return;
     const saved = readJourneyProgress(journey.slug);
     setProgress(saved);
     if (saved && saved.stop > 0 && !saved.completed) setResumable(saved);
-  }, [journey.slug]);
+  }, [journey.slug, preview]);
 
-  const update = (patch: Partial<JourneyProgress>) => {
-    const next = { stop: 0, completed: false, ...progress, ...patch };
-    setProgress(next);
-    if (!preview) saveJourneyProgress(journey.slug, patch);
+  // Functional updates: several patches in one handler (pre answers, then the
+  // stop reached) must compose instead of overwriting each other.
+  const update = (patch: Partial<JourneyProgress> | ((prev: JourneyProgress) => Partial<JourneyProgress>)) => {
+    setProgress((prev) => {
+      const base: JourneyProgress = { stop: 0, completed: false, ...prev };
+      const p = typeof patch === "function" ? patch(base) : patch;
+      if (!preview) saveJourneyProgress(journey.slug, p);
+      return { ...base, ...p };
+    });
   };
 
   const go = (s: Step) => {
     setStep(s);
-    if (typeof s === "number") update({ stop: Math.max(progress?.stop ?? 0, s + 1) });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof s === "number") update((prev) => ({ stop: Math.max(prev.stop, s + 1) }));
   };
 
-  const total = journey.stops.length;
+  // After every step change: bring the player into view and move focus to the
+  // new heading, so screen-reader and keyboard users land on the new content.
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    rootRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    rootRef.current?.querySelector<HTMLElement>("[data-step-heading]")?.focus({ preventScroll: true });
+  }, [step]);
 
+  const total = journey.stops.length;
+  return (
+    <div ref={rootRef} className="scroll-mt-4">
+      {renderStep()}
+    </div>
+  );
+
+  function renderStep() {
   // ── Intro ──────────────────────────────────────────────────────────────────
   if (step === "intro") {
     return (
@@ -83,7 +109,7 @@ export function JourneyPlayer({
           {journey.stops.map((s) => (
             <li key={s.order} className="flex items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-paper">
-                <span className="ltr-nums leading-none">{s.order}</span>
+                <span className="ltr-nums leading-none">{s.index}</span>
               </span>
               <span className="text-lg">{s.title}</span>
             </li>
@@ -142,8 +168,11 @@ export function JourneyPlayer({
       <JourneyQuiz
         quiz={journey.quiz}
         phase="pre"
+        initial={progress?.pre?.some((a) => a >= 0) ? progress.pre : undefined}
         onDone={(answers) => {
-          update({ pre: answers });
+          // "Skip" must not wipe answers given earlier.
+          const skipped = answers.every((a) => a < 0);
+          if (!(skipped && progress?.pre?.some((a) => a >= 0))) update({ pre: answers });
           go(0);
         }}
       />
@@ -154,6 +183,8 @@ export function JourneyPlayer({
       <JourneyQuiz
         quiz={journey.quiz}
         phase="post"
+        initial={progress?.post?.some((a) => a >= 0) ? progress.post : undefined}
+        onBack={() => go(total - 1)}
         onDone={(answers) => {
           update({ post: answers, completed: true });
           go("done");
@@ -183,12 +214,22 @@ export function JourneyPlayer({
         <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${((step + 1) / total) * 100}%` }} />
       </div>
 
-      <StopView stop={stop} total={total} journeySlug={journey.slug} lang={lang} />
+      {/* Keyed: each stop mounts fresh (closed guide, closed sources). */}
+      <StopView
+        key={stop.order}
+        stop={stop}
+        total={total}
+        journeySlug={journey.slug}
+        lang={lang}
+        preview={preview}
+        kids={kids}
+        onKidsChange={setKids}
+      />
 
-      <nav className="flex gap-3 border-t border-ink/10 pt-4">
+      <nav aria-label={t("stepsNav")} className="flex gap-3 border-t border-ink/10 pt-4">
         <button
           type="button"
-          onClick={() => go(step === 0 ? (hasQuiz ? "pre" : "intro") : step - 1)}
+          onClick={() => go(step === 0 ? "intro" : step - 1)}
           className="flex min-h-14 items-center gap-2 rounded-2xl border-[1.5px] border-ink/30 px-5 font-medium"
         >
           <Prev aria-hidden="true" className="h-5 w-5" />
@@ -209,6 +250,29 @@ export function JourneyPlayer({
         </button>
       </nav>
     </div>
+  );
+  }
+}
+
+/** Module scope: defined inside Completion it remounted on every tap and lost focus. */
+function Rating({ value, onChange, label }: { value: number | null; onChange: (n: number) => void; label: string }) {
+  return (
+    <fieldset>
+      <legend className="mb-2 font-medium">{label}</legend>
+      <div className="flex gap-2">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            aria-pressed={value === n}
+            onClick={() => onChange(n)}
+            className={`h-12 w-12 rounded-xl text-lg font-bold ${value === n ? "bg-primary text-paper" : "bg-surface"}`}
+          >
+            <span className="ltr-nums">{n}</span>
+          </button>
+        ))}
+      </div>
+    </fieldset>
   );
 }
 
@@ -265,30 +329,13 @@ function Completion({
     }
   };
 
-  const Rating = ({ value, onChange, label }: { value: number | null; onChange: (n: number) => void; label: string }) => (
-    <fieldset>
-      <legend className="mb-2 font-medium">{label}</legend>
-      <div className="flex gap-2">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button
-            key={n}
-            type="button"
-            aria-pressed={value === n}
-            onClick={() => onChange(n)}
-            className={`h-12 w-12 rounded-xl text-lg font-bold ltr-nums ${value === n ? "bg-primary text-paper" : "bg-surface"}`}
-          >
-            {n}
-          </button>
-        ))}
-      </div>
-    </fieldset>
-  );
-
   return (
     <section className="space-y-6">
       <div className="space-y-2 rounded-3xl bg-primary p-6 text-paper">
         <PartyPopper aria-hidden="true" className="h-8 w-8" />
-        <h2 className="text-2xl">{t("doneTitle", { title: journey.title })}</h2>
+        <h2 tabIndex={-1} data-step-heading className="text-2xl outline-none">
+          {t("doneTitle", { title: journey.title })}
+        </h2>
         {pre !== null && post !== null ? (
           <p className="text-lg ltr-nums">{t("scoreCompare", { pre, post, total: journey.quiz.length })}</p>
         ) : post !== null ? (

@@ -49,8 +49,21 @@ export function NarrationPlayer({ text, lang = "ar" }: { text: string; lang?: "a
   const [hasVoice, setHasVoice] = useState(true);
   const [state, setState] = useState<"idle" | "playing" | "paused">("idle");
   const [rate, setRate] = useState<(typeof RATES)[number]>(lang === "ar" ? 0.8 : 1);
-  const queue = useRef<string[]>([]);
-  const cancelled = useRef(false);
+  // Refs, not state, for everything the utterance callbacks read: callbacks
+  // fire long after render. `gen` invalidates callbacks of a cancelled run, so
+  // a late `onend` can never restart speech the visitor stopped.
+  const parts = useRef<string[]>([]);
+  const current = useRef(0);
+  const gen = useRef(0);
+  const rateRef = useRef<number>(rate);
+
+  const halt = useCallback(() => {
+    gen.current += 1;
+    if (!("speechSynthesis" in window)) return;
+    // Some engines ignore cancel() while paused; resume first.
+    window.speechSynthesis.resume();
+    window.speechSynthesis.cancel();
+  }, []);
 
   useEffect(() => {
     if (!("speechSynthesis" in window)) {
@@ -63,46 +76,48 @@ export function NarrationPlayer({ text, lang = "ar" }: { text: string; lang?: "a
     window.speechSynthesis.addEventListener("voiceschanged", check);
     return () => {
       window.speechSynthesis.removeEventListener("voiceschanged", check);
-      cancelled.current = true;
-      window.speechSynthesis.cancel();
+      halt();
     };
-  }, [lang]);
+  }, [lang, halt]);
 
   // A new script (next stop) stops the current one.
   useEffect(() => {
-    cancelled.current = true;
-    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    halt();
     setState("idle");
-  }, [text]);
+  }, [text, halt]);
 
-  const speakNext = useCallback(() => {
-    const next = queue.current.shift();
-    if (!next || cancelled.current) {
-      setState("idle");
-      return;
-    }
-    const u = new SpeechSynthesisUtterance(next);
-    u.lang = lang === "ar" ? "ar-SA" : "en-GB";
-    const voice = pickVoice(lang);
-    if (voice) u.voice = voice;
-    u.rate = rate;
-    u.onend = speakNext;
-    u.onerror = () => setState("idle");
-    window.speechSynthesis.speak(u);
-  }, [lang, rate]);
+  const speakFrom = useCallback(
+    (i: number, run: number) => {
+      if (run !== gen.current) return;
+      if (i >= parts.current.length) {
+        setState("idle");
+        return;
+      }
+      current.current = i;
+      const u = new SpeechSynthesisUtterance(parts.current[i]);
+      u.lang = lang === "ar" ? "ar-SA" : "en-GB";
+      const voice = pickVoice(lang);
+      if (voice) u.voice = voice;
+      u.rate = rateRef.current;
+      u.onend = () => speakFrom(i + 1, run);
+      u.onerror = () => {
+        if (run === gen.current) setState("idle");
+      };
+      window.speechSynthesis.speak(u);
+    },
+    [lang]
+  );
 
   const play = () => {
-    const synth = window.speechSynthesis;
     if (state === "paused") {
-      synth.resume();
+      window.speechSynthesis.resume();
       setState("playing");
       return;
     }
-    synth.cancel();
-    cancelled.current = false;
-    queue.current = chunks(text);
+    halt();
+    parts.current = chunks(text);
     setState("playing");
-    speakNext();
+    speakFrom(0, gen.current);
   };
 
   const pause = () => {
@@ -111,9 +126,18 @@ export function NarrationPlayer({ text, lang = "ar" }: { text: string; lang?: "a
   };
 
   const stop = () => {
-    cancelled.current = true;
-    window.speechSynthesis.cancel();
+    halt();
     setState("idle");
+  };
+
+  // Speed applies at once: restart the current sentence at the new rate.
+  const changeRate = (r: (typeof RATES)[number]) => {
+    rateRef.current = r;
+    setRate(r);
+    if (state === "playing") {
+      halt();
+      speakFrom(current.current, gen.current);
+    }
   };
 
   if (supported === false) return null;
@@ -155,7 +179,7 @@ export function NarrationPlayer({ text, lang = "ar" }: { text: string; lang?: "a
             <button
               key={r}
               type="button"
-              onClick={() => setRate(r)}
+              onClick={() => changeRate(r)}
               aria-pressed={rate === r}
               className={`min-h-11 min-w-11 rounded-lg px-2 text-sm font-semibold ltr-nums ${
                 rate === r ? "bg-basalt text-paper" : "bg-surface"
