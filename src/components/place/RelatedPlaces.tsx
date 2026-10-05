@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import type { Lang } from "@/lib/i18n";
 import { getPlacesBySlugs } from "@/lib/queries";
 import { PlaceCard, toPlaceCardData } from "@/components/place/PlaceCard";
 
@@ -6,9 +7,9 @@ import { PlaceCard, toPlaceCardData } from "@/components/place/PlaceCard";
  * "أماكن خفية قريبة" — renders only PUBLISHED related places; hides itself
  * entirely while all of them are still drafts (e.g. Quba's five stubs).
  */
-export async function RelatedPlaces({ slugs }: { slugs: string[] }) {
+export async function RelatedPlaces({ slugs, lang }: { slugs: string[]; lang: Lang }) {
   if (slugs.length === 0) return null;
-  const places = await getPlacesBySlugs(slugs);
+  const places = await getPlacesBySlugs(slugs, lang);
   if (places.length === 0) return null;
   const t = await getTranslations("place");
 

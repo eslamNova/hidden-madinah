@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateBoth } from "@/lib/revalidate";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { TransportOption } from "@/lib/content";
@@ -19,14 +19,14 @@ async function requireAdmin() {
 }
 
 function revalidatePublic(slug?: string | null) {
-  revalidatePath("/");
-  revalidatePath("/places");
-  revalidatePath("/map");
-  revalidatePath("/routes");
+  revalidateBoth("/");
+  revalidateBoth("/places");
+  revalidateBoth("/map");
+  revalidateBoth("/routes");
   // Place names, coordinates and publish state also feed the planner and journeys.
-  revalidatePath("/plan");
-  revalidatePath("/journeys", "layout");
-  if (slug) revalidatePath(`/places/${slug}`);
+  revalidateBoth("/plan");
+  revalidateBoth("/journeys", "layout");
+  if (slug) revalidateBoth(`/places/${slug}`);
 }
 
 /** Storage object path ("places/…") from a public URL, or null for embeds. */

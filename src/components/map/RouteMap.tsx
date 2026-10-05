@@ -11,11 +11,13 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useTranslations } from "next-intl";
 import { MADINAH_BOUNDS } from "@/lib/geo";
 import { mapStyleUrl } from "@/lib/maps";
+import { useLang } from "@/lib/use-lang";
 import { useTheme } from "@/lib/use-theme";
 import {
-  applyArabicLabels,
+  applyMapLabels,
   createNumberedPinElement,
   ensureRtlTextPlugin,
+  mapControlCorner,
 } from "./map-utils";
 
 export type RouteMapStop = {
@@ -30,6 +32,7 @@ export function RouteMap({ stops }: { stops: RouteMapStop[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations("map");
   const [theme] = useTheme();
+  const lang = useLang();
 
   // Re-created on theme change so the tile style follows light/dark.
   useEffect(() => {
@@ -50,10 +53,10 @@ export function RouteMap({ stops }: { stops: RouteMapStop[] }) {
       cooperativeGestures: true,
       attributionControl: { compact: true },
     });
-    map.addControl(new NavigationControl({ showCompass: false }), "top-left");
+    map.addControl(new NavigationControl({ showCompass: false }), mapControlCorner(lang));
 
     map.on("load", () => {
-      applyArabicLabels(map);
+      applyMapLabels(map, lang);
       map.addSource("route", {
         type: "geojson",
         data: {
@@ -88,7 +91,7 @@ export function RouteMap({ stops }: { stops: RouteMapStop[] }) {
       markers.forEach((m) => m.remove());
       map.remove();
     };
-  }, [stops, theme]);
+  }, [stops, theme, lang]);
 
   if (stops.length === 0) return null;
 

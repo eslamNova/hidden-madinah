@@ -1,13 +1,13 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateBoth } from "@/lib/revalidate";
 import { requireAdmin, type ActionResult } from "@/lib/admin-auth";
 
 function refresh(slug?: string) {
-  revalidatePath("/journeys");
-  revalidatePath("/my-journey");
-  if (slug) revalidatePath(`/journeys/${slug}`);
-  revalidatePath("/admin/journeys");
+  revalidateBoth("/journeys");
+  revalidateBoth("/my-journey");
+  if (slug) revalidateBoth(`/journeys/${slug}`);
+  revalidateBoth("/admin/journeys");
 }
 
 /**
@@ -83,7 +83,7 @@ export async function setJourneyPublishedAction(input: { slug: string; published
     const { error } = await supabase.from("journeys").update({ is_published: input.published }).eq("slug", input.slug);
     if (error) return { ok: false, error: error.message };
     refresh(input.slug);
-    revalidatePath("/", "layout");
+    revalidateBoth("/", "layout");
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };

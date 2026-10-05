@@ -205,7 +205,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                         category={p.category}
                         className="h-6 w-6 shrink-0"
                       />
-                      {CATEGORY_META[p.category].labelAr}
+                      {tPlaces(`category.${p.category}`)}
                     </span>
                   </StoryItem>
                   <StoryItem>
@@ -229,7 +229,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                       className="press inline-flex min-h-14 items-center gap-2 rounded-2xl bg-paper px-7 text-lg font-semibold text-primary-dark shadow-lg"
                     >
                       {t("story.openPlace")}
-                      <ChevronLeft aria-hidden="true" className="h-5 w-5" />
+                      <ChevronLeft aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
                     </Link>
                   </StoryItem>
                 </StoryPanel>
@@ -283,7 +283,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                         />
                         <span className="min-w-0">
                           <span className="block truncate text-base font-semibold text-paper">
-                            {CATEGORY_META[c.category].pluralAr}
+                            {tPlaces(`categoryPlural.${c.category}`)}
                           </span>
                           <span className="block text-sm text-paper/75">
                             {tPlaces("count", { count: c.count })}
@@ -325,7 +325,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                       className="flex min-h-12 items-center gap-1 font-medium text-paper/85"
                     >
                       {tCommon("viewAll")}
-                      <ChevronLeft aria-hidden="true" className="h-5 w-5" />
+                      <ChevronLeft aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
                     </Link>
                   </div>
                 </StoryItem>
@@ -475,7 +475,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                 >
                   <Send aria-hidden="true" className="h-5 w-5 shrink-0 text-accent" />
                   <span className="text-sm font-semibold">{tTelegram("short")}</span>
-                  <ChevronLeft aria-hidden="true" className="h-4 w-4 shrink-0 opacity-60" />
+                  <ChevronLeft aria-hidden="true" className="h-4 w-4 shrink-0 opacity-60 ltr:-scale-x-100" />
                 </a>
               </StoryItem>
             </StoryPanel>
@@ -483,8 +483,8 @@ export function StoryLanding({ data }: { data: StoryData }) {
 
           {/* Channel icon, pinned over the story rather than inside a panel:
               the landing's only other Telegram link is on the closing panel,
-              which most visitors never reach. Physical top-LEFT, mirroring the
-              floating أ control. */}
+              which most visitors never reach. Inline-end top corner (physical
+              left in RTL), mirroring the floating أ control. */}
           <TelegramIconLink className="absolute end-2 top-[max(env(safe-area-inset-top),0.5rem)] z-10" />
 
           {/* Floating controls over the scroll container. No backdrop-blur —

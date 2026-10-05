@@ -5,6 +5,7 @@ import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
 import { BookOpen, Car, Footprints, Hotel, Loader2, LocateFixed, Map as MapIcon, Share2, Sparkles, TriangleAlert, Undo2 } from "lucide-react";
 import { formatDistance, type LatLng } from "@/lib/geo";
+import { useLang } from "@/lib/use-lang";
 import {
   solvePlan,
   type Companions,
@@ -83,6 +84,7 @@ function applyParsed(f: Form, p: ParsedRequest): Form {
 
 export function Planner({ places }: { places: PlannerPlace[] }) {
   const t = useTranslations("plan");
+  const lang = useLang();
   const [form, setForm] = useState<Form>(DEFAULT_FORM);
   const [hotel, setHotel] = useState<{ point: LatLng; label: string | null } | null>(null);
   const [here, setHere] = useState<LatLng | null>(null);
@@ -204,8 +206,8 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
 
   const legText = (leg: PlanLeg) =>
     leg.mode === "walk"
-      ? t("legWalk", { min: leg.minutes, distance: formatDistance(leg.km) })
-      : t("legCar", { min: leg.minutes, distance: formatDistance(leg.km), from: leg.fareSar?.[0] ?? 0, to: leg.fareSar?.[1] ?? 0 });
+      ? t("legWalk", { min: leg.minutes, distance: formatDistance(leg.km, lang) })
+      : t("legCar", { min: leg.minutes, distance: formatDistance(leg.km, lang), from: leg.fareSar?.[0] ?? 0, to: leg.fareSar?.[1] ?? 0 });
 
   const chip = (active: boolean) =>
     `min-h-11 rounded-full border px-4 py-2 font-medium ${active ? "border-primary bg-primary text-paper" : "border-ink/15 bg-surface"}`;
@@ -457,7 +459,7 @@ export function Planner({ places }: { places: PlannerPlace[] }) {
                 {t("moreTime")}{" "}
                 {plan.skipped.map((slug, i) => (
                   <span key={slug}>
-                    {i > 0 && "، "}
+                    {i > 0 && t("listSeparator")}
                     <Link href={`/places/${slug}`} className="underline">
                       {bySlug.get(slug)?.name ?? slug}
                     </Link>

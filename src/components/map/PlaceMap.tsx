@@ -6,8 +6,9 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useTranslations } from "next-intl";
 import { MADINAH_BOUNDS } from "@/lib/geo";
 import { mapStyleUrl } from "@/lib/maps";
+import { useLang } from "@/lib/use-lang";
 import { useTheme } from "@/lib/use-theme";
-import { applyArabicLabels, ensureRtlTextPlugin } from "./map-utils";
+import { applyMapLabels, ensureRtlTextPlugin, mapControlCorner } from "./map-utils";
 
 /** Small embedded map with a single pin, for the place detail page. */
 export function PlaceMap({
@@ -24,6 +25,7 @@ export function PlaceMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations("map");
   const [theme] = useTheme();
+  const lang = useLang();
 
   // Re-created on theme change so the tile style follows light/dark.
   useEffect(() => {
@@ -41,8 +43,8 @@ export function PlaceMap({
       cooperativeGestures: true,
       attributionControl: { compact: true },
     });
-    map.addControl(new NavigationControl({ showCompass: false }), "top-left");
-    map.on("load", () => applyArabicLabels(map));
+    map.addControl(new NavigationControl({ showCompass: false }), mapControlCorner(lang));
+    map.on("load", () => applyMapLabels(map, lang));
 
     const marker = new Marker({ color }).setLngLat([lng, lat]).addTo(map);
 
@@ -50,7 +52,7 @@ export function PlaceMap({
       marker.remove();
       map.remove();
     };
-  }, [lat, lng, color, theme]);
+  }, [lat, lng, color, theme, lang]);
 
   return (
     <div

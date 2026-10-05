@@ -9,16 +9,18 @@ import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
 import { useBarePath } from "@/lib/use-lang";
 
 /**
- * The أ−/أ+ font stepper as a floating corner control — the top navbar is
- * gone, but text sizing is an elderly-first accessibility feature that must
- * stay one tap away on every page.
+ * The أ−/أ+ (A−/A+ in English) font stepper as a floating corner control —
+ * the top navbar is gone, but text sizing is an elderly-first accessibility
+ * feature that must stay one tap away on every page.
  *
- * Collapsed: a single 48px round "أ" button, fixed at the inline-start corner
- * (physical top-RIGHT in RTL — the free corner on every public page; the
- * map's physical left holds its legend and zoom controls). Expanded: a pill
+ * Collapsed: a single 48px round "أ"/"A" button (plus the language switch),
+ * fixed at the inline-start corner: top-RIGHT in Arabic, top-LEFT in English
+ * — the corner the page's own top controls (Telegram link, map legend and
+ * zoom) leave free, since they sit at the inline end. Expanded: a pill
  * containing the unchanged TextSizeControl (it keeps its role=group and
- * aria-live announcer). Dark glass over the story landing, light surface
- * everywhere else — near-opaque, never backdrop-blur.
+ * aria-live announcer); it slides in from the button's side in both
+ * directions. Dark glass over the story landing, light surface everywhere
+ * else — near-opaque, never backdrop-blur.
  */
 export function FloatingTextSize() {
   const t = useTranslations("fontSize");

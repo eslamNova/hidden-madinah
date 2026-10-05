@@ -3,6 +3,7 @@ import {
   setRTLTextPlugin,
   type Map as MaplibreMap,
 } from "maplibre-gl";
+import type { Lang } from "@/lib/i18n";
 import { RTL_TEXT_PLUGIN_URL } from "@/lib/maps";
 
 /**
@@ -22,21 +23,37 @@ export function ensureRtlTextPlugin(): void {
 }
 
 /**
- * Prefer Arabic names from the OpenMapTiles schema on every symbol layer that
- * renders a name (leaves ref/housenumber-driven layers untouched).
+ * Tile labels in the page's language from the OpenMapTiles schema, on every
+ * symbol layer that renders a name (leaves ref/housenumber-driven layers
+ * untouched). English falls back to the Latin transliteration, then to the
+ * local (Arabic) name.
  */
-export function applyArabicLabels(map: MaplibreMap): void {
+export function applyMapLabels(map: MaplibreMap, lang: Lang): void {
+  const field =
+    lang === "ar"
+      ? ["coalesce", ["get", "name:ar"], ["get", "name"]]
+      : ["coalesce", ["get", "name:en"], ["get", "name_en"], ["get", "name:latin"], ["get", "name"]];
   for (const layer of map.getStyle().layers ?? []) {
     if (layer.type !== "symbol") continue;
     const current = map.getLayoutProperty(layer.id, "text-field");
     if (current && JSON.stringify(current).includes("name")) {
-      map.setLayoutProperty(layer.id, "text-field", [
-        "coalesce",
-        ["get", "name:ar"],
-        ["get", "name"],
-      ]);
+      map.setLayoutProperty(layer.id, "text-field", field);
     }
   }
+}
+
+/** Arabic tile labels (the admin pin picker is Arabic-only). */
+export function applyArabicLabels(map: MaplibreMap): void {
+  applyMapLabels(map, "ar");
+}
+
+/**
+ * Corner for maplibre's zoom/geolocate stack: the inline-END top corner
+ * (physical left in RTL, right in LTR), because the floating أ/theme control
+ * holds the inline-start corner on every page.
+ */
+export function mapControlCorner(lang: Lang): "top-left" | "top-right" {
+  return lang === "ar" ? "top-left" : "top-right";
 }
 
 /**

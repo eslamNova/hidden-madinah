@@ -1,6 +1,7 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Send } from "lucide-react";
 import { TELEGRAM_CHANNEL } from "@/lib/constants";
+import { langOf } from "@/lib/i18n";
 
 /**
  * Quiet channel invite at the foot of the places list — the visitor has just
@@ -10,9 +11,12 @@ import { TELEGRAM_CHANNEL } from "@/lib/constants";
  * Deliberately lighter than SeerahAppCard: one line of copy and a single link,
  * no gold rule and no button pair. The two must never read as competing
  * banners when a place page shows one and the list shows the other.
+ *
+ * The channel posts in Arabic; English pages say so in the same line.
  */
 export function TelegramCard() {
   const t = useTranslations("telegram");
+  const lang = langOf(useLocale());
 
   return (
     <section aria-label={t("title")} className="card-elevated p-5">
@@ -25,7 +29,10 @@ export function TelegramCard() {
         </span>
         <div className="min-w-0 sm:flex-1">
           <h2 className="text-lg leading-snug">{t("title")}</h2>
-          <p className="text-muted">{t("description")}</p>
+          <p className="text-muted">
+            {t("description")}
+            {lang === "en" && <> {t("arabicNote")}</>}
+          </p>
         </div>
         <a
           href={TELEGRAM_CHANNEL}

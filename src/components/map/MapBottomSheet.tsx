@@ -28,6 +28,7 @@ export function MapBottomSheet({
   const t = useTranslations("map");
   const tCommon = useTranslations("common");
   const tPlace = useTranslations("place");
+  const tPlaces = useTranslations("places");
   const closeRef = useRef<HTMLButtonElement>(null);
   const invokerRef = useRef<HTMLElement | null>(null);
 
@@ -84,7 +85,7 @@ export function MapBottomSheet({
             )}
             <div>
               <h2 className="text-xl leading-snug">{place.name_ar}</h2>
-              <p className="text-sm text-muted">{meta.labelAr}</p>
+              <p className="text-sm text-muted">{tPlaces(`category.${place.category}`)}</p>
               {place.distanceKm != null && (
                 <p className="text-sm text-muted">
                   {tCommon("distanceKm", { km: place.distanceKm })}

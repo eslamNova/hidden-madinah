@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
 import { CheckCircle2, Circle, QrCode, Share2 } from "lucide-react";
+import { useLang } from "@/lib/use-lang";
 import { readAllJourneyProgress, readVisits, VISITS_EVENT, type JourneyProgress, type Visit } from "@/lib/visits";
 
 /**
- * "رحلتي في المدينة": what this device has visited and completed. Reads
+ * "My journey in Madinah": what this device has visited and completed. Reads
  * localStorage only; the page itself is static and identical for everyone.
+ * Visits and stop progress are shared by both languages (same places).
  */
 export function MyJourney({
   places,
@@ -18,6 +20,7 @@ export function MyJourney({
   journeys: { slug: string; title: string; stops: number; placeSlugs: string[] }[];
 }) {
   const t = useTranslations("journey");
+  const lang = useLang();
   const [visits, setVisits] = useState<Visit[] | null>(null);
   const [progress, setProgress] = useState<Record<string, JourneyProgress>>({});
   const [shared, setShared] = useState(false);
@@ -38,7 +41,8 @@ export function MyJourney({
 
   const share = async () => {
     const text = t("shareVisits", { count });
-    const url = window.location.origin;
+    // The home page in the visitor's language.
+    const url = lang === "en" ? `${window.location.origin}/en` : window.location.origin;
     try {
       if (navigator.share) await navigator.share({ text, url });
       else await navigator.clipboard.writeText(`${text} ${url}`);

@@ -11,11 +11,13 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useTranslations } from "next-intl";
 import { MADINAH_BOUNDS, MADINAH_CENTER } from "@/lib/geo";
 import { CATEGORY_META, CATEGORY_ORDER, mapStyleUrl } from "@/lib/maps";
+import { useLang } from "@/lib/use-lang";
 import { useTheme } from "@/lib/use-theme";
 import {
-  applyArabicLabels,
+  applyMapLabels,
   createPinElement,
   ensureRtlTextPlugin,
+  mapControlCorner,
 } from "./map-utils";
 import { MapBottomSheet, type MapPlacePreview } from "./MapBottomSheet";
 
@@ -40,10 +42,12 @@ export function MapView({ pins }: { pins: MapPin[] }) {
   // Camera survives the theme re-create so a toggle never resets the view.
   const viewRef = useRef<{ center: [number, number]; zoom: number } | null>(null);
   const t = useTranslations("map");
+  const tPlaces = useTranslations("places");
   const [theme] = useTheme();
+  const lang = useLang();
 
   // Re-created on theme change so the tile style follows light/dark; the
-  // markers effect below re-adds the pins (theme in its deps too).
+  // markers effect below re-adds the pins (theme and lang in its deps too).
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -58,11 +62,11 @@ export function MapView({ pins }: { pins: MapPin[] }) {
       maxBounds: MADINAH_BOUNDS,
       attributionControl: { compact: true },
     });
-    map.addControl(new NavigationControl({ showCompass: false }), "top-left");
-    map.addControl(new GeolocateControl({ trackUserLocation: false }), "top-left");
+    map.addControl(new NavigationControl({ showCompass: false }), mapControlCorner(lang));
+    map.addControl(new GeolocateControl({ trackUserLocation: false }), mapControlCorner(lang));
     setLoading(true);
     map.on("load", () => {
-      applyArabicLabels(map);
+      applyMapLabels(map, lang);
       setLoading(false);
     });
     mapRef.current = map;
@@ -75,7 +79,7 @@ export function MapView({ pins }: { pins: MapPin[] }) {
       map.remove();
       mapRef.current = null;
     };
-  }, [theme]);
+  }, [theme, lang]);
 
   // Markers mount once — pins are static SSG data.
   useEffect(() => {
@@ -90,7 +94,7 @@ export function MapView({ pins }: { pins: MapPin[] }) {
       });
       return new Marker({ element: el }).setLngLat([lng, lat]).addTo(map);
     });
-  }, [pins, theme]);
+  }, [pins, theme, lang]);
 
   return (
     // 5.5rem = floating-dock clearance only; there is no top bar anymore.
@@ -106,8 +110,9 @@ export function MapView({ pins }: { pins: MapPin[] }) {
         {loading ? t("loading") : ""}
       </p>
       <div ref={containerRef} className="h-full w-full" aria-label={t("title")} />
-      {/* end = physical LEFT in RTL — the same corner maplibre puts its 48px
-          zoom/geolocate stack, so inset past it. */}
+      {/* end = the corner maplibre puts its 48px zoom/geolocate stack in
+          (physical left in RTL, right in LTR — see mapControlCorner), so
+          inset past it. */}
       <details className="absolute end-[4.5rem] top-2 z-10 rounded-2xl border border-ink/10 bg-surface/95 p-2.5 shadow-lg">
         <summary className="press flex min-h-12 cursor-pointer items-center gap-1 rounded-lg px-2 text-base font-semibold">
           {t("legend")}
@@ -120,7 +125,7 @@ export function MapView({ pins }: { pins: MapPin[] }) {
                 className="h-4 w-4 rounded-full border-2 border-surface shadow"
                 style={{ backgroundColor: CATEGORY_META[c].color }}
               />
-              <span>{CATEGORY_META[c].labelAr}</span>
+              <span>{tPlaces(`category.${c}`)}</span>
             </li>
           ))}
         </ul>

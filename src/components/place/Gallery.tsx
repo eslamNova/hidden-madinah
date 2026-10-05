@@ -10,7 +10,7 @@ import { VideoPlayer } from "@/components/place/VideoPlayer";
 
 /**
  * Swipeable scroll-snap gallery. Pinch-zoom stays available (no touch-action
- * override); buttons use scrollIntoView so RTL scroll math never matters.
+ * override); buttons use scrollIntoView so RTL/LTR scroll math never matters.
  */
 export function Gallery({ media, placeName }: { media: MediaRow[]; placeName: string }) {
   const t = useTranslations("place");
@@ -102,7 +102,8 @@ export function Gallery({ media, placeName }: { media: MediaRow[]; placeName: st
           )}
           <div className="flex items-center justify-between gap-3">
             {/* Labeled controls — a chevron alone was not expressive enough.
-                In RTL "next" is visually to the left. */}
+                The chevrons point the reading way: "next" points left in
+                Arabic and flips to point right on English pages. */}
             <div className="flex gap-2">
               <button
                 type="button"
@@ -111,7 +112,7 @@ export function Gallery({ media, placeName }: { media: MediaRow[]; placeName: st
                 aria-label={t("galleryNext")}
                 className="press inline-flex min-h-12 items-center gap-1.5 rounded-2xl bg-primary px-4 text-base font-semibold text-paper shadow-sm disabled:opacity-40"
               >
-                <ChevronLeft aria-hidden="true" className="h-5 w-5" />
+                <ChevronLeft aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
                 {t("galleryNext")}
               </button>
               <button
@@ -122,7 +123,7 @@ export function Gallery({ media, placeName }: { media: MediaRow[]; placeName: st
                 className="press inline-flex min-h-12 items-center gap-1.5 rounded-2xl border-[1.5px] border-ink/15 bg-surface px-4 text-base font-semibold text-ink shadow-sm disabled:opacity-40"
               >
                 {t("galleryPrev")}
-                <ChevronRight aria-hidden="true" className="h-5 w-5" />
+                <ChevronRight aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
               </button>
             </div>
             <p aria-live="polite" className="text-base font-medium text-muted">

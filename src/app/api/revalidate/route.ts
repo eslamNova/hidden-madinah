@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidateBoth } from "@/lib/revalidate";
 import { NextResponse } from "next/server";
 
 /**
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   }
 
   const paths = Array.isArray(body.paths) ? body.paths.filter((p) => typeof p === "string") : [];
-  for (const path of paths) revalidatePath(path);
+  for (const path of paths) revalidateBoth(path);
 
   return NextResponse.json({ ok: true, revalidated: paths });
 }

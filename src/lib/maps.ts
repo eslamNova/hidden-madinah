@@ -7,6 +7,10 @@ export type PlaceCategory = Enums<"place_category">;
  * components; `color` is the map-pin/badge color (calm, heritage-adjacent —
  * gold stays decorative and is never used as a category color).
  * `tintOnDark` is the same hue lifted for legibility on photo scrims.
+ *
+ * `labelAr`/`pluralAr` serve the Arabic-only admin. Public pages show the
+ * labels from messages (places.category.<cat> / places.categoryPlural.<cat>),
+ * so they follow the page's language.
  */
 export const CATEGORY_META: Record<
   PlaceCategory,

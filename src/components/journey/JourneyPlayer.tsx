@@ -4,13 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, Clock, PartyPopper, RotateCcw, Share2 } from "lucide-react";
+import { localizeHref } from "@/lib/i18n";
 import type { PlayerJourney } from "@/lib/journey-view";
 import { createClient } from "@/lib/supabase/client";
 import {
+  quizAnswers,
+  quizAnswersPatch,
   readJourneyProgress,
   resetJourneyProgress,
   saveJourneyProgress,
   type JourneyProgress,
+  type QuizAnswers,
 } from "@/lib/visits";
 import { JourneyQuiz, score } from "./JourneyQuiz";
 import { StopView } from "./StopView";
@@ -18,6 +22,17 @@ import { StopView } from "./StopView";
 type Step = "intro" | "pre" | number | "post" | "done";
 
 const FAMILIARITY = ["new", "some", "good"] as const;
+
+/**
+ * The saved answers to this page's quiz: the page language's set (visits.ts),
+ * and only when it still matches the questions — answers saved before the quiz
+ * was edited would score the wrong options.
+ */
+function savedAnswers(journey: PlayerJourney, progress: JourneyProgress | null): QuizAnswers {
+  const { pre, post } = quizAnswers(progress, journey.lang);
+  const fits = (a: number[] | undefined) => (a && a.length === journey.quiz.length ? a : undefined);
+  return { pre: fits(pre), post: fits(post) };
+}
 
 /**
  * A journey with a beginning, context and an end:
@@ -35,6 +50,7 @@ export function JourneyPlayer({
   others?: { slug: string; title: string }[];
 }) {
   const t = useTranslations("journey");
+  const tc = useTranslations("common");
   const [step, setStep] = useState<Step>("intro");
   const [progress, setProgress] = useState<JourneyProgress | null>(null);
   const [resumable, setResumable] = useState<JourneyProgress | null>(null);
@@ -45,6 +61,7 @@ export function JourneyPlayer({
   const lang = journey.lang;
   const Next = lang === "ar" ? ArrowLeft : ArrowRight;
   const Prev = lang === "ar" ? ArrowRight : ArrowLeft;
+  const saved = savedAnswers(journey, progress);
 
   // The reviewer's preview never reads or writes the device's real progress.
   useEffect(() => {
@@ -94,6 +111,7 @@ export function JourneyPlayer({
     return (
       <section className="space-y-6">
         {journey.intro && <p className="text-lg leading-loose">{journey.intro}</p>}
+        {lang === "en" && <p className="text-sm text-muted">{tc("translationNote")}</p>}
         <ul className="flex flex-wrap gap-2 text-sm">
           {journey.theme && <li className="rounded-full bg-primary/10 px-3 py-1 font-medium text-brand-dark">{journey.theme}</li>}
           {journey.durationMin && (
@@ -168,11 +186,11 @@ export function JourneyPlayer({
       <JourneyQuiz
         quiz={journey.quiz}
         phase="pre"
-        initial={progress?.pre?.some((a) => a >= 0) ? progress.pre : undefined}
+        initial={saved.pre?.some((a) => a >= 0) ? saved.pre : undefined}
         onDone={(answers) => {
           // "Skip" must not wipe answers given earlier.
           const skipped = answers.every((a) => a < 0);
-          if (!(skipped && progress?.pre?.some((a) => a >= 0))) update({ pre: answers });
+          if (!(skipped && saved.pre?.some((a) => a >= 0))) update((prev) => quizAnswersPatch(prev, lang, { pre: answers }));
           go(0);
         }}
       />
@@ -183,10 +201,10 @@ export function JourneyPlayer({
       <JourneyQuiz
         quiz={journey.quiz}
         phase="post"
-        initial={progress?.post?.some((a) => a >= 0) ? progress.post : undefined}
+        initial={saved.post?.some((a) => a >= 0) ? saved.post : undefined}
         onBack={() => go(total - 1)}
         onDone={(answers) => {
-          update({ post: answers, completed: true });
+          update((prev) => ({ ...quizAnswersPatch(prev, lang, { post: answers }), completed: true }));
           go("done");
         }}
       />
@@ -288,8 +306,9 @@ function Completion({
   others: { slug: string; title: string }[];
 }) {
   const t = useTranslations("journey");
-  const pre = score(journey.quiz, progress?.pre);
-  const post = score(journey.quiz, progress?.post);
+  const saved = savedAnswers(journey, progress);
+  const pre = score(journey.quiz, saved.pre);
+  const post = score(journey.quiz, saved.post);
   const [clarity, setClarity] = useState<number | null>(null);
   const [flow, setFlow] = useState<number | null>(null);
   const [sent, setSent] = useState<"idle" | "sending" | "sent" | "error">(progress?.submitted ? "sent" : "idle");
@@ -319,7 +338,7 @@ function Completion({
 
   const share = async () => {
     const text = t("shareText", { title: journey.title });
-    const url = `${window.location.origin}/journeys/${journey.slug}`;
+    const url = `${window.location.origin}${localizeHref(`/journeys/${journey.slug}`, journey.lang)}`;
     try {
       if (navigator.share) await navigator.share({ text, url });
       else await navigator.clipboard.writeText(`${text} ${url}`);

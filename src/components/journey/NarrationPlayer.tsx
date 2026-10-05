@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Pause, Play, Square, Volume2 } from "lucide-react";
+import type { Lang } from "@/lib/i18n";
 
 /**
  * Reads a reviewed script aloud with the device's own voice (Web Speech API):
@@ -33,17 +34,21 @@ function chunks(text: string): string[] {
   return out;
 }
 
-function pickVoice(lang: "ar" | "en"): SpeechSynthesisVoice | null {
-  const voices = window.speechSynthesis.getVoices();
-  const prefix = lang === "ar" ? "ar" : "en";
-  return (
-    voices.find((v) => v.lang.toLowerCase().startsWith(lang === "ar" ? "ar-sa" : "en-gb")) ??
-    voices.find((v) => v.lang.toLowerCase().startsWith(prefix)) ??
-    null
-  );
+/** Preferred voice languages, best first: Saudi Arabic, then British, American or any English. */
+const VOICE_PREFS: Record<Lang, string[]> = { ar: ["ar-sa", "ar"], en: ["en-gb", "en-us", "en"] };
+
+function pickVoice(lang: Lang): SpeechSynthesisVoice | null {
+  // Some Android engines report "en_US" rather than "en-US".
+  const voices = window.speechSynthesis.getVoices().map((v) => ({ v, tag: v.lang.toLowerCase().replace(/_/g, "-") }));
+  for (const pref of VOICE_PREFS[lang]) {
+    const hit = voices.find(({ tag }) => tag.startsWith(pref));
+    if (hit) return hit.v;
+  }
+  return null;
 }
 
-export function NarrationPlayer({ text, lang = "ar" }: { text: string; lang?: "ar" | "en" }) {
+/** `lang` is the script's language — it picks the voice and the "no voice" message. */
+export function NarrationPlayer({ text, lang = "ar" }: { text: string; lang?: Lang }) {
   const t = useTranslations("journey");
   const [supported, setSupported] = useState<boolean | null>(null);
   const [hasVoice, setHasVoice] = useState(true);
@@ -95,8 +100,9 @@ export function NarrationPlayer({ text, lang = "ar" }: { text: string; lang?: "a
       }
       current.current = i;
       const u = new SpeechSynthesisUtterance(parts.current[i]);
-      u.lang = lang === "ar" ? "ar-SA" : "en-GB";
       const voice = pickVoice(lang);
+      // English follows the chosen voice (an en-US voice reads as en-US).
+      u.lang = lang === "ar" ? "ar-SA" : voice?.lang.replace(/_/g, "-") || "en-GB";
       if (voice) u.voice = voice;
       u.rate = rateRef.current;
       u.onend = () => speakFrom(i + 1, run);
@@ -190,7 +196,7 @@ export function NarrationPlayer({ text, lang = "ar" }: { text: string; lang?: "a
           ))}
         </div>
       </div>
-      {!hasVoice && <p className="text-sm text-muted">{t("noVoice")}</p>}
+      {!hasVoice && <p className="text-sm text-muted">{t(lang === "ar" ? "noVoice" : "noVoiceEn")}</p>}
     </div>
   );
 }

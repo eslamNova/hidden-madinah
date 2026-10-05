@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { BookOpen, Check, Loader2, LocateFixed, Send, Sparkles } from "lucide-react";
 import type { CitationInfo } from "@/lib/guide/context";
+import type { Lang } from "@/lib/i18n";
+import { useLang } from "@/lib/use-lang";
 
 type Turn = {
   role: "user" | "model";
@@ -19,7 +21,8 @@ type Props = {
   place?: string;
   journey?: string;
   stop?: number;
-  lang?: "ar" | "en";
+  /** Defaults to the page's language (useLang); callers need not pass it. */
+  lang?: Lang;
 };
 
 /** Renders [C12] markers as small numbered references matching the source list. */
@@ -38,8 +41,14 @@ function withRefs(text: string, citations: CitationInfo[] | undefined) {
   });
 }
 
-export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
+export function GuideChat({ place, journey, stop, lang: langProp }: Props) {
   const t = useTranslations("guide");
+  const pageLang = useLang();
+  const lang = langProp ?? pageLang;
+  // English pages accept questions (and get answers) in Arabic too: let each
+  // message take its direction from its own text. Arabic pages keep the
+  // page's direction, as before.
+  const bubbleDir = lang === "en" ? "auto" : undefined;
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -116,7 +125,7 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
       const res = await fetch("/api/guide", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question: q, history, place, journey, stop, location: location ?? undefined }),
+        body: JSON.stringify({ question: q, history, place, journey, stop, location: location ?? undefined, lang }),
       });
       if (res.status === 429) {
         update({ text: t("busy"), pending: false, type: "refuse" });
@@ -180,6 +189,7 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
           {t("title")}
         </h2>
         <p className="text-sm text-muted">{t("disclosure")}</p>
+        {lang === "en" && <p className="text-sm text-muted">{t("translationDisclosure")}</p>}
       </div>
 
       {turns.length > 0 && (
@@ -187,14 +197,19 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
           {turns.map((tn, i) =>
             tn.role === "user" ? (
               <li key={i} className="ms-8 rounded-2xl bg-primary px-4 py-3 text-paper">
-                {tn.text}
+                {/* The direction sits inside the bubble so its margin stays on the page's side. */}
+                <span dir={bubbleDir} className="block">
+                  {tn.text}
+                </span>
               </li>
             ) : (
               <li key={i} className="me-4 space-y-3 rounded-2xl bg-sand/60 px-4 py-3">
                 {tn.pending && !tn.text ? (
                   <Progress stage={tn.stage} facts={tn.facts} elapsed={elapsed} />
                 ) : (
-                  <p className="whitespace-pre-line text-lg leading-relaxed">{withRefs(tn.text, tn.citations)}</p>
+                  <p dir={bubbleDir} className="whitespace-pre-line text-lg leading-relaxed">
+                    {withRefs(tn.text, tn.citations)}
+                  </p>
                 )}
                 {tn.citations && tn.citations.length > 0 && (
                   <div className="space-y-1 border-t border-ink/10 pt-2">
@@ -206,9 +221,15 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
                       {tn.citations.map((c, n) => (
                         <li key={c.id}>
                           <span className="font-bold ltr-nums">[{n + 1}]</span>{" "}
-                          {t("citation", { vol: c.vol ?? "?", page: c.page ?? "?" })}
-                          {c.samarrai && ` · ${t("samarrai", { ref: c.samarrai })}`}
-                          {c.hadith && ` · ${c.hadith}${c.grading ? ` (${c.grading})` : ""}`}
+                          {lang === "ar" ? (
+                            <>
+                              {t("citation", { vol: c.vol ?? "?", page: c.page ?? "?" })}
+                              {c.samarrai && ` · ${t("samarrai", { ref: c.samarrai })}`}
+                              {c.hadith && ` · ${c.hadith}${c.grading ? ` (${c.grading})` : ""}`}
+                            </>
+                          ) : (
+                            <ForeignCitation c={c} />
+                          )}
                         </li>
                       ))}
                     </ol>
@@ -288,6 +309,50 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
         {announce}
       </p>
     </section>
+  );
+}
+
+/** "ج1 ص424" — al-Samarrai edition references are stored in Arabic notation. */
+const SAMARRAI_VOL_PAGE = /^ج\s*(\d+)\s*ص\s*(\d+(?:\s*[-–]\s*\d+)?)$/;
+
+/**
+ * A source line on English pages: the book's English title (and author) from
+ * the sources table, else the generic book name; the al-Samarrai reference in
+ * English notation when it parses; hadith references and gradings — Arabic
+ * citations, kept as written — marked as Arabic.
+ */
+function ForeignCitation({ c }: { c: CitationInfo }) {
+  const t = useTranslations("guide");
+  const vol = c.vol ?? "?";
+  const page = c.page ?? "?";
+  const m = c.samarrai?.trim().match(SAMARRAI_VOL_PAGE);
+  return (
+    <>
+      {c.source
+        ? c.source.author
+          ? t("citationBookBy", { title: c.source.title, author: c.source.author, vol, page })
+          : t("citationBook", { title: c.source.title, vol, page })
+        : t("citation", { vol, page })}
+      {c.samarrai && (
+        <>
+          {" · "}
+          {m ? (
+            t("samarraiVolPage", { vol: m[1], page: m[2].replace(/\s+/g, "") })
+          ) : (
+            <bdi lang="ar">{t("samarrai", { ref: c.samarrai })}</bdi>
+          )}
+        </>
+      )}
+      {c.hadith && (
+        <>
+          {" · "}
+          <bdi lang="ar">
+            {c.hadith}
+            {c.grading ? ` (${c.grading})` : ""}
+          </bdi>
+        </>
+      )}
+    </>
   );
 }
 

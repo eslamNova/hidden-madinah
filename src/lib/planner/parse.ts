@@ -97,6 +97,10 @@ const FRACTIONS: [RegExp, number][] = [
   [/\bhalf (?:an )?hour\b|\bhalf-hour\b/, 30],
 ];
 
+// "two and a half hours", "1 and a half hours" (English puts the half before "hours").
+const EN_NUMBERS: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
+const EN_AND_A_HALF = /\b(\d+|one|two|three|four|five|six) and a half (?:hours?|hrs?)\b/;
+
 const DAYS: [RegExp, number][] = [
   [word("يوم كامل|طول اليوم|اليوم كله|اليوم كامل"), 360],
   [/\b(?:whole|full|all|entire) day\b/, 360],
@@ -121,6 +125,9 @@ function readMinutes(text: string): number | null {
     return h * 60 + (extra ? Number(extra[1]) : 0);
   };
 
+  const andAHalf = text.match(EN_AND_A_HALF);
+  if (andAHalf) return normaliseMinutes(((EN_NUMBERS[andAHalf[1]] ?? Number(andAHalf[1])) + 0.5) * 60);
+
   const digits = text.match(/(\d+(?:\.\d+)?)\s*(?:ساعات|ساعه|hours?|hrs?|h)(?![\p{L}])/u);
   if (digits && digits.index !== undefined) {
     return normaliseMinutes(withSuffix(Number(digits[1]), text.slice(digits.index + digits[0].length)));
@@ -139,7 +146,7 @@ function readMinutes(text: string): number | null {
 const ELDERLY_AR = word(
   "والدتي|والدي|والده|والدته|الوالده|الوالد|والدين|والديني|امي|ابوي|جدتي|جدي|حبوبتي|كبار السن|كبير السن|كبيره في السن|كبيره بالسن|كبير بالسن|شايب|عجوز|مسن|مسنه|المسنين"
 );
-const ELDERLY_EN = /\b(?:my (?:mom|mum|mother|dad|father|parents?)|elderly|grand(?:ma|pa|mother|father|parents?)|old(?:er)? (?:parents?|people|man|woman|lady|relatives?))\b/;
+const ELDERLY_EN = /\b(?:my (?:mom|mum|mother|dad|father|parents?)|with (?:mom|mum|dad|(?:the |our )?parents)|elderly|grand(?:ma|pa|mother|father|parents?)|old(?:er)? (?:parents?|people|man|woman|lady|relatives?))\b/;
 const KIDS_AR = word("اطفال|طفل|طفلي|عيالي|عيال|اولادي|اولاد|بزران|بزارين|ولدي|بنتي|بناتي|صغار");
 const KIDS_EN = /\b(?:kids?|children|child|my (?:son|daughter|boys|girls))\b/;
 const FAMILY_AR = word("عائله|عايله|عائلتي|عايلتي|اهلي|زوجتي|زوجي|المدام|اسرتي");

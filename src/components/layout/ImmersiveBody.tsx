@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useBarePath } from "@/lib/use-lang";
 
 /**
  * Marks full-bleed media routes (story landing, tours) on <html> so the page
@@ -10,7 +10,8 @@ import { usePathname } from "next/navigation";
  * flashes sand around the photography.
  */
 export function ImmersiveBody() {
-  const pathname = usePathname();
+  // Without the /en prefix, so the English landing ("/en") is immersive too.
+  const pathname = useBarePath();
   const immersive = pathname === "/" || pathname.endsWith("/tour");
 
   useEffect(() => {

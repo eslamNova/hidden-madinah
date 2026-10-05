@@ -137,6 +137,7 @@ export function TourViewer({
   exitHref?: string;
 }) {
   const t = useTranslations("tour");
+  const tPlaces = useTranslations("places");
   const containerRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
   const [current, setCurrent] = useState(0);
@@ -310,7 +311,7 @@ export function TourViewer({
                     style={{ color: CATEGORY_META[s.category].tintOnDark }}
                   >
                     <CategoryIcon category={s.category} className="h-5 w-5 shrink-0" />
-                    {CATEGORY_META[s.category].labelAr}
+                    {tPlaces(`category.${s.category}`)}
                   </span>
                   <h2 className="text-2xl leading-snug text-paper">{s.placeName}</h2>
                   {s.summary && (
@@ -325,7 +326,7 @@ export function TourViewer({
                       className="press pointer-events-auto mt-1 inline-flex min-h-12 items-center gap-1.5 rounded-2xl bg-paper/95 px-5 text-base font-semibold text-primary-dark shadow-lg"
                     >
                       {t("openPlace")}
-                      <ChevronLeft aria-hidden="true" className="h-5 w-5" />
+                      <ChevronLeft aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
                     </Link>
                   )}
                 </div>

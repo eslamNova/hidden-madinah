@@ -9,7 +9,7 @@ const ICONS = {
   "map-pin": MapPin,
 } as const;
 
-/** Category glyph (decorative — pair it with the Arabic category label). */
+/** Category glyph (decorative — pair it with the category label, places.category.*). */
 export function CategoryIcon({
   category,
   className,

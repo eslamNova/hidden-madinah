@@ -378,6 +378,11 @@ html[data-immersive] body::before {
   animation-fill-mode: both;
 }
 
+/* The bar fills from the reading start: right in Arabic, left in English. */
+[dir="ltr"] .tour-progress {
+  transform-origin: left;
+}
+
 /* Scroll hint bounce — CSS keyframes so the reduced-motion block below
    neutralizes it without JS. */
 @keyframes story-hint-bounce {

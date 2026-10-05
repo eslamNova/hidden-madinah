@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test src/lib/planner/solver.test.ts src/lib/planner/parse.test.ts"
+    "test": "node --import tsx --test src/lib/planner/solver.test.ts src/lib/planner/parse.test.ts src/lib/guide/answer.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.27.0",

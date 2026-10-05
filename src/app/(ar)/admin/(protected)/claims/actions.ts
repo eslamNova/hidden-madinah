@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateBoth } from "@/lib/revalidate";
 import { requireAdmin, type ActionResult } from "@/lib/admin-auth";
 import type { Enums, TablesUpdate } from "@/lib/database.types";
 
@@ -33,7 +33,7 @@ export async function reviewClaimAction(input: ClaimReviewInput): Promise<Action
     const { error } = await supabase.from("claims").update(patch).eq("id", input.id);
     if (error) return { ok: false, error: error.message };
     // Verified claims feed place pages, journeys and the guide: refresh all.
-    revalidatePath("/", "layout");
+    revalidateBoth("/", "layout");
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };
@@ -50,7 +50,7 @@ export async function approveClaimsAction(ids: number[]): Promise<ActionResult<{
       .update({ status: "verified", reviewed_at: new Date().toISOString(), en_reviewed: true })
       .in("id", ids);
     if (error) return { ok: false, error: error.message };
-    revalidatePath("/", "layout");
+    revalidateBoth("/", "layout");
     return { ok: true, data: { count: ids.length } };
   } catch {
     return { ok: false, error: "unauthorized" };

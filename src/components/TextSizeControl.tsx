@@ -45,7 +45,7 @@ export function TextSizeControl() {
         disabled={step === 0}
         aria-label={t("decrease")}
       >
-        أ−
+        {t("glyph")}−
       </button>
       <button
         type="button"
@@ -54,7 +54,7 @@ export function TextSizeControl() {
         disabled={step === FONT_STEPS.length - 1}
         aria-label={t("increase")}
       >
-        أ+
+        {t("glyph")}+
       </button>
       <span aria-live="polite" className="sr-only">
         {t("announce", { size: FONT_STEPS[step] })}

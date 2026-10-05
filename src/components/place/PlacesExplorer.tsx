@@ -5,8 +5,10 @@ import Link from "@/components/i18n/Link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { List, Map as MapIcon, Search } from "lucide-react";
-import { arabicIncludes, normalizeArabic } from "@/lib/arabic";
-import { CATEGORY_META, CATEGORY_ORDER, type PlaceCategory } from "@/lib/maps";
+import { normalizeArabic, normalizeLatin, searchIncludes } from "@/lib/arabic";
+import type { Lang } from "@/lib/i18n";
+import { CATEGORY_ORDER, type PlaceCategory } from "@/lib/maps";
+import { useLang } from "@/lib/use-lang";
 import { PlaceCard, type PlaceCardData } from "@/components/place/PlaceCard";
 
 export type ExplorerPlace = PlaceCardData & {
@@ -17,10 +19,19 @@ export type ExplorerPlace = PlaceCardData & {
 type DistanceFilter = "all" | "under2" | "2to5" | "over5";
 type TimeFilter = "all" | "morning" | "asr" | "evening";
 
-const TIME_KEYWORDS: Record<Exclude<TimeFilter, "all">, string[]> = {
-  morning: ["صباح"],
-  asr: ["عصر", "ظهر"],
-  evening: ["مغرب", "مساء", "غروب", "عشاء"],
+// Keywords looked for in the place's best-time text, in the page's language
+// (English pages read the English best-time text).
+const TIME_KEYWORDS: Record<Lang, Record<Exclude<TimeFilter, "all">, string[]>> = {
+  ar: {
+    morning: ["صباح"],
+    asr: ["عصر", "ظهر"],
+    evening: ["مغرب", "مساء", "غروب", "عشاء"],
+  },
+  en: {
+    morning: ["morning", "sunrise", "dawn", "fajr", "duha", "forenoon"],
+    asr: ["asr", "afternoon", "noon", "dhuhr", "zuhr", "midday"],
+    evening: ["maghrib", "evening", "sunset", "dusk", "isha", "night"],
+  },
 };
 
 function matchesDistance(km: number | null, filter: DistanceFilter): boolean {
@@ -31,11 +42,15 @@ function matchesDistance(km: number | null, filter: DistanceFilter): boolean {
   return km > 5;
 }
 
-function matchesTime(bestTime: string | null, filter: TimeFilter): boolean {
+function matchesTime(bestTime: string | null, filter: TimeFilter, lang: Lang): boolean {
   if (filter === "all") return true;
   if (!bestTime) return false;
+  if (lang === "en") {
+    const normalized = normalizeLatin(bestTime);
+    return TIME_KEYWORDS.en[filter].some((k) => normalized.includes(k));
+  }
   const normalized = normalizeArabic(bestTime);
-  return TIME_KEYWORDS[filter].some((k) => normalized.includes(normalizeArabic(k)));
+  return TIME_KEYWORDS.ar[filter].some((k) => normalized.includes(normalizeArabic(k)));
 }
 
 function Chip({
@@ -66,6 +81,7 @@ function Chip({
 /** Client-side search + filters over the (small) published-places list. */
 export function PlacesExplorer({ places }: { places: ExplorerPlace[] }) {
   const t = useTranslations("places");
+  const lang = useLang();
   const initialCategory = useSearchParams().get("category") ?? undefined;
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<PlaceCategory | "all">(
@@ -82,12 +98,12 @@ export function PlacesExplorer({ places }: { places: ExplorerPlace[] }) {
         (p) =>
           (category === "all" || p.category === category) &&
           matchesDistance(p.distanceKm, distance) &&
-          matchesTime(p.bestTime, time) &&
+          matchesTime(p.bestTime, time, lang) &&
           (query.trim() === "" ||
-            arabicIncludes(p.name_ar, query) ||
-            (p.summary ? arabicIncludes(p.summary, query) : false))
+            searchIncludes(p.name_ar, query, lang) ||
+            (p.summary ? searchIncludes(p.summary, query, lang) : false))
       ),
-    [places, category, distance, time, query]
+    [places, category, distance, time, query, lang]
   );
 
   return (
@@ -120,7 +136,7 @@ export function PlacesExplorer({ places }: { places: ExplorerPlace[] }) {
           </Chip>
           {CATEGORY_ORDER.filter((c) => c !== "other").map((c) => (
             <Chip key={c} active={category === c} onClick={() => setCategory(c)}>
-              {CATEGORY_META[c].pluralAr}
+              {t(`categoryPlural.${c}`)}
             </Chip>
           ))}
         </div>

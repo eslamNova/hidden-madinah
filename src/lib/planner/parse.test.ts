@@ -24,6 +24,12 @@ test("time phrases", () => {
     ["an hour and a half", 90],
     ["half an hour", 30],
     ["a couple of hours", 120],
+    ["two and a half hours", 150],
+    ["2 and a half hrs", 150],
+    ["two hours and a half", 150],
+    ["1.5 hours", 90],
+    ["90 minutes", 90],
+    ["the whole day", 360],
     ["عندي ساعة", 60],
     ["طول اليوم", 360],
     ["45 دقيقة", 45],
@@ -98,4 +104,19 @@ test("only malformed AI fields are filled from keywords", () => {
   assert.equal(malformedFields(explicitUnknown).size, 0);
   const bad = malformedFields({ minutes: "two", companions: "grandma", interests: ["food"], start: "quba" });
   assert.deepEqual([...bad].sort(), ["companions", "interests", "minutes", "mobility", "mode"]);
+});
+
+test("English requests (the /en planner)", () => {
+  const p = parse("I have three hours after Asr, my mother is with me and she can't walk far, we'd like Seerah sites near Quba");
+  assert.equal(p.minutes, 180);
+  assert.equal(p.companions, "elderly");
+  assert.equal(p.mobility, "limited");
+  assert.equal(p.start, "quba");
+  assert.equal(p.mode, "car");
+  assert.equal(parse("with mom and dad").companions, "elderly");
+  assert.equal(parse("We have 4 hours with the kids, we have a car").companions, "kids");
+  assert.equal(parse("I'm staying near the Haram, 2 hours, walking").start, "nabawi");
+  assert.equal(parse("I'm staying near the Haram, 2 hours, walking").mode, "walk");
+  assert.deepEqual(parse("I like battle sites").interests, ["battles"]);
+  assert.equal(parse("starting at 4pm").minutes, null);
 });

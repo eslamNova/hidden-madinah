@@ -100,7 +100,7 @@ export function NearestPlaces({ places }: { places: NearestPlaceInput[] }) {
                     {t("nearestKm", { km: p.km })}
                   </span>
                 </span>
-                <ChevronLeft aria-hidden="true" className="h-5 w-5 shrink-0 text-muted" />
+                <ChevronLeft aria-hidden="true" className="h-5 w-5 shrink-0 text-muted ltr:-scale-x-100" />
               </Link>
             </li>
           ))}

@@ -77,6 +77,8 @@ export async function SiteDocument({ lang, children }: { lang: Lang; children: R
       suppressHydrationWarning
       className={`${thmanyahSans.variable} ${thmanyahSerif.variable}`}
     >
+      {/* This component IS the root layout's document (both root layouts render it). */}
+      {/* eslint-disable-next-line @next/next/no-head-element */}
       <head>
         <script dangerouslySetInnerHTML={{ __html: fontStepScript }} />
       </head>

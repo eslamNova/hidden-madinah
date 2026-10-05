@@ -1,4 +1,609 @@
 {
-  "places": {},
-  "routes": {}
+  "places": {
+    "al-masajid-al-sabaa": {
+      "fields": {
+        "name": {
+          "text": "The Seven Mosques",
+          "src": "51506f28"
+        },
+        "summary": {
+          "text": "A group of historic mosques west of Mount Sal', at the site of the Battle of the Trench (al-Khandaq). The best known is Masjid al-Fath, where the Prophet ﷺ made supplication (du'a) for three days in a row until his du'a was answered.",
+          "src": "3a5659d2"
+        },
+        "story": {
+          "text": "This is a group of mosques west of Mount Sal'. Prayers have been held in them, and they are named after the Prophet ﷺ and some of the noble Companions (Sahabah). These mosques are linked with the places where those Companions kept guard and camped during the Battle of the Trench (al-Khandaq), also called the Battle of the Confederates (al-Ahzab), in 5 AH. Masjid al-Fath (the Mosque of Victory) is considered the most important of them, and it stands on the highest ground. It is the spot where the Prophet ﷺ made supplication against the Confederates for three days in a row, until his supplication was answered and he received the good news of victory. The area also includes the mosques of Salman al-Farisi (whose idea it was to dig the trench), Abu Bakr as-Siddiq, 'Umar ibn al-Khattab, 'Ali ibn Abi Talib and Fatimah az-Zahra, as well as Masjid al-Khandaq, the Friday mosque.",
+          "src": "e96514dd"
+        },
+        "virtue": {
+          "text": "Jabir ibn 'Abd Allah (may Allah be pleased with him and his father) reported: “The Prophet ﷺ made supplication in Masjid al-Fath three times: on Monday, Tuesday and Wednesday. His supplication was answered on Wednesday, between the two prayers, and joy could be seen on his face.” (Musnad Ahmad).\n\nThese mosques have no special status that calls for particular acts of worship or prayers in them. Rather, they are visited to connect with scenes from the Seerah (the Prophet's biography), and to remember how the Companions acted and stood firm in the Battle of the Trench.",
+          "src": "2ffeb5b5"
+        },
+        "visiting_tips": {
+          "text": "30 to 45 minutes is enough for a full tour and the climb up the stairs to Masjid al-Fath.",
+          "src": "241d896c"
+        },
+        "featured_quote": {
+          "text": "[Remember] when they came at you from above you and from below you, and when eyes shifted [in fear], and hearts reached the throats",
+          "src": "3a1ce965"
+        },
+        "featured_quote_source": {
+          "text": "Surah Al-Ahzab 33:10, revealed about this battle (translation of the meaning: Saheeh International)",
+          "src": "f4ce6308"
+        },
+        "how_to_get_there": {
+          "text": "By car or taxi: you can go straight there via Seven Mosques Road or as-Sayh Road (northwest of the Prophet's Mosque, al-Masjid an-Nabawi).\nTour buses: Madinah's sightseeing buses have their own stop right in the square.",
+          "src": "e447bc0f"
+        },
+        "transport_note": {
+          "text": "Traffic and crowds get heavy during the Hajj and Umrah seasons and on Ramadan nights, especially just before the Maghrib (sunset) prayer.",
+          "src": "d46488aa"
+        },
+        "best_time": {
+          "text": "Early morning, or between the Asr (afternoon) and Maghrib (sunset) prayers. This avoids the hot sun on the climb to Masjid al-Fath on the hillside, and lets you enjoy the beauty of the site and the view.",
+          "src": "7ebd9d6c"
+        },
+        "open_status": {
+          "text": "The site and the outdoor squares around the mountain are open all day. Masjid al-Khandaq, the Friday mosque, opens for the five daily prayers and for Friday prayer.",
+          "src": "dea42152"
+        }
+      },
+      "transport": [
+        {
+          "mode": {
+            "text": "Regular taxi",
+            "src": "e38099bb"
+          },
+          "note": null
+        },
+        {
+          "mode": {
+            "text": "Ride-hailing apps (Uber and similar)",
+            "src": "3d598ac9"
+          },
+          "note": null
+        }
+      ],
+      "captions": {}
+    },
+    "bir-ghars": {
+      "fields": {
+        "name": {
+          "text": "Bir Ghars",
+          "src": "fa1c7ef8"
+        },
+        "summary": {
+          "text": "A blessed well in the Qurban district, linked to the Prophet ﷺ. Fresh water used to be brought to him from it, and he gave instructions to be washed with its water after his death.",
+          "src": "fffc343b"
+        },
+        "story": {
+          "text": "It is one of the well-known wells linked to the Prophet ﷺ, and one that was dear to him. Fresh water used to be brought to him from it. He drank from it and performed ablution (wudu) with its water. He asked Allah to bless it and said that it lies over one of the springs of Paradise. Its owner was the noble Companion Sa'd ibn Khaythamah (may Allah be pleased with him). One of the clearest signs of its historical value is that the Prophet ﷺ instructed 'Ali ibn Abi Talib (may Allah be pleased with him) that he should be washed with its water after his death. So he was washed with seven water-skins of its water, their ties still unopened, as he had instructed.",
+          "src": "4b60148d"
+        },
+        "virtue": {
+          "text": "'Ali ibn Abi Talib (may Allah be pleased with him) reported that the Prophet ﷺ said: \"When I die, wash me with seven water-skins from my well, the well of Ghars.\" (Sunan Ibn Majah)\n\nIbn 'Umar (may Allah be pleased with him and his father) reported that the Messenger ﷺ said: \"What an excellent well is the well of Ghars! It is one of the springs of Paradise, and the best of water.\" (Sunan Ibn Majah)\n\nPeople visit it to connect with the traces of the Prophet ﷺ and to learn about the landmarks of the Seerah (the Prophet's biography).",
+          "src": "25b47546"
+        },
+        "visiting_tips": {
+          "text": "Learn the well's history before you visit, so you can appreciate the value of the place. It looks plain from the outside, but its story is a great one.",
+          "src": "661bfe5e"
+        },
+        "featured_quote": {
+          "text": "What an excellent well is the well of Ghars! It is one of the springs of Paradise, and the best of water.",
+          "src": "d466d0fc"
+        },
+        "featured_quote_source": {
+          "text": "Sunan Ibn Majah",
+          "src": "eb0312aa"
+        },
+        "how_to_get_there": {
+          "text": "By car or taxi: you can get there directly via 'Ali ibn Abi Talib Road (al-Awali / Qurban district).\nOn foot: it is about 1.5 km from Quba Mosque (about 15 to 20 minutes' walk).",
+          "src": "de187901"
+        },
+        "transport_note": {
+          "text": "Visitor numbers and ride fares go up during the Hajj season and the last ten days of Ramadan.",
+          "src": "e03307a2"
+        },
+        "best_time": {
+          "text": "Late in the day, after the 'Asr (afternoon) prayer, when it opens. This way you avoid the heat of the sun and enjoy the pleasant atmosphere at the site.",
+          "src": "99b9524a"
+        },
+        "open_status": {
+          "text": "Open daily from 4:00 pm to 12:00 midnight.",
+          "src": "1c1a33d5"
+        }
+      },
+      "transport": [
+        {
+          "mode": {
+            "text": "Regular taxi",
+            "src": "e38099bb"
+          },
+          "note": null
+        },
+        {
+          "mode": {
+            "text": "Ride apps (Uber and similar)",
+            "src": "3d598ac9"
+          },
+          "note": null
+        }
+      ],
+      "captions": {}
+    },
+    "bustan-al-mustazal": {
+      "fields": {
+        "name": {
+          "text": "Bustan al-Mustazill & Bir 'Adhq",
+          "src": "1f4a0aac"
+        },
+        "summary": {
+          "text": "This is the place where the Prophet ﷺ was welcomed when he reached Madinah on his Hijrah (migration). Here Abu Bakr as-Siddiq (may Allah be pleased with him) shaded the Messenger of Allah ﷺ with his cloak, and so the Helpers (Ansar) recognised the Prophet ﷺ.",
+          "src": "e1d6e273"
+        },
+        "story": {
+          "text": "This is the place where the Prophet ﷺ and his companion Abu Bakr as-Siddiq (may Allah be pleased with him) were welcomed when they reached Madinah (al-Madinah al-Munawwarah) on their migration from Makkah. It is also known as Bustan at-Tazlil (the Garden of Shading) and the Bir 'Adhq farm. When the shade moved away and the sun fell on the face of the Prophet ﷺ, Abu Bakr took off his cloak and shaded the Messenger of Allah ﷺ with it. So the Helpers (Ansar), who had not seen the Prophet ﷺ before, knew which of the two was the Messenger and which was as-Siddiq. The garden also saw the first gathering the Prophet ﷺ held with the people of Madinah, and inside it is the famous historic well, Bir 'Adhq.",
+          "src": "4830878d"
+        },
+        "virtue": {
+          "text": "It is reported in Sahih al-Bukhari, in the story of the Hijrah and the welcome:\n“…and received the Messenger of Allah ﷺ. Abu Bakr began receiving the people, while the Messenger of Allah ﷺ sat in silence. Those of the Helpers (Ansar) who came and had not seen the Messenger of Allah ﷺ began greeting Abu Bakr, until the sun fell on the Messenger of Allah ﷺ. Then Abu Bakr came forward and shaded him with his cloak, and at that the people recognised the Messenger of Allah ﷺ…” (Sahih al-Bukhari).\n\nThis place has no special religious merit tied to a particular act of worship. Rather, it is permissible to visit it, to get to know and learn about the landmarks of the Seerah (the Prophet's biography) and the sites of the noble Hijrah.",
+          "src": "c09963e3"
+        },
+        "visiting_tips": {
+          "text": "Entry fees: a ticket for the garden costs 19 Saudi riyals per person, and a combined ticket (Quba Mosque and Bustan al-Mustazill) costs 39 Saudi riyals.",
+          "src": "6b425fec"
+        },
+        "featured_quote": {
+          "text": "Then Abu Bakr came forward and shaded him with his cloak, and at that the people recognised the Messenger of Allah ﷺ.",
+          "src": "2e6a811c"
+        },
+        "featured_quote_source": {
+          "text": "Sahih al-Bukhari",
+          "src": "f68952ab"
+        },
+        "how_to_get_there": {
+          "text": "On foot: it is very close to Quba Mosque (about 200 metres west of the mosque). You can reach it in under 3 minutes along the path around Quba.\nBy car or taxi: directly via Quba Road or Jaddat Quba (Quba Avenue).",
+          "src": "fbbb4aa2"
+        },
+        "transport_note": {
+          "text": "Visitor numbers and ride prices go up during the Hajj season, the month of Ramadan and public holidays.",
+          "src": "b647f468"
+        },
+        "best_time": {
+          "text": "The evening period, from 4:30 pm: enjoy the pleasant air among the palm trees and avoid the heat of the sun as you walk around.",
+          "src": "93c1904a"
+        },
+        "open_status": {
+          "text": "Open in two periods, every day of the week: the morning period from 5:00 am to 1:20 pm, and the evening period from 4:30 pm to 11:20 pm. (On Fridays, the morning period closes at 1:00 pm for the Friday prayer.)",
+          "src": "e0c0d912"
+        }
+      },
+      "transport": [
+        {
+          "mode": {
+            "text": "Regular taxi",
+            "src": "e38099bb"
+          },
+          "note": null
+        },
+        {
+          "mode": {
+            "text": "Ride apps (Uber and similar)",
+            "src": "3d598ac9"
+          },
+          "note": null
+        }
+      ],
+      "captions": {}
+    },
+    "jabal-al-rumah": {
+      "fields": {
+        "name": {
+          "text": "Archers' Hill and Sayyid ash-Shuhada Square",
+          "src": "b151e748"
+        },
+        "summary": {
+          "text": "The site of the Battle of Uhud: the hill where the fifty archers of the Prophet ﷺ held their post, and the Martyrs' Square, where Hamzah ibn 'Abd al-Muttalib (may Allah be pleased with him) and seventy of the Companions (Sahabah) were buried.",
+          "src": "9d7bdd10"
+        },
+        "story": {
+          "text": "This is the historic field of the famous Battle of Uhud (3 AH). Fifty archers took up position on the Archers' Hill (Jabal 'Aynayn) on the order of the Prophet ﷺ, to protect the rear of the Muslim army. He told them firmly not to leave their place, whatever the outcome. When the course of the battle changed, most of them came down, and the horsemen took advantage of the gap. A fierce battle followed in which seventy of the noble Companions were martyred. Foremost among them was the Lion of Allah, Hamzah ibn 'Abd al-Muttalib, the Master of the Martyrs (Sayyid ash-Shuhada) and the uncle of the Prophet ﷺ. They were buried in the Martyrs' Cemetery next to the hill. The square also has the Sayyid ash-Shuhada Mosque, which is considered one of the largest mosques in Madinah.",
+          "src": "dd50d872"
+        },
+        "virtue": {
+          "text": "The Messenger of Allah ﷺ said about Mount Uhud: “Uhud is a mountain that loves us and we love it.” (Sahih al-Bukhari and Sahih Muslim).\n\nHe ﷺ also said, encouraging people to visit the martyrs: “Indeed, these martyrs: until the Day of Resurrection, no Muslim passes by them and greets them without their returning his greeting.” (Musnad Ahmad).\n\nVerses from Surah Al 'Imran were revealed about the events of the battle. Among them, Allah the Exalted says: “If a wound should touch you - there has already touched the [opposing] people a wound similar to it. And these days [of varying conditions] We alternate among the people” [Surah Al 'Imran 3:140 – translation of the meaning: Saheeh International].\n\nIt is Sunnah (a recommended practice) to visit the cemetery of the Martyrs of Uhud, to greet them with the greeting of peace (salam), to make supplication (du'a) for them, to ask Allah to forgive them, and to reflect on the lessons of the Battle of Uhud. This should be done while keeping to the Islamic etiquette of visiting graves, and avoiding seeking blessings (tabarruk) and other mistaken practices.",
+          "src": "82c23314"
+        },
+        "visiting_tips": {
+          "text": "Entry fee for the hill: 10 riyals per person.",
+          "src": "b58d3a87"
+        },
+        "featured_quote": {
+          "text": "Uhud is a mountain that loves us and we love it.",
+          "src": "a00524a9"
+        },
+        "featured_quote_source": {
+          "text": "Sahih al-Bukhari and Sahih Muslim",
+          "src": "422a06cf"
+        },
+        "how_to_get_there": {
+          "text": "By car, taxi or bus: you can get there directly via Sayyid ash-Shuhada Road or King Fahd Road (north of the Prophet's Mosque).\nTour buses: the Madinah sightseeing bus (Madinah Hop-On Hop-Off Bus) stops right in the square.",
+          "src": "397d49f0"
+        },
+        "transport_note": {
+          "text": "Traffic and crowds are heavier during the Hajj and Umrah seasons, during the month of Ramadan, and at prayer times, especially the Friday prayer.",
+          "src": "815f4969"
+        },
+        "best_time": {
+          "text": "Early morning, or between the afternoon ('Asr) and sunset (Maghrib) prayers. This avoids the heat of the sun while you climb the Archers' Hill, and lets you see the light on Mount Uhud and across the whole square.",
+          "src": "a3c77b6c"
+        },
+        "open_status": {
+          "text": "Open 24 hours (the Archers' Hill, the Martyrs' Square and the viewpoint overlooking the cemetery are open all day; the Sayyid ash-Shuhada Mosque is open at the times of the five daily prayers and the Friday prayer).",
+          "src": "1ece070d"
+        }
+      },
+      "transport": [
+        {
+          "mode": {
+            "text": "Regular taxi",
+            "src": "e38099bb"
+          },
+          "note": null
+        },
+        {
+          "mode": {
+            "text": "Ride-hailing apps (Uber and similar)",
+            "src": "3d598ac9"
+          },
+          "note": null
+        }
+      ],
+      "captions": {}
+    },
+    "masjid-abu-bakr-al-siddiq": {
+      "fields": {
+        "name": {
+          "text": "Masjid Abu Bakr as-Siddiq",
+          "src": "c7b05f95"
+        },
+        "summary": {
+          "text": "A historic mosque in the al-Musalla area, a few minutes from the Prophet's Mosque. It stands in the area where the Prophet ﷺ used to pray the two Eid prayers and the prayer for rain (istisqa). Abu Bakr as-Siddiq (may Allah be pleased with him) prayed the Eid prayer here during his caliphate.",
+          "src": "449516c9"
+        },
+        "story": {
+          "text": "It is one of the old, historic mosques very close to the Prophet's Mosque (al-Masjid an-Nabawi), in the area called \"al-Musalla\" (the prayer ground). The history of the site goes back to the time of the Prophet ﷺ, who used to pray the two Eid prayers and the prayer for rain (istisqa) in this area. The Rightly Guided Caliph Abu Bakr as-Siddiq (may Allah be pleased with him) prayed the Eid prayer here during his caliphate. So the mosque was built and named after him, to keep alive the memory of what he did here and of how he followed the example of the Prophet ﷺ. It is part of a group of neighboring historic mosques, near Masjid al-Ghamamah, Masjid 'Ali ibn Abi Talib and Masjid 'Umar ibn al-Khattab.\n\nIt is a different mosque from the Masjid Abu Bakr as-Siddiq that is part of the Seven Mosques, west of Mount Sal'. Each has its own location and its own story.",
+          "src": "3038e9df"
+        },
+        "virtue": {
+          "text": "There is no special virtue of its own, specified by name, for worship in this mosque. However, it is recommended to visit it and to pray the prayer of greeting the mosque (tahiyyat al-masjid) or a voluntary prayer here, finding comfort in the Prophetic landmarks and in the places where the Prophet ﷺ and his Rightly Guided Caliphs prayed.",
+          "src": "119be28e"
+        },
+        "how_to_get_there": {
+          "text": "On foot (the best and easiest way): leave the Prophet's Mosque through its western courtyards toward al-Ghamamah Square — only 3 to 5 minutes. It is near Masjid al-Ghamamah and Masjid 'Ali ibn Abi Talib.\nBy car or taxi: go to the area around as-Salam or al-Manakhah Road.",
+          "src": "3cc8c9cf"
+        }
+      },
+      "transport": [
+        {
+          "mode": {
+            "text": "On foot from the Prophet's Mosque",
+            "src": "43240eda"
+          },
+          "note": {
+            "text": "3 to 5 minutes through the western courtyards",
+            "src": "18bf547c"
+          }
+        }
+      ],
+      "captions": {}
+    },
+    "masjid-al-jumuah": {
+      "fields": {
+        "name": {
+          "text": "Masjid al-Jumu'ah",
+          "src": "3de9673e"
+        },
+        "summary": {
+          "text": "The place where the Prophet ﷺ led the first Friday (Jumu'ah) prayer in Islam and gave the first Friday sermon. It lies in the bed of Wadi Ranuna, in the lands of Banu Salim ibn 'Awf.",
+          "src": "04c94067"
+        },
+        "story": {
+          "text": "This is the mosque where the first Friday prayer in Islam was held, led by the Prophet ﷺ. It is also known as the Mosque of Banu Salim ibn 'Awf, the Valley Mosque (Masjid al-Wadi) and the Mosque of 'Utbah ibn Ban. During his Hijrah (migration) from Makkah to Madinah, the Prophet ﷺ stayed in Quba for four days. Then, on Friday morning, he set out towards the heart of Madinah. When he reached the bed of Wadi Ranuna, in the lands of Banu Salim ibn 'Awf, the time for the Friday prayer came. So he gathered the Muslims for the Friday prayer. He led them in the first Friday prayer and gave them the first Friday sermon in Islam. The mosque was built on that spot.",
+          "src": "30a85e76"
+        },
+        "virtue": {
+          "text": "It is reported that the Prophet ﷺ said in his sermon at the first Friday prayer held in this place: «Now then, O people, send forth [good] for yourselves… and know that Allah orders justice and good conduct…» (as-Sirah an-Nabawiyyah by Ibn Hisham, and at-Tabaqat by Ibn Sa'd).\n\nThe place is also linked to the rulings of the Friday prayer and to the command to proceed to it, given in the words of Allah the Exalted: «O you who have believed, when [the adhan] is called for the prayer on the day of Jumu'ah [Friday], then proceed to the remembrance of Allah and leave trade.» (Surah Al-Jumu'ah 62:9; translation of the meaning: Saheeh International)\n\nIt is Sunnah (recommended) to visit it and pray in it: for example, a voluntary prayer, the prayer of greeting the mosque, or the Friday prayer if possible. This recommendation draws on the fact that it is the place where the first Friday prayer in Islamic history was instituted and held.",
+          "src": "397216e4"
+        },
+        "featured_quote": {
+          "text": "O you who have believed, when [the adhan] is called for the prayer on the day of Jumu'ah [Friday], then proceed to the remembrance of Allah and leave trade.",
+          "src": "651dc553"
+        },
+        "featured_quote_source": {
+          "text": "Surah Al-Jumu'ah 62:9 — translation of the meaning: Saheeh International",
+          "src": "229b64cb"
+        },
+        "how_to_get_there": {
+          "text": "On foot: it is only about 500 meters from Masjid Quba (less than 6 minutes' walk along Quba Avenue and the pedestrian path).\nBy car or taxi: you can get there directly via Quba Street or al-Jumu'ah Road.",
+          "src": "12575744"
+        }
+      },
+      "transport": [
+        {
+          "mode": {
+            "text": "Regular taxi",
+            "src": "e38099bb"
+          },
+          "note": null
+        },
+        {
+          "mode": {
+            "text": "Ride apps (such as Uber)",
+            "src": "3d598ac9"
+          },
+          "note": null
+        }
+      ],
+      "captions": {}
+    },
+    "masjid-al-qiblatayn": {
+      "fields": {
+        "name": {
+          "text": "Masjid al-Qiblatayn (Mosque of the Two Qiblahs)",
+          "src": "ee41f3c3"
+        },
+        "summary": {
+          "text": "This is the mosque that saw the qiblah (the direction Muslims face in prayer) change from Bayt al-Maqdis (Jerusalem) to the Noble Ka'bah in 2 AH. The Prophet ﷺ and his Companions turned to face the new direction during the prayer itself.",
+          "src": "74b0abe0"
+        },
+        "story": {
+          "text": "This is the great historic mosque that saw the qiblah in Islam change from al-Masjid al-Aqsa (Bayt al-Maqdis, Jerusalem) to the Noble Ka'bah in al-Masjid al-Haram in Makkah. It is also known as Masjid Bani Salimah (the Mosque of Banu Salimah). The change took place in the middle of the month of Sha'ban in 2 AH. The Prophet ﷺ was leading his Companions (may Allah be pleased with them) in prayer when the noble verse was revealed to him with the command to turn toward the Ka'bah. The Prophet ﷺ and the Muslims with him then turned toward the new qiblah in the middle of the prayer. This is why it was named “Masjid al-Qiblatayn” (the Mosque of the Two Qiblahs).",
+          "src": "2042fe6b"
+        },
+        "virtue": {
+          "text": "Al-Bara' ibn 'Azib (may Allah be pleased with him) reported: “When the Prophet ﷺ first came to Madinah, he stayed with his grandfathers — or he said: his maternal uncles — from the Helpers (Ansar). He prayed facing Bayt al-Maqdis [Jerusalem] for sixteen or seventeen months, and he wished that his qiblah would be toward the House [the Ka'bah].” (Sahih al-Bukhari)\n\nIt is recommended to visit it and to pray in it (for example, the prayer of greeting the mosque, or a voluntary prayer), drawing inspiration from the great historic event of the change of the qiblah in Islam.",
+          "src": "7ee9bbaf"
+        },
+        "featured_quote": {
+          "text": "We have certainly seen the turning of your face, [O Muḥammad], toward the heaven, and We will surely turn you to a qiblah with which you will be pleased. So turn your face [i.e., yourself] toward al-Masjid al-Ḥarām.",
+          "src": "7064b1a1"
+        },
+        "featured_quote_source": {
+          "text": "Surah Al-Baqarah 2:144 — translation of the meaning (Saheeh International)",
+          "src": "fdf40bd2"
+        },
+        "how_to_get_there": {
+          "text": "By car or taxi: you can get there directly via Khalid ibn al-Walid Road or Sultanah Road (in the north-west of Madinah).\nTour buses: the Madinah Hop-On Hop-Off Bus (the city sightseeing bus) stops regularly in the mosque's outer courtyard.",
+          "src": "b1fca37b"
+        },
+        "transport_note": {
+          "text": "Traffic is heavier during the Hajj and Umrah seasons, especially just before the Friday prayer and at the times of the Maghrib (sunset) and 'Isha (night) prayers during Ramadan.",
+          "src": "29e9446b"
+        },
+        "best_time": {
+          "text": "Between the 'Asr (afternoon) and Maghrib (sunset) prayers, or early in the morning. This lets you enjoy the calm of the mosque, reflect on its historic importance and walk around its courtyards.",
+          "src": "dc603f89"
+        },
+        "open_status": {
+          "text": "Open around the clock (the courtyards and outer grounds are open all day; the prayer hall opens at the times of the five daily prayers and the Friday prayer).",
+          "src": "356069f5"
+        }
+      },
+      "transport": [
+        {
+          "mode": {
+            "text": "Regular taxi",
+            "src": "e38099bb"
+          },
+          "note": null
+        },
+        {
+          "mode": {
+            "text": "Ride-hailing apps (Uber, etc.)",
+            "src": "3d598ac9"
+          },
+          "note": null
+        }
+      ],
+      "captions": {}
+    },
+    "masjid-al-usba": {
+      "fields": {
+        "name": {
+          "text": "Masjid al-Usba (Masjid al-Nur) & Bir al-Hajin",
+          "src": "a49c889e"
+        },
+        "summary": {
+          "text": "The place where the first Emigrants (Muhajirun) prayed before the Prophet ﷺ came to Madinah. Salim, the freed slave of Abu Hudhayfah (may Allah be pleased with him), used to lead them in prayer.",
+          "src": "a51a5b2a"
+        },
+        "story": {
+          "text": "This is one of the old, historic mosques in the south of Madinah (al-Madinah al-Munawwarah). It is also known as Masjid al-Nur and Masjid Bani Jahjaba. Its historical importance is that it is the place where the first Emigrants (Muhajirun) used to pray. They had reached Madinah before the Prophet ﷺ. Their prayer leader was the eminent Companion Salim, the freed slave of Abu Hudhayfah (may Allah be pleased with him), because he knew more of the Quran than any of them. The Prophet ﷺ also prayed here after he arrived in Madinah. Next to the mosque is Bir al-Hajin, a historic well.",
+          "src": "759b4189"
+        },
+        "virtue": {
+          "text": "'Abdullah ibn 'Umar (may Allah be pleased with him and his father) said: \"When the first Emigrants arrived at al-Usba — a place in Quba — before the Messenger of Allah ﷺ came, Salim, the freed slave of Abu Hudhayfah, used to lead them in prayer, and he knew more of the Quran than any of them.\" (Sahih al-Bukhari)\n\nNo special virtue for worship is stated for this mosque by name. But visiting it and praying in it is recommended (sunnah), to feel close to the scenes of the Seerah (the Prophet's biography) and the places where the first Emigrants prayed.",
+          "src": "87eecf4d"
+        },
+        "visiting_tips": {
+          "text": "Length of visit: 15 to 25 minutes is enough to get to know the place and read its history.\nPhotography: Allowed. It is a good place for souvenir photos and for photos of its historic features.\nDress and etiquette: Wear modest clothing suitable for a mosque, and respect the calm and quiet of the place.\nTip: Try to include it in your tour of the historic Quba area and the farms around it.",
+          "src": "b37c3f81"
+        },
+        "featured_quote": {
+          "text": "Salim, the freed slave of Abu Hudhayfah, used to lead them in prayer, and he knew more of the Quran than any of them.",
+          "src": "c42c2a05"
+        },
+        "featured_quote_source": {
+          "text": "Sahih al-Bukhari — narrated by 'Abdullah ibn 'Umar (may Allah be pleased with him and his father)",
+          "src": "e29af344"
+        },
+        "how_to_get_there": {
+          "text": "By car or taxi: You can get there directly through the Quba / al-Usba area (near al-Hijrah Street and the Quba farms).\nOn foot: You can walk from Quba Mosque in about 15 to 20 minutes (about 1.2 km, through farms and orchards).",
+          "src": "e7eb16a0"
+        },
+        "transport_note": {
+          "text": "Prices rise and traffic gets heavier in the area during the Hajj and Umrah seasons, the Eid holidays and the blessed month of Ramadan.",
+          "src": "6e60363b"
+        },
+        "best_time": {
+          "text": "Early morning, or between the afternoon (Asr) and sunset (Maghrib) prayers. At these times you can enjoy the countryside around it, among the orchards and palm trees, and explore the place quietly.",
+          "src": "64b708a5"
+        },
+        "open_status": {
+          "text": "Open 24 hours (the site and its outdoor area are open to visitors all day; the prayer hall opens at prayer times and visiting times).",
+          "src": "b25bc57d"
+        }
+      },
+      "transport": [
+        {
+          "mode": {
+            "text": "Regular taxi",
+            "src": "e38099bb"
+          },
+          "note": null
+        },
+        {
+          "mode": {
+            "text": "Ride apps (such as Uber)",
+            "src": "3d598ac9"
+          },
+          "note": null
+        }
+      ],
+      "captions": {}
+    },
+    "masjid-bani-anif": {
+      "fields": {
+        "name": {
+          "text": "Masjid Bani Unayf",
+          "src": "7879886c"
+        },
+        "summary": {
+          "text": "A historic mosque from the time of the Prophet ﷺ, near Quba Mosque. It was built on the spot where the Prophet ﷺ performed ablution (wudu) and prayed when he visited Talhah ibn al-Bara' (may Allah be pleased with him), who was ill. It is also known as Masjid Musbih.",
+          "src": "46c7a863"
+        },
+        "story": {
+          "text": "It is one of the old, historic mosques of Madinah, dating back to the time of the Prophet ﷺ. It is also known as Masjid Musbih. It is said that the Prophet ﷺ was checking on one of his Companions from Bani Unayf, Talhah ibn al-Bara' (may Allah be pleased with him), who was ill, and that he performed ablution (wudu) and prayed at this spot, and so the mosque was built where he had prayed. Its walls were recently given a new covering and distinctive lighting was added, while its historic architectural character was preserved: it is built of black volcanic stone (harrah, the stone of the local lava fields).",
+          "src": "e26e9540"
+        },
+        "virtue": {
+          "text": "It has no special, established virtue like that of Quba Mosque. But visiting it and remembering the mark the Prophet ﷺ left on this place are regarded as acts of following his example and of finding comfort in his noble traces.",
+          "src": "90cf7c8e"
+        },
+        "featured_quote": {
+          "text": "The Prophet ﷺ came to Bani Unayf to pray, and he prayed at the spot where the mosque stands today.",
+          "src": "4c421823"
+        },
+        "featured_quote_source": {
+          "text": "Al-Mu'jam al-Kabir by al-Tabarani — on the authority of Talhah ibn al-Bara' (may Allah be pleased with him). Also narrated by Ibn Shabbah in Tarikh al-Madinah.",
+          "src": "91da9692"
+        },
+        "how_to_get_there": {
+          "text": "By car or taxi: you can get there directly via Quba Street.\nOn foot: it is only about 500 metres southwest of Quba Mosque (less than a 7-minute walk along the pedestrian walkway).",
+          "src": "39ad60c8"
+        },
+        "transport_note": {
+          "text": "Prices and traffic go up during the Hajj season, the last ten days of Ramadan and public holidays.",
+          "src": "e59cd9a3"
+        },
+        "best_time": {
+          "text": "Between the afternoon (Asr) and sunset (Maghrib) prayers, or early in the morning, when the weather is mild. In the evening, the distinctive lighting brings out the beauty of its historic architecture.",
+          "src": "01f100ee"
+        },
+        "open_status": {
+          "text": "Open 24 hours a day.",
+          "src": "52844c77"
+        }
+      },
+      "transport": [
+        {
+          "mode": {
+            "text": "Regular taxi",
+            "src": "e38099bb"
+          },
+          "note": null
+        },
+        {
+          "mode": {
+            "text": "Ride apps (Uber and similar)",
+            "src": "3d598ac9"
+          },
+          "note": null
+        }
+      ],
+      "captions": {}
+    },
+    "masjid-quba": {
+      "fields": {
+        "name": {
+          "text": "Quba Mosque",
+          "src": "0a3fb172"
+        },
+        "summary": {
+          "text": "The first mosque built in Islam. Allah revealed this verse about it: “A mosque founded on righteousness from the first day is more worthy for you to stand in” (9:108). The Prophet ﷺ used to visit it and pray in it every Saturday.",
+          "src": "499c7c76"
+        },
+        "story": {
+          "text": "Quba Mosque is the first mosque built in Islam. The Prophet ﷺ founded it during the Hijrah (his migration to Madinah), when he arrived in the city. He ﷺ used to come to it every Saturday and pray in it. The mosque has been renovated and expanded over the centuries. Its distinctive modern expansion was designed by the famous Egyptian architect Abdel-Wahed El-Wakil. The mosque is in the south-west of Madinah.",
+          "src": "5129e01e"
+        },
+        "virtue": {
+          "text": "Praying in it earns a reward equal to that of an Umrah (the lesser pilgrimage) for anyone who purifies himself at home and then comes to it intending only to pray there. This is based on the hadith of the Prophet ﷺ: “Whoever purifies himself in his house, then comes to Quba Mosque and offers a prayer in it, will have a reward like that of an Umrah” (Narrated by an-Nasa'i and Ibn Majah).",
+          "src": "71aee723"
+        },
+        "visiting_tips": {
+          "text": "Make wudu (ablution) where you are staying before you set out, and intend to pray in the mosque, so that you earn the reward mentioned in the hadith. There are several historic sites near the mosque that are worth visiting on the same trip.",
+          "src": "dd7d5e55"
+        },
+        "featured_quote": {
+          "text": "“A mosque founded on righteousness from the first day is more worthy for you to stand in.”",
+          "src": "3eba9c33"
+        },
+        "featured_quote_source": {
+          "text": "Surah At-Tawbah 9:108 (translation of the meaning: Saheeh International)",
+          "src": "23816deb"
+        },
+        "how_to_get_there": {
+          "text": "It is in the south-west of Madinah, about 10 minutes by car from the Prophet's Mosque (al-Masjid an-Nabawi). You can get there by taxi or using a ride app.",
+          "src": "7c549266"
+        },
+        "transport_note": {
+          "text": "Prices are estimates and change with the season.",
+          "src": "6d4dc97f"
+        }
+      },
+      "transport": [
+        {
+          "mode": {
+            "text": "Regular taxi",
+            "src": "e38099bb"
+          },
+          "note": {
+            "text": "Prices may go up at peak times, such as Ramadan and the Eid holidays",
+            "src": "8e0836be"
+          }
+        },
+        {
+          "mode": {
+            "text": "Ride apps (such as Uber)",
+            "src": "3d598ac9"
+          },
+          "note": null
+        }
+      ],
+      "captions": {}
+    }
+  },
+  "routes": {
+    "quba-wells": {
+      "title": {
+        "text": "Quba and the Wells Tour",
+        "src": "c3403ae9"
+      },
+      "description": {
+        "text": "A half-day tour. It starts at Quba Mosque, the first mosque in Islam. Next comes Bir Ghars, a well linked to the Prophet ﷺ. It ends with a quiet walk through the Quba Orchards before sunset.",
+        "src": "55c48774"
+      }
+    }
+  }
 }

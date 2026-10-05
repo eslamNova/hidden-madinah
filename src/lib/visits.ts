@@ -1,6 +1,7 @@
 "use client";
 
 import { VISITS_STORAGE_KEY } from "@/lib/constants";
+import type { Lang } from "@/lib/i18n";
 
 /**
  * "My journey": the places a visitor checked in at (QR scan or a tap), and
@@ -11,11 +12,13 @@ import { VISITS_STORAGE_KEY } from "@/lib/constants";
 export const VISITS_EVENT = "hm-visits-change";
 
 export type Visit = { slug: string; at: number; via: "qr" | "tap" | "journey" };
+export type QuizAnswers = { pre?: number[]; post?: number[] };
 export type JourneyProgress = {
-  stop: number;               // furthest stop reached (1-based)
+  stop: number;               // furthest stop reached (1-based), in either language
   completed: boolean;
-  pre?: number[];             // pre-quiz answers
-  post?: number[];            // post-quiz answers
+  pre?: number[];             // pre-quiz answers (Arabic quiz)
+  post?: number[];            // post-quiz answers (Arabic quiz)
+  en?: QuizAnswers;           // English quiz answers — see quizAnswers()
   familiarity?: "new" | "some" | "good";
   submitted?: boolean;        // anonymous result already sent
 };
@@ -67,6 +70,22 @@ export function saveJourneyProgress(slug: string, patch: Partial<JourneyProgress
   const store = read();
   const prev = store.journeys[slug] ?? { stop: 0, completed: false };
   write({ ...store, journeys: { ...store.journeys, [slug]: { ...prev, ...patch } } });
+}
+
+/**
+ * One language's quiz answers. Answers are positions in that language's quiz,
+ * and the English quiz leaves out questions not yet translated, so the two
+ * sets are stored apart and never scored against each other. (Arabic keeps
+ * the top-level fields it has always used.)
+ */
+export function quizAnswers(p: JourneyProgress | null | undefined, lang: Lang): QuizAnswers {
+  if (!p) return {};
+  return lang === "ar" ? { pre: p.pre, post: p.post } : (p.en ?? {});
+}
+
+/** A progress patch storing one language's quiz answers, leaving the other language's alone. */
+export function quizAnswersPatch(p: JourneyProgress, lang: Lang, answers: QuizAnswers): Partial<JourneyProgress> {
+  return lang === "ar" ? answers : { en: { ...p.en, ...answers } };
 }
 
 export function resetJourneyProgress(slug: string) {

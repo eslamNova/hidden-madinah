@@ -2,8 +2,9 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import { modelFor, streamText, type Usage } from "@/lib/ai/gemini";
 import { buildGuideContext, type CitationInfo, type GuideRequestContext } from "@/lib/guide/context";
-import { RELIGIOUS_REFERRAL, REFERRAL_LINE, REFUSAL, systemPrompt, type AnswerType } from "@/lib/guide/prompt";
-import { isPracticalQuestion, normaliseCitations, parseAnswer } from "@/lib/guide/answer";
+import { UNAVAILABLE, systemPrompt } from "@/lib/guide/prompt";
+import { guardAnswer, parseAnswer, replyLanguage } from "@/lib/guide/answer";
+import type { Lang } from "@/lib/i18n";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,10 +17,16 @@ export const maxDuration = 60;
  *   {"t":"m","type":"answer|practical|refuse|refer","citations":[…],"replace"?:"…"}
  * `replace` means the server guard rewrote the answer (e.g. a historical
  * answer that cited nothing): the client shows `replace` instead.
+ *
+ * Body: { question, history?, place?, journey?, stop?, location?, lang? }.
+ * `lang` is the page's language ("ar" unless exactly "en"): it picks the
+ * language of the context and the prompt. The reply — and the refusal and
+ * referral wording — follows the question's script, so a question written in
+ * Arabic on an English page is answered in Arabic.
  */
 
 type HistoryTurn = { role: "user" | "model"; text: string };
-type Body = GuideRequestContext & { question?: string; history?: HistoryTurn[] };
+type Body = Omit<GuideRequestContext, "lang"> & { question?: string; history?: HistoryTurn[]; lang?: unknown };
 
 const db = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -42,12 +49,6 @@ function rateLimited(ip: string): boolean {
   return recent.length > PER_MINUTE;
 }
 
-const langOf = (s: string): "ar" | "en" => {
-  const arabic = (s.match(/[؀-ۿ]/g) ?? []).length;
-  const latin = (s.match(/[A-Za-z]/g) ?? []).length;
-  return arabic >= latin ? "ar" : "en";
-};
-
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 
@@ -60,7 +61,8 @@ export async function POST(request: Request) {
   }
   const question = (body.question ?? "").trim().slice(0, 600);
   if (!question) return json(400, { error: "empty" });
-  const lang = langOf(question);
+  const pageLang: Lang = body.lang === "en" ? "en" : "ar";
+  const lang = replyLanguage(question, pageLang);
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
   if (rateLimited(ip)) return json(429, { error: "rate_limited" });
@@ -100,6 +102,7 @@ export async function POST(request: Request) {
         journey: typeof body.journey === "string" ? body.journey : undefined,
         stop: typeof body.stop === "number" ? body.stop : undefined,
         location,
+        lang: pageLang,
       });
       send({ t: "p", s: "facts", n: ctx.claims.size });
       let full = "";
@@ -107,7 +110,7 @@ export async function POST(request: Request) {
       try {
         for await (const delta of streamText({
           tier: "fast",
-          system: systemPrompt(ctx.factsBlock, ctx.practicalBlock),
+          system: systemPrompt(ctx.factsBlock, ctx.practicalBlock, pageLang),
           contents: [...history, { role: "user", parts: [{ text: question }] }],
           onUsage: (u) => (usage = u),
           onModel: (m) => (usedModel = m),
@@ -128,28 +131,16 @@ export async function POST(request: Request) {
           // citation guard below judge it like any other answer.
           if (!/<<\s*type/i.test(full)) full += "\n<<type:answer>>";
         } else {
-          full = `${lang === "ar" ? "تعذّر الوصول إلى المرشد الآن. حاول بعد قليل." : "The guide is unavailable right now. Please try again shortly."}\n<<type:refuse>>`;
+          full = `${UNAVAILABLE[lang]}\n<<type:refuse>>`;
           emitted = Number.MAX_SAFE_INTEGER; // force a clean `replace` below
         }
       }
 
       // ── Guard ────────────────────────────────────────────────────────────
-      // Judged on content, not on the model's own label: a "practical" reply
-      // without citations is accepted only for a practical question.
-      const parsed = parseAnswer(full);
-      let type: AnswerType = parsed.type;
-      const norm = normaliseCitations(parsed.body, ctx.claims);
-      let text = norm.text;
-      const valid = norm.valid;
-      if (type === "practical" && valid.length === 0 && !isPracticalQuestion(question)) type = "answer";
-      if (type === "answer" && valid.length === 0) {
-        type = "refuse";
-        text = `${REFUSAL[lang]}\n${REFERRAL_LINE[lang]}`;
-      } else if (type === "refuse") {
-        text = `${REFUSAL[lang]}\n${REFERRAL_LINE[lang]}`;
-      } else if (type === "refer" && !text.includes(RELIGIOUS_REFERRAL)) {
-        text = `${text}\n${REFERRAL_LINE[lang]}`;
-      }
+      // Judged on content, not on the model's own label (see guardAnswer).
+      // The same rules on both languages' pages; only the refusal and
+      // referral wording follows the reply language.
+      const { type, text, valid } = guardAnswer({ raw: full, question, allowed: ctx.claims, lang });
 
       // Finish the stream in `full` coordinates: if the final text simply
       // continues what was already shown, send the rest; otherwise replace.

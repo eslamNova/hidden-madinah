@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { BookOpen, Car, CheckCircle2, Footprints, Heart, MapPinned, MessageCircleQuestion, TriangleAlert } from "lucide-react";
-import type { PlayerStop } from "@/lib/journey-view";
+import type { PlayerStop, StopSource } from "@/lib/journey-view";
 import { formatDistance } from "@/lib/geo";
+import type { Lang } from "@/lib/i18n";
 import { addVisit, readVisits, VISITS_EVENT } from "@/lib/visits";
 import { PlaceImage } from "@/components/place/PlaceImage";
 import { GuideChat } from "@/components/guide/GuideChat";
@@ -22,13 +23,14 @@ export function StopView({
   stop: PlayerStop;
   total: number;
   journeySlug: string;
-  lang: "ar" | "en";
+  lang: Lang;
   /** Reviewer preview: check-ins stay in memory, never on the device. */
   preview?: boolean;
   kids: boolean;
   onKidsChange: (kids: boolean) => void;
 }) {
   const t = useTranslations("journey");
+  const tc = useTranslations("common");
   const [here, setHere] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
 
@@ -64,7 +66,7 @@ export function StopView({
         </div>
       )}
 
-      <NarrationPlayer text={script} lang={lang} />
+      {script && <NarrationPlayer text={script} lang={lang} />}
 
       {stop.scriptKids && (
         <label className="flex min-h-11 items-center gap-3 font-medium">
@@ -73,7 +75,8 @@ export function StopView({
         </label>
       )}
 
-      <p className="whitespace-pre-line text-lg leading-loose">{script}</p>
+      {script && <p className="whitespace-pre-line text-lg leading-loose">{script}</p>}
+      {lang === "en" && <p className="text-sm text-muted">{tc("translationNote")}</p>}
 
       {stop.humanMoment && (
         <aside className="flex gap-3 rounded-2xl border-[1.5px] border-accent/60 bg-sand/60 p-4">
@@ -94,11 +97,24 @@ export function StopView({
           <ol className="mt-3 space-y-3 text-sm">
             {stop.sources.map((s, i) => (
               <li key={s.id} className="leading-relaxed">
-                <span className="font-bold ltr-nums">[{i + 1}]</span> {s.text}
+                <span className="font-bold ltr-nums">[{i + 1}]</span>{" "}
+                {s.textLang === lang ? (
+                  s.text
+                ) : (
+                  <span lang={s.textLang} dir={s.textLang === "ar" ? "rtl" : "ltr"}>
+                    {s.text}
+                  </span>
+                )}
                 <span className="block text-muted">
                   {t("sourceRef", { vol: s.vol ?? "?", page: s.page ?? "?" })}
-                  {s.samarrai && ` · ${t("samarraiRef", { ref: s.samarrai })}`}
-                  {s.hadith && ` · ${s.hadith}${s.grading ? ` (${s.grading})` : ""}`}
+                  {lang === "ar" ? (
+                    <>
+                      {s.samarrai && ` · ${t("samarraiRef", { ref: s.samarrai })}`}
+                      {s.hadith && ` · ${s.hadith}${s.grading ? ` (${s.grading})` : ""}`}
+                    </>
+                  ) : (
+                    <ForeignRefs source={s} />
+                  )}
                 </span>
               </li>
             ))}
@@ -178,5 +194,41 @@ export function StopView({
         )}
       </div>
     </article>
+  );
+}
+
+/** "ج1 ص424" — al-Samarrai edition references are stored in Arabic notation. */
+const SAMARRAI_VOL_PAGE = /^ج\s*(\d+)\s*ص\s*(\d+(?:\s*[-–]\s*\d+)?)$/;
+
+/**
+ * English pages: the al-Samarrai reference in English notation when it parses,
+ * and the hadith reference and grading — Arabic citations, kept as written —
+ * marked as Arabic so they render and are read correctly.
+ */
+function ForeignRefs({ source: s }: { source: StopSource }) {
+  const t = useTranslations("journey");
+  const m = s.samarrai?.trim().match(SAMARRAI_VOL_PAGE);
+  return (
+    <>
+      {s.samarrai && (
+        <>
+          {" · "}
+          {m ? (
+            t("samarraiVolPage", { vol: m[1], page: m[2].replace(/\s+/g, "") })
+          ) : (
+            <bdi lang="ar">{t("samarraiRef", { ref: s.samarrai })}</bdi>
+          )}
+        </>
+      )}
+      {s.hadith && (
+        <>
+          {" · "}
+          <bdi lang="ar">
+            {s.hadith}
+            {s.grading ? ` (${s.grading})` : ""}
+          </bdi>
+        </>
+      )}
+    </>
   );
 }
