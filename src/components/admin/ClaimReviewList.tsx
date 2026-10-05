@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Check, ExternalLink, TriangleAlert, X } from "lucide-react";
+import { Check, ExternalLink, Loader2, TriangleAlert, X } from "lucide-react";
 import type { Enums, Tables } from "@/lib/database.types";
 import { approveClaimsAction, reviewClaimAction } from "@/app/admin/(protected)/claims/actions";
 
@@ -23,8 +23,18 @@ export function ClaimReviewList({
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
+  // Optimistic: a claim leaves this list the moment it's approved/rejected;
+  // the server refresh follows in the background (and restores it on error).
+  const [hidden, setHidden] = useState<Set<number>>(new Set());
+  const setHiddenFor = (ids: number[], hide: boolean) =>
+    setHidden((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => (hide ? next.add(id) : next.delete(id)));
+      return next;
+    });
+  const visible = claims.filter((c) => !hidden.has(c.id));
 
-  if (claims.length === 0) {
+  if (visible.length === 0) {
     return <p className="rounded-2xl border border-ink/10 bg-surface p-4">{t("none")}</p>;
   }
 
@@ -36,13 +46,18 @@ export function ClaimReviewList({
       return next;
     });
 
-  const approveSelected = () =>
+  const approveSelected = () => {
+    const ids = [...selected];
+    setHiddenFor(ids, true);
+    setSelected(new Set());
+    setMessage(null);
     startTransition(async () => {
-      const res = await approveClaimsAction([...selected]);
+      const res = await approveClaimsAction(ids);
+      if (!res.ok) setHiddenFor(ids, false);
       setMessage(res.ok ? t("approvedN", { count: res.data.count }) : t("error"));
-      setSelected(new Set());
       router.refresh();
     });
+  };
 
   return (
     <div className="space-y-4">
@@ -51,11 +66,11 @@ export function ClaimReviewList({
           <button
             type="button"
             onClick={() =>
-              setSelected(selected.size === claims.length ? new Set() : new Set(claims.map((c) => c.id)))
+              setSelected(selected.size === visible.length ? new Set() : new Set(visible.map((c) => c.id)))
             }
             className="min-h-11 rounded-xl border-[1.5px] border-ink/30 px-4 font-medium"
           >
-            {selected.size === claims.length ? t("selectNone") : t("selectAll")}
+            {selected.size === visible.length ? t("selectNone") : t("selectAll")}
           </button>
           <button
             type="button"
@@ -63,7 +78,7 @@ export function ClaimReviewList({
             onClick={approveSelected}
             className="flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 font-semibold text-paper disabled:opacity-50"
           >
-            <Check aria-hidden="true" className="h-5 w-5" />
+            {pending ? <Loader2 aria-hidden="true" className="h-5 w-5 animate-spin" /> : <Check aria-hidden="true" className="h-5 w-5" />}
             {t("approveSelected", { count: selected.size })}
           </button>
           {message && <span role="status" className="text-sm text-muted">{message}</span>}
@@ -71,12 +86,13 @@ export function ClaimReviewList({
       )}
 
       <ul className="space-y-4">
-        {claims.map((c) => (
+        {visible.map((c) => (
           <ClaimCard
             key={c.id}
             claim={c}
             checked={selected.has(c.id)}
             onToggle={status === "pending" ? () => toggle(c.id) : undefined}
+            onHide={(hide) => setHiddenFor([c.id], hide)}
           />
         ))}
       </ul>
@@ -88,10 +104,12 @@ function ClaimCard({
   claim,
   checked,
   onToggle,
+  onHide,
 }: {
   claim: ReviewClaim;
   checked: boolean;
   onToggle?: () => void;
+  onHide: (hide: boolean) => void;
 }) {
   const t = useTranslations("admin.claims");
   const router = useRouter();
@@ -99,18 +117,31 @@ function ClaimCard({
   const [note, setNote] = useState(claim.reviewer_note ?? "");
   const [busy, startTransition] = useTransition();
   const [error, setError] = useState(false);
+  const [acting, setActing] = useState<Enums<"review_status"> | null>(null);
   const edited = text.trim() !== claim.text_ar || note.trim() !== (claim.reviewer_note ?? "");
 
-  const save = (status: Enums<"review_status">) =>
+  const save = (status: Enums<"review_status">) => {
+    setActing(status);
+    setError(false);
+    if (status !== claim.status) onHide(true);
     startTransition(async () => {
       const res = await reviewClaimAction({
         id: claim.id,
         status,
         ...(edited ? { text_ar: text, reviewer_note: note } : {}),
       });
-      setError(!res.ok);
-      if (res.ok) router.refresh();
+      if (res.ok) {
+        router.refresh();
+      } else {
+        setError(true);
+        onHide(false);
+      }
+      setActing(null);
     });
+  };
+
+  const icon = (s: Enums<"review_status">, Idle: typeof Check) =>
+    acting === s ? <Loader2 aria-hidden="true" className="h-5 w-5 animate-spin" /> : <Idle aria-hidden="true" className="h-5 w-5" />;
 
   return (
     <li className="space-y-3 rounded-2xl border border-ink/10 bg-surface p-4 shadow-sm">
@@ -210,7 +241,7 @@ function ClaimCard({
           onClick={() => save("verified")}
           className="flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 font-semibold text-paper disabled:opacity-50"
         >
-          <Check aria-hidden="true" className="h-5 w-5" />
+          {icon("verified", Check)}
           {edited ? t("saveApprove") : t("approve")}
         </button>
         <button
@@ -219,7 +250,7 @@ function ClaimCard({
           onClick={() => save("rejected")}
           className="flex min-h-11 items-center gap-2 rounded-xl border-[1.5px] border-ink/30 px-4 font-medium disabled:opacity-50"
         >
-          <X aria-hidden="true" className="h-5 w-5" />
+          {icon("rejected", X)}
           {t("reject")}
         </button>
         {claim.status !== "pending" && (

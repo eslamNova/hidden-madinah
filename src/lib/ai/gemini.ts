@@ -130,30 +130,35 @@ export async function* streamText(opts: {
   onUsage?: (usage: Usage) => void;
   onModel?: (model: string) => void;
 }): AsyncGenerator<string> {
-  // Fallback only applies before the first chunk: once text has reached the
-  // visitor we can't switch models mid-sentence.
-  let stream: AsyncGenerator<import("@google/genai").GenerateContentResponse> | undefined;
+  // Fallback applies until the first text chunk: a capacity error may arrive
+  // at the HTTP stage OR inside the SSE stream (a 200 whose first event is an
+  // error), so the iteration lives inside the per-model try. Once text has
+  // reached the visitor we can't switch models mid-sentence.
   let lastErr: unknown;
   for (const model of modelChain(opts.tier)) {
+    let yielded = false;
     try {
-      stream = await gemini().models.generateContentStream({
+      const stream = await gemini().models.generateContentStream({
         model,
         contents: opts.contents,
         config: { systemInstruction: opts.system, temperature: 0.2, ...tierConfig(opts.tier), ...opts.config },
       });
       opts.onModel?.(model);
-      break;
+      let lastMeta: GenerateContentResponseUsageMetadata | undefined;
+      for await (const chunk of stream) {
+        if (chunk.usageMetadata) lastMeta = chunk.usageMetadata;
+        const text = chunk.text;
+        if (text) {
+          yielded = true;
+          yield text;
+        }
+      }
+      opts.onUsage?.(toUsage(lastMeta));
+      return;
     } catch (err) {
       lastErr = err;
-      if (!isCapacityError(err)) throw err;
+      if (yielded || !isCapacityError(err)) throw err;
     }
   }
-  if (!stream) throw lastErr;
-  let lastMeta: GenerateContentResponseUsageMetadata | undefined;
-  for await (const chunk of stream) {
-    if (chunk.usageMetadata) lastMeta = chunk.usageMetadata;
-    const text = chunk.text;
-    if (text) yield text;
-  }
-  opts.onUsage?.(toUsage(lastMeta));
+  throw lastErr;
 }

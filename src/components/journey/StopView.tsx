@@ -130,14 +130,14 @@ export function StopView({
             {t("nextIs", { title: stop.next.title })}
           </h3>
           {stop.next.km > 0 && (
-            <p className="flex flex-wrap gap-x-4 gap-y-1 ltr-nums">
+            <p className="flex flex-wrap gap-x-4 gap-y-1">
               <span className="flex items-center gap-1">
                 <Footprints aria-hidden="true" className="h-4 w-4" />
-                {t("walkLeg", { distance: formatDistance(stop.next.km, lang), min: stop.next.walkMin })}
+                <span>{t("walkLeg", { distance: formatDistance(stop.next.km, lang), min: stop.next.walkMin })}</span>
               </span>
               <span className="flex items-center gap-1">
                 <Car aria-hidden="true" className="h-4 w-4" />
-                {t("driveLeg", { min: stop.next.driveMin })}
+                <span>{t("driveLeg", { min: stop.next.driveMin })}</span>
               </span>
             </p>
           )}

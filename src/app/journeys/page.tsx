@@ -56,9 +56,9 @@ export default async function JourneysPage() {
                       {t("stopsCount", { count: j.stops.length })}
                     </span>
                     {j.duration_min && (
-                      <span className="flex items-center gap-1 ltr-nums">
+                      <span className="flex items-center gap-1">
                         <Clock aria-hidden="true" className="h-4 w-4" />
-                        {t("duration", { min: j.duration_min })}
+                        <span>{t("duration", { min: j.duration_min })}</span>
                       </span>
                     )}
                   </span>

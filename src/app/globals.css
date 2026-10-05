@@ -273,6 +273,22 @@ html[data-immersive] body::before {
   display: inline-block;
 }
 
+/* Tailwind v4 resets buttons to the default arrow; anything clickable shows
+   the hand, and anything disabled says so. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  select:not(:disabled),
+  label:has(> input:not(:disabled)) {
+    cursor: pointer;
+  }
+  button:disabled,
+  select:disabled {
+    cursor: not-allowed;
+  }
+}
+
 /* --------------------------------------------------------------------------
    Story landing: full-viewport snap panels inside their own scroll container.
    -------------------------------------------------------------------------- */

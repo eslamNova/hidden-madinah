@@ -2,7 +2,8 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import { modelFor, streamText, type Usage } from "@/lib/ai/gemini";
 import { buildGuideContext, type CitationInfo, type GuideRequestContext } from "@/lib/guide/context";
-import { REFERRAL_LINE, REFUSAL, TYPE_RE, systemPrompt, type AnswerType } from "@/lib/guide/prompt";
+import { RELIGIOUS_REFERRAL, REFERRAL_LINE, REFUSAL, systemPrompt, type AnswerType } from "@/lib/guide/prompt";
+import { isPracticalQuestion, normaliseCitations, parseAnswer } from "@/lib/guide/answer";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -122,10 +123,10 @@ export async function POST(request: Request) {
         }
       } catch (err) {
         console.error("guide model error", err);
-        if (full.replace(TYPE_RE, "").trim().length > 40) {
+        if (parseAnswer(full).body.length > 40) {
           // The stream broke after a usable answer: keep it and let the
           // citation guard below judge it like any other answer.
-          if (!TYPE_RE.test(full)) full += "\n<<type:answer>>";
+          if (!/<<\s*type/i.test(full)) full += "\n<<type:answer>>";
         } else {
           full = `${lang === "ar" ? "تعذّر الوصول إلى المرشد الآن. حاول بعد قليل." : "The guide is unavailable right now. Please try again shortly."}\n<<type:refuse>>`;
           emitted = Number.MAX_SAFE_INTEGER; // force a clean `replace` below
@@ -133,40 +134,44 @@ export async function POST(request: Request) {
       }
 
       // ── Guard ────────────────────────────────────────────────────────────
-      const typeMatch = full.match(TYPE_RE);
-      let type: AnswerType = (typeMatch?.[1] as AnswerType) ?? "answer";
-      let text = full.replace(TYPE_RE, "").trim();
-      const cited = [...text.matchAll(/\[C(\d+)\]/g)].map((m) => Number(m[1]));
-      const valid = [...new Set(cited.filter((id) => ctx.claims.has(id)))];
-      let replace: string | undefined;
-      if (cited.some((id) => !ctx.claims.has(id))) {
-        // Drop any citation the model invented.
-        text = text.replace(/\[C(\d+)\]/g, (m, id) => (ctx.claims.has(Number(id)) ? m : ""));
-        replace = text;
-      }
+      // Judged on content, not on the model's own label: a "practical" reply
+      // without citations is accepted only for a practical question.
+      const parsed = parseAnswer(full);
+      let type: AnswerType = parsed.type;
+      const norm = normaliseCitations(parsed.body, ctx.claims);
+      let text = norm.text;
+      const valid = norm.valid;
+      if (type === "practical" && valid.length === 0 && !isPracticalQuestion(question)) type = "answer";
       if (type === "answer" && valid.length === 0) {
         type = "refuse";
         text = `${REFUSAL[lang]}\n${REFERRAL_LINE[lang]}`;
+      } else if (type === "refuse") {
+        text = `${REFUSAL[lang]}\n${REFERRAL_LINE[lang]}`;
+      } else if (type === "refer" && !text.includes(RELIGIOUS_REFERRAL)) {
+        text = `${text}\n${REFERRAL_LINE[lang]}`;
+      }
+
+      // Finish the stream in `full` coordinates: if the final text simply
+      // continues what was already shown, send the rest; otherwise replace.
+      let replace: string | undefined;
+      const shown = emitted === Number.MAX_SAFE_INTEGER ? null : full.slice(0, emitted).trimStart();
+      if (shown !== null && text.startsWith(shown)) {
+        const rest = text.slice(shown.length);
+        if (rest) send({ t: "d", v: rest });
+      } else {
         replace = text;
       }
-      if (emitted === Number.MAX_SAFE_INTEGER) replace = text;
-      if (!replace && emitted < text.length) send({ t: "d", v: text.slice(emitted) });
 
       const citations: CitationInfo[] = valid.map((id) => ctx.claims.get(id)!);
       send({ t: "m", type, citations, ...(replace ? { replace } : {}) });
-      if (open) {
-        try {
-          controller.close();
-        } catch {
-          // already closed by the client
-        }
-      }
 
-      await db.from("guide_logs").insert({
+      // Log before closing: the function stays alive until close, so the row
+      // is written even when the visitor has already left.
+      const { error: logErr } = await db.from("guide_logs").insert({
         lang,
         context: ctx.label,
         question,
-        answer: text,
+        answer: text.slice(0, 8000),
         cited_claim_ids: valid,
         refused: type === "refuse",
         model: usedModel,
@@ -175,6 +180,14 @@ export async function POST(request: Request) {
         cached_tokens: usage.cachedTokens,
         latency_ms: Date.now() - started,
       });
+      if (logErr) console.error("guide log failed", logErr.message);
+      if (open) {
+        try {
+          controller.close();
+        } catch {
+          // already closed by the client
+        }
+      }
     },
   });
 

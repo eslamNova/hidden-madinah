@@ -82,8 +82,8 @@ export function JourneyPlayer({
         <ol className="space-y-2">
           {journey.stops.map((s) => (
             <li key={s.order} className="flex items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-bold text-paper ltr-nums">
-                {s.order}
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-paper">
+                <span className="ltr-nums leading-none">{s.order}</span>
               </span>
               <span className="text-lg">{s.title}</span>
             </li>
