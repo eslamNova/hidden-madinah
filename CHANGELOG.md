@@ -36,3 +36,10 @@ built inside the challenge window; the judges can diff `pre-hackathon..master`.
 - Works without the AI: an on-device keyword reader fills the form instantly; the AI refines it if it answers within a few seconds.
 - Hotel mode: `/plan?from=…&name=…` plus a printable reception card with a QR (`/admin/hotel`).
 - 24 unit tests (`npm test`) for the planner and the keyword reader.
+
+### M5 — English
+- Every public page has an English twin under `/en` (home, places, place pages, map, routes, tours, journeys, My journey, planner, privacy); Arabic URLs unchanged. Two root layouts give each language the right `lang`/`dir` from the first byte, and every page stays static.
+- 471 texts translated (interface, places, routes) through translate → faithfulness check → English edit, following the organizers' scientific package: Quran from an approved translation with surah:ayah, hadith keep narrator and source, Arabic hedges kept. English pages state the translation awaits scholarly review.
+- Each English place/route text stores a hash of the Arabic it came from: when the Arabic is edited, the stale English is hidden instead of shown. Claims appear in English only when their translation was reviewed.
+- The guide answers in English with the same citation guard, English refusal and referrals, and English source titles; narration uses an English voice; maps show English names; search ignores accents.
+- Language switch beside the text-size control; hreflang alternates; sitemap lists both languages; admin edits refresh both languages.
