@@ -43,3 +43,10 @@ built inside the challenge window; the judges can diff `pre-hackathon..master`.
 - Each English place/route text stores a hash of the Arabic it came from: when the Arabic is edited, the stale English is hidden instead of shown. Claims appear in English only when their translation was reviewed.
 - The guide answers in English with the same citation guard, English refusal and referrals, and English source titles; narration uses an English voice; maps show English names; search ignores accents.
 - Language switch beside the text-size control; hreflang alternates; sitemap lists both languages; admin edits refresh both languages.
+
+### M6 — Stories, tags, testimonials, "how far am I"
+- `/stories`: the verified "human moments" from *Wafa al-Wafa* grouped by theme (mercy, humility, brotherhood, loyalty…), each with its source and a link to its place; English shows only reviewed translations.
+- Journeys carry tags (first visit, family, evening, seasonal) with filters, and link to the stories.
+- Visitor testimonials: an optional form at the end of a journey (explicit consent, moderated in `/admin/testimonials`, approved ones on the home page). Database rules verified: visitors can only submit with consent and as pending.
+- Place pages: "How far am I from here?" — distance and walking/driving time computed on the device, on request; "you are here" after a QR scan.
+- Review fixes: admin edits refresh the whole site in both languages; the floating language control no longer blocks taps on phones; edited claims hide their stale English.
