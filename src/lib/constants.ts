@@ -14,6 +14,9 @@ export type Theme = "light" | "dark";
 export const CONSENT_STORAGE_KEY = "hm-consent";
 export type ConsentChoice = "granted" | "denied";
 
+/** "My journey" check-ins and journey progress — on-device only (src/lib/visits.ts). */
+export const VISITS_STORAGE_KEY = "hm-visits";
+
 /**
  * GA4 measurement ID (G-XXXXXXXXXX). Unset in local dev and previews, which
  * keeps both the tag and the consent notice off — production traffic is the

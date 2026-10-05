@@ -25,14 +25,20 @@ export default async function AdminProtectedLayout({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 pb-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 pb-4 print:hidden">
         <h1 className="text-2xl">{t("title")}</h1>
-        <nav className="flex gap-2">
+        <nav className="flex flex-wrap gap-2 print:hidden">
           <Link href="/admin" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
             {t("navPlaces")}
           </Link>
           <Link href="/admin/claims" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
             {t("navClaims")}
+          </Link>
+          <Link href="/admin/journeys" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
+            {t("navJourneys")}
+          </Link>
+          <Link href="/admin/qr" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
+            {t("navQr")}
           </Link>
         </nav>
         <form action={signOutAction}>

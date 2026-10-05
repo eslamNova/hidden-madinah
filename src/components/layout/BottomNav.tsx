@@ -9,7 +9,7 @@ const ITEMS = [
   { href: "/", key: "home", Icon: Home },
   { href: "/places", key: "places", Icon: MapPin },
   { href: "/map", key: "map", Icon: Map },
-  { href: "/routes", key: "routes", Icon: Route },
+  { href: "/journeys", key: "journeys", Icon: Route },
 ] as const;
 
 /**
@@ -30,7 +30,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(env(safe-area-inset-bottom),0.75rem)]"
+      className="fixed inset-x-0 bottom-0 z-40 px-3 print:hidden pb-[max(env(safe-area-inset-bottom),0.75rem)]"
       aria-label={t("home")}
     >
       <ul

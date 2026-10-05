@@ -14,6 +14,7 @@ import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
 import { RelatedPlaces } from "@/components/place/RelatedPlaces";
 import { SeerahAppCard } from "@/components/place/SeerahAppCard";
 import { GuideChat } from "@/components/guide/GuideChat";
+import { QrCheckin } from "@/components/place/QrCheckin";
 import { VisitInfoCard } from "@/components/place/VisitInfoCard";
 import { PlaceMapLazy } from "@/components/map/LazyMaps";
 import { TelegramIconLink } from "@/components/layout/TelegramIconLink";
@@ -153,6 +154,8 @@ export default async function PlacePage({
       </header>
 
       <div className="mx-auto max-w-3xl space-y-8 px-4">
+        <QrCheckin slug={place.slug} name={place.name_ar} />
+
         {view.quote && <FeaturedQuote quote={view.quote} source={view.quoteSource} />}
 
         <VisitInfoCard place={view} />
