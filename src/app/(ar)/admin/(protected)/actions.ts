@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidateBoth } from "@/lib/revalidate";
+import { revalidateSite } from "@/lib/revalidate";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { TransportOption } from "@/lib/content";
@@ -18,15 +18,10 @@ async function requireAdmin() {
   return supabase;
 }
 
-function revalidatePublic(slug?: string | null) {
-  revalidateBoth("/");
-  revalidateBoth("/places");
-  revalidateBoth("/map");
-  revalidateBoth("/routes");
-  // Place names, coordinates and publish state also feed the planner and journeys.
-  revalidateBoth("/plan");
-  revalidateBoth("/journeys", "layout");
-  if (slug) revalidateBoth(`/places/${slug}`);
+// A place appears on most public pages (home, lists, map, tours, routes,
+// journeys, planner, sitemap) in both languages: refresh them all.
+function revalidatePublic() {
+  revalidateSite();
 }
 
 /** Storage object path ("places/…") from a public URL, or null for embeds. */
@@ -93,7 +88,7 @@ export async function savePlaceAction(
     const { data, error } = await query;
     if (error || !data) return { ok: false, error: error?.message ?? "save" };
 
-    revalidatePublic(data.slug);
+    revalidatePublic();
     return { ok: true, data: { id: data.id, slug: data.slug } };
   } catch {
     return { ok: false, error: "unauthorized" };
@@ -113,7 +108,7 @@ export async function setPublishedAction(
       .select("slug")
       .single();
     if (error || !data) return { ok: false, error: error?.message ?? "publish" };
-    revalidatePublic(data.slug);
+    revalidatePublic();
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };
@@ -138,14 +133,14 @@ export async function deletePlaceAction(id: string): Promise<never | ActionResul
       if (objects.length < 100) break;
     }
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("places")
       .delete()
       .eq("id", id)
       .select("slug")
       .single();
     if (error) return { ok: false, error: error.message };
-    revalidatePublic(data?.slug);
+    revalidatePublic();
     deleted = true;
   } catch {
     return { ok: false, error: "unauthorized" };
@@ -169,13 +164,13 @@ export type MediaRowInput = Pick<
 
 export async function saveMediaRowAction(
   row: MediaRowInput,
-  placeSlug: string
+  _placeSlug: string
 ): Promise<ActionResult> {
   try {
     const supabase = await requireAdmin();
     const { error } = await supabase.from("media").insert(row);
     if (error) return { ok: false, error: error.message };
-    revalidatePublic(placeSlug);
+    revalidatePublic();
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };
@@ -185,7 +180,7 @@ export async function saveMediaRowAction(
 export async function updateMediaCaptionAction(
   id: string,
   caption: string,
-  placeSlug: string
+  _placeSlug: string
 ): Promise<ActionResult> {
   try {
     const supabase = await requireAdmin();
@@ -194,7 +189,7 @@ export async function updateMediaCaptionAction(
       .update({ caption_ar: caption.trim() || null })
       .eq("id", id);
     if (error) return { ok: false, error: error.message };
-    revalidatePublic(placeSlug);
+    revalidatePublic();
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };
@@ -203,7 +198,7 @@ export async function updateMediaCaptionAction(
 
 export async function reorderMediaAction(
   orderedIds: string[],
-  placeSlug: string
+  _placeSlug: string
 ): Promise<ActionResult> {
   try {
     const supabase = await requireAdmin();
@@ -214,7 +209,7 @@ export async function reorderMediaAction(
         .eq("id", orderedIds[i]);
       if (error) return { ok: false, error: error.message };
     }
-    revalidatePublic(placeSlug);
+    revalidatePublic();
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };
@@ -223,7 +218,7 @@ export async function reorderMediaAction(
 
 export async function deleteMediaAction(
   id: string,
-  placeSlug: string
+  _placeSlug: string
 ): Promise<ActionResult> {
   try {
     const supabase = await requireAdmin();
@@ -257,7 +252,7 @@ export async function deleteMediaAction(
 
     const { error } = await supabase.from("media").delete().eq("id", id);
     if (error) return { ok: false, error: error.message };
-    revalidatePublic(placeSlug);
+    revalidatePublic();
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };

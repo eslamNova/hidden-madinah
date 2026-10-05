@@ -1,13 +1,12 @@
 "use server";
 
-import { revalidateBoth } from "@/lib/revalidate";
+import { revalidateSite } from "@/lib/revalidate";
 import { requireAdmin, type ActionResult } from "@/lib/admin-auth";
 
-function refresh(slug?: string) {
-  revalidateBoth("/journeys");
-  revalidateBoth("/my-journey");
-  if (slug) revalidateBoth(`/journeys/${slug}`);
-  revalidateBoth("/admin/journeys");
+// Journey changes reach the journey pages, My journey, the planner (stop
+// approval can verify claims) and the sitemap, in both languages.
+function refresh() {
+  revalidateSite();
 }
 
 /**
@@ -38,7 +37,7 @@ export async function approveStopAction(input: {
     }
     const { error } = await supabase.from("journey_stops").update({ status: "verified" }).eq("id", input.stopId);
     if (error) return { ok: false, error: error.message };
-    refresh(input.journeySlug);
+    refresh();
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };
@@ -54,7 +53,7 @@ export async function setStopStatusAction(input: {
     const supabase = await requireAdmin();
     const { error } = await supabase.from("journey_stops").update({ status: input.status }).eq("id", input.stopId);
     if (error) return { ok: false, error: error.message };
-    refresh(input.journeySlug);
+    refresh();
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };
@@ -70,7 +69,7 @@ export async function setQuizStatusAction(input: {
     const supabase = await requireAdmin();
     const { error } = await supabase.from("quiz_items").update({ status: input.status }).in("id", input.ids);
     if (error) return { ok: false, error: error.message };
-    refresh(input.journeySlug);
+    refresh();
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };
@@ -82,8 +81,8 @@ export async function setJourneyPublishedAction(input: { slug: string; published
     const supabase = await requireAdmin();
     const { error } = await supabase.from("journeys").update({ is_published: input.published }).eq("slug", input.slug);
     if (error) return { ok: false, error: error.message };
-    refresh(input.slug);
-    revalidateBoth("/", "layout");
+    refresh();
+    revalidateSite();
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };

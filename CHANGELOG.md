@@ -14,7 +14,7 @@ built inside the challenge window; the judges can diff `pre-hackathon..master`.
 ### M1 — Verified knowledge base and review console
 - Migration `006_knowledge.sql`: sources, claims (source page, verbatim quote, al-Samarrai cross-reference, content level A–D, themes, review status), journeys, quiz items, anonymous guide logs and quiz results. Row-level security: visitors read only *verified* claims of published places.
 - Source: *Wafa al-Wafa* (al-Samhudi), Dar al-Kutub al-'Ilmiyya edition via Turath, each passage cross-matched against al-Samarrai's critical edition (`scripts/content/build_wafa_corpus.py`). Passages without a match are flagged "verify against al-Samarrai".
-- 196 claims for 11 places, each checked word for word against its cited page before import (`scripts/content/validate_claims.py`, `scripts/import-claims.ts`) and imported as *pending*.
+- 198 claims for 11 places, each checked word for word against its cited page before import (`scripts/content/validate_claims.py`, `scripts/import-claims.ts`) and imported as *pending*.
 - `/admin/claims`: approve, edit or reject each claim next to its source passage.
 
 ### M2 — AI guide with refusal

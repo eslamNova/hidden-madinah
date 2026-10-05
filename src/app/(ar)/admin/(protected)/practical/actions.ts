@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidateBoth } from "@/lib/revalidate";
+import { revalidateSite } from "@/lib/revalidate";
 import { requireAdmin, type ActionResult } from "@/lib/admin-auth";
 import type { Json } from "@/lib/database.types";
 
@@ -41,9 +41,7 @@ export async function savePracticalAction(input: PracticalInput): Promise<Action
       })
       .eq("id", input.id);
     if (error) return { ok: false, error: error.message };
-    revalidateBoth("/plan");
-    revalidateBoth("/journeys", "layout");
-    revalidateBoth(`/places/${input.slug}`);
+    revalidateSite();
     return { ok: true };
   } catch {
     return { ok: false, error: "unauthorized" };
