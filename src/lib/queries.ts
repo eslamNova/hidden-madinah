@@ -143,7 +143,10 @@ export async function getRouteSlugs(): Promise<string[]> {
 
 export type JourneyRow = Tables<"journeys">;
 export type JourneyStopRow = Tables<"journey_stops">;
-export type ClaimRow = Tables<"claims">;
+/** Visitors' column grant on claims (migration 008) — reviewer_note is internal. */
+const PUBLIC_CLAIM_COLUMNS =
+  "id, place_id, topic, text_ar, text_en, en_reviewed, source_id, vol, page, quote_ar, hadith_ref, grading, samarrai_ref, needs_samarrai_check, content_level, kind, themes, status, reviewed_at, created_at";
+export type ClaimRow = Omit<Tables<"claims">, "reviewer_note">;
 export type JourneyStopFull = JourneyStopRow & { place: PlaceWithMedia | null };
 export type JourneyFull = JourneyRow & {
   stops: JourneyStopFull[];
@@ -200,7 +203,7 @@ export async function getJourney(slug: string, client: SupabaseLike = publicClie
   const ids = [...new Set(stops.flatMap((s) => s.claim_ids ?? []))];
   const claims = new Map<number, ClaimRow>();
   if (ids.length) {
-    const { data: rows, error: claimsErr } = await client.from("claims").select("*").in("id", ids);
+    const { data: rows, error: claimsErr } = await client.from("claims").select(PUBLIC_CLAIM_COLUMNS).in("id", ids);
     if (claimsErr) throw claimsErr;
     for (const c of rows ?? []) claims.set(c.id, c);
   }

@@ -1,0 +1,143 @@
+{
+ "slug": "hijra",
+ "intro_ar": "تروي هذه الرحلة قصة وصول النبي ﷺ إلى المدينة بعد خروجه من مكة، كما نقلها السمهودي في كتابه وفاء الوفاء. في أربع محطات: نبدأ من قباء حيث نزل وشارك بنفسه في بناء مسجدها، ثم الوادي الذي صلى فيه الجمعة، ثم نعود إلى قباء لقصة عيادة مريض يرويها شيوخ بني أُنَيف، ولا تذكر الرواية زمنها، ونختم بالموضع الذي بركت فيه ناقته. إنها قصة عن التواضع، وعن عيادة المريض، وعن أخوة جمعت المهاجرين والأنصار.",
+ "intro_en": "This journey tells the story of the Prophet's ﷺ arrival in Madinah after he left Makkah, as al-Samhudi relates it in his book Wafa al-Wafa. Across four stops: we begin at Quba, where he stayed and took part himself in building its mosque, then the valley where he prayed the Friday prayer, then we return to Quba for the story of a visit to a sick man, told by the elders of Banu Anif, whose date the report does not give, and we end at the spot where his camel knelt. It is a story about humility, about visiting the sick, and about a brotherhood that joined the Muhajirun, the emigrants from Makkah, and the Ansar, their hosts in Madinah.",
+ "stops": [
+  {
+   "stop_id": "49c988f0-5aaa-44e8-8dad-d4a0d97c4097",
+   "sort_order": 1,
+   "script_ar": "نبدأ من قباء. سمع المسلمون في المدينة بخروج النبي ﷺ من مكة، فكانوا يخرجون كل صباح إلى الحَرَّة ينتظرونه، فلا يردهم إلا حر الشمس. وفي يوم رآه رجل من اليهود من فوق حصن، فنادى يبشر الأنصار بأن حظهم قد أقبل، فأسرع المسلمون وتلقوه. ونزل ﷺ في بني عمرو بن عوف بقباء على كلثوم بن الهِدْم، وقيل: عند سعد بن خيثمة، لأنه ﷺ كان يجلس مع أصحابه في بيته. وفي الصحيح أن أبا بكر قام يستقبل الناس، والنبي ﷺ جالس، فكان القادمون من الأنصار يحيون أبا بكر، حتى أصابت الشمس النبي ﷺ، فظلله أبو بكر بردائه، فعرفه الناس. وهنا أسس ﷺ المسجد، وعمل فيه بنفسه مع المهاجرين والأنصار. واختُلف في المسجد الذي وصفه القرآن بأنه أسس على التقوى من أول يوم: فالجمهور على أنه مسجد قباء، وفي حديث عند مسلم أنه ﷺ سُئل عنه فقال: هو مسجدكم هذا، وجُمع بأن كليهما أسس على التقوى. ومن قباء نتبع طريقه.",
+   "script_en": "We begin at Quba. The Muslims of Madinah had heard that the Prophet ﷺ had set out from Makkah, so every morning they went out to the lava plain, al-Harrah, to wait for him, and only the heat of the sun made them turn back. One day a Jewish man saw him from the top of a fort and called out, telling the Ansar, the people of Madinah who welcomed him, that their good fortune had come; and the Muslims hurried out to meet him. The Prophet ﷺ halted among the clan of Banu Amr ibn Awf at Quba, with Kulthum ibn al-Hidm as his host; some said he stayed with Saad ibn Khaythamah, because he ﷺ used to sit with his companions in Saad's house. An authentic hadith collection reports that Abu Bakr stood to receive the people while the Prophet ﷺ sat, and the Ansar who came kept greeting Abu Bakr, until the sun reached the Prophet ﷺ and Abu Bakr shaded him with his cloak; then the people recognised him. Here the Prophet ﷺ founded the mosque, working on it himself with the Muhajirun, or emigrants, and the Ansar. Scholars differ over which mosque the Qur'an describes as founded on piety from the first day: most say it is Quba, yet in a hadith recorded by Muslim, when the Prophet ﷺ was asked about it he said, \"It is this mosque of yours\"; the two are reconciled by holding that both were founded on piety. From Quba, we follow his path.",
+   "script_kids_ar": "في قباء بنى النبي ﷺ مسجدًا مع أصحابه. كان يحمل الحجارة الثقيلة بنفسه، حتى يميل من ثقلها، والتراب الأبيض على بطنه. وكان أحد أصحابه يأتيه ويطلب أن يحمل الحجر عنه، فيقول له ﷺ: لا، خذ مثله. لم يترك العمل لغيره، بل عمل مع الجميع. هذا هو التواضع: أن تعمل مع فريقك، يدًا بيد.",
+   "human_moment_ar": "تروي الشموس بنت النعمان أنها رأت النبي ﷺ يحمل الحجر حتى يميله ثقله، والتراب الأبيض على بطنه، فإذا جاءه أحد أصحابه يقول: أعطني أكفك، قال: لا، خذ مثله.",
+   "human_moment_en": "Al-Shamus bint al-Numan recalled seeing the Prophet ﷺ carry stones so heavy that they bent him over, with white dust on his belly; when a companion came and said, \"Let me carry it for you,\" he answered, \"No — take another like it.\"",
+   "reflection_ar": "ماذا يعني لك أن يعمل القائد بيديه مع فريقه، بدل أن يكتفي بالتوجيه؟",
+   "reflection_en": "What does it mean to you when a leader works with their own hands alongside the team, instead of only giving directions?",
+   "claim_ids": [
+    184,
+    185,
+    186,
+    189,
+    192,
+    2,
+    200,
+    3,
+    203
+   ]
+  },
+  {
+   "stop_id": "7be5d62d-2ea4-4193-84f4-dddd8976c501",
+   "sort_order": 2,
+   "script_ar": "نقف الآن عند مسجد الجمعة. في البخاري عن أنس أن النبي ﷺ أقام في بني عمرو بن عوف أربع عشرة ليلة، ثم أرسل إلى بني النجار، فجاؤوا متقلدين سيوفهم، وسلموا عليه وعلى أبي بكر وقالوا: اركبا آمنين مطاعين. ويذكر أهل السير أن بني النجار أخواله، لأن هاشم بن عبد مناف تزوج منهم سلمى بنت عمرو فولدت له عبد المطلب. وكان خروجه من قباء يوم الجمعة. وفي الطريق دعته قبائل الأنصار كلها أن ينزل عندها، وتعده النصرة والحماية، فكان يقول عن ناقته: خلوها فإنها مأمورة. ولما مر ببني سالم أمسك رجلان بزمام ناقته يدعوانه، فتبسم ﷺ وقال: خلوا سبيلها فإنها مأمورة. وأدركته الجمعة في بني سالم، فصلاها في بطن الوادي، وادي ذي صُلْب، وفي رواية أنه خطبهم يومئذ. ويذكر السمهودي قولين: أنها أول جمعة صلاها بالمدينة، أو أنه كان يصليها في قباء مدة إقامته. والآن نعود إلى قباء لقصة أخرى.",
+   "script_en": "We now stop at Masjid al-Jumuah, the Friday Mosque. Al-Bukhari records from Anas that the Prophet ﷺ stayed among Banu Amr ibn Awf for fourteen nights, then sent for Banu al-Najjar, who came girded with their swords, greeted him and Abu Bakr, and said: \"Ride on, safe and obeyed.\" The biographers relate that Banu al-Najjar were his maternal kin, because Hashim ibn Abd Manaf married one of their women, Salma bint Amr, who bore him Abd al-Muttalib. He left Quba on a Friday. On the way, every clan of the Ansar invited him to stay with them, promising him support and protection, and he would say of his camel: \"Let her go, for she is under command.\" As he passed Banu Salim, two men took hold of his camel's rein, urging him to stay; he ﷺ smiled and said: \"Let her go on her way, for she is under command.\" The time of the Friday prayer came upon him among Banu Salim, and he prayed it in the bed of the valley, the valley of Dhu Sulb; one report adds that he gave them a sermon that day. Al-Samhudi records two views: that this was the first Friday prayer he led in Madinah, or that he had already been praying it at Quba during his stay. Now we return to Quba for another story.",
+   "script_kids_ar": "خرج النبي ﷺ من قباء على ناقته، والناس حوله، منهم الماشي والراكب. وكانت قبائل الأنصار تدعوه أن ينزل عندها، فكان يقول عن ناقته: خلوها فإنها مأمورة، يعني: اتركوها تمشي، فهي تسير بأمر. ولما مر ببني سالم أمسك رجلان بحبل الناقة، فتبسم ﷺ وقال: خلوا سبيلها فإنها مأمورة. وقال لآخرين: بارك الله عليكم، إنها مأمورة. رد عليهم بابتسامة ودعاء، لا بكلمة قاسية. هكذا نعتذر بلطف.",
+   "human_moment_ar": "دعت قبائل الأنصار كلها النبيَّ ﷺ أن ينزل عندها. ولما مر ببني سالم أمسك رجلان بزمام ناقته يقولان: انزل فينا، فتبسم ﷺ وقال: خلوا سبيلها فإنها مأمورة، وقال لآخرين دعوه: بارك الله عليكم، إنها مأمورة.",
+   "human_moment_en": "Every clan of the Ansar invited the Prophet ﷺ to stay with them. As he passed Banu Salim, two men took hold of his camel's rein, saying, \"Stay with us\"; he ﷺ smiled and said, \"Let her go on her way, for she is under command,\" and to others who urged him he said, \"May Allah bless you — she is under command.\"",
+   "reflection_ar": "كيف تقول لا لمن يحبك، دون أن تجرح قلبه؟",
+   "reflection_en": "How do you say no to someone who loves you, without hurting them?",
+   "claim_ids": [
+    218,
+    219,
+    220,
+    222,
+    223,
+    224,
+    225,
+    226
+   ]
+  },
+  {
+   "stop_id": "3d3c876f-428b-4be4-b614-2f5ddfb9c5ae",
+   "sort_order": 3,
+   "script_ar": "نعود الآن إلى قباء، إلى مسجد بني أُنَيف. يذكر السمهودي أن بني أُنَيف حي من قبيلة بَلِيّ، كانوا حلفاء لبني عمرو بن عوف من الأوس. ومنهم رجل اسمه طلحة بن البراء، يذكره المصنفون في أسماء الصحابة. ويروي ابن زبالة عن شيوخ بني أُنَيف أن النبي ﷺ صلى قريبًا من حصنهم، حين جاء يعود طلحة بن البراء. ولا تذكر الرواية متى كانت هذه الزيارة. ويقول سويد، راوي الخبر، إنه أدرك أهل الحي يرشون ذلك المكان بالماء ويتعاهدونه، ثم بنوه بعد ذلك، فهو مسجد بني أُنَيف بقباء. وهكذا، كما تقول الرواية، حفظ أهل الحي الموضع الذي صلى فيه ﷺ حين جاء يعود رجلًا منهم. وقد رجح السمهودي أن ديار بني أُنَيف كانت بقباء، في جهة قبلة مسجد قباء من ناحية الغرب. والآن نمضي إلى المحطة الأخيرة، حيث بركت الناقة.",
+   "script_en": "We now return to Quba, to the Mosque of Banu Anif. Al-Samhudi tells us that Banu Anif were a clan of the Bali tribe, allies of Banu Amr ibn Awf of the Aws. Among them was a man named Talha ibn al-Bara, whom the authors of books on the Companions list. Ibn Zabalah reported from the elders of Banu Anif that the Prophet ﷺ prayed near their fort when he came to visit Talha ibn al-Bara in his illness. The report does not say when this visit took place. Suwayd, the narrator of the report, said he found the people of the clan sprinkling that spot with water and tending it; later they built on it, and that is the Mosque of Banu Anif at Quba. So, as the report tells it, the clan cared for the spot where he ﷺ prayed when he came to visit one of their men who was ill. Al-Samhudi considered it most likely that the homes of Banu Anif were at Quba, on the qibla side of the Quba mosque, toward the west. Now we go on to the final stop, where the camel knelt.",
+   "script_kids_ar": "يذكر السمهودي أن قومًا اسمهم بنو أُنَيف كانوا يسكنون في قباء. ويروي شيوخهم أن النبي ﷺ جاء يزور رجلًا مريضًا منهم اسمه طلحة، وصلى قريبًا من حصنهم. ويقول أحد الرواة إن أهل الحي كانوا يرشون ذلك المكان بالماء ويعتنون به، ثم بنوا فيه مسجدًا. زيارة المريض لطف ورحمة. فمن تحب أن تزور أنت، لتفرح قلبه؟",
+   "human_moment_ar": "يروي شيوخ بني أُنَيف أن النبي ﷺ جاء ليعود رجلًا منهم، هو طلحة بن البراء، فصلى قريبًا من حصنهم. ويحكي سويد أنه أدرك أهل الحي يرشون ذلك الموضع بالماء ويتعاهدونه، ثم بنوا فيه مسجدًا.",
+   "human_moment_en": "The elders of Banu Anif related that the Prophet ﷺ came to visit one of their men who was ill, Talha ibn al-Bara, and prayed near their fort. Suwayd recalled finding the people of the clan sprinkling that spot with water and tending it, and later they built a mosque there.",
+   "reflection_ar": "أي زيارة تلقيتها يومًا ما زالت حاضرة في ذاكرتك حتى اليوم؟",
+   "reflection_en": "Which visit you once received is still alive in your memory today?",
+   "claim_ids": [
+    302,
+    304,
+    305,
+    306,
+    308
+   ]
+  },
+  {
+   "stop_id": "1099e238-975e-4712-9914-13ee157b6472",
+   "sort_order": 4,
+   "script_ar": "وصلنا إلى المحطة الأخيرة، عند المسجد النبوي. في رواية ابن إسحاق أن الناقة لما بلغت ديار بني مالك بن النجار بركت عند موضع مسجده ﷺ، ثم قامت وسارت قليلًا، وهو يرخي لها زمامها لا يوجهها، ثم التفتت خلفها، فعادت فبركت في مبركها الأول، فنزل عنها ﷺ. يقول أنس: لما كان اليوم الذي دخل فيه رسول الله ﷺ المدينة أضاء منها كل شيء. ويروي عبد الله بن سلام أن أول ما سمعه من النبي ﷺ: أيها الناس، أفشوا السلام، وأطعموا الطعام، وصِلوا الأرحام، وصَلّوا بالليل والناس نيام، تدخلون الجنة بسلام. وكان موضع المسجد مِرْبَدًا للتمر لغلامين يتيمين، سهل وسهيل، فلما أرادا أن يهباه له، أبى أن يقبله هبة حتى اشتراه منهما، ثم بناه مسجدًا. ونزل ﷺ في بيت أبي أيوب. وآخى بين المهاجرين والأنصار، وقال فيما بلغ ابن إسحاق: تآخوا في الله أخوين أخوين. وهنا نختم رحلتنا بقصص عن التواضع، ولطف الرد، وعيادة المريض، والأخوة.",
+   "script_en": "We have reached the final stop, at the Prophet's Mosque. In Ibn Ishaq's account, when the camel reached the quarter of Banu Malik ibn al-Najjar she knelt at the site of his ﷺ mosque, then rose and went a short way while he left her rein loose, not steering her; then she looked back, returned and knelt again where she had first knelt, and the Prophet ﷺ dismounted. Anas said: \"On the day the Messenger of Allah ﷺ entered Madinah, everything in it shone.\" Abdullah ibn Salam relates that the first thing he heard the Prophet ﷺ say was: \"O people, spread the greeting of peace, feed others, keep the ties of kinship, and pray at night while people sleep — you will enter Paradise in peace.\" The site of the mosque was a yard for drying dates that belonged to two orphan boys, Sahl and Suhayl. When they wanted to give it to him as a gift, he refused to accept it as a gift until he had bought it from them, and then he built it as a mosque. The Prophet ﷺ stayed in the house of Abu Ayyub. He joined the Muhajirun and the Ansar in brotherhood, and, according to what reached Ibn Ishaq, said: \"Become brothers for the sake of Allah, two by two.\" Here our journey ends, with stories of humility, of kindness in saying no, of visiting the sick, and of brotherhood.",
+   "script_kids_ar": "حين وصل النبي ﷺ إلى هنا، بركت ناقته عند أرض يجفف فيها التمر، يملكها غلامان يتيمان، اسمهما سهل وسهيل. قال الغلامان: نهبها لك. لكنه أبى أن يأخذها هدية، واشتراها منهما، ثم بنى فيها مسجدًا. هذا هو العدل: أن تعطي كل أحد حقه، حتى لو كان صغيرًا.",
+   "human_moment_ar": "في صحيح مسلم أن النبي ﷺ نزل في الطابق الأسفل من بيت أبي أيوب، وأبو أيوب فوقه، فتحرج أبو أيوب أن يمشي فوق رأسه. فقال له النبي ﷺ: السفل أرفق، فقال أبو أيوب: لا أعلو سقيفة وأنت تحتها، فتحول النبي ﷺ إلى الأعلى، وأبو أيوب إلى الأسفل.",
+   "human_moment_en": "Sahih Muslim reports that the Prophet ﷺ stayed on the lower floor of Abu Ayyub's house while Abu Ayyub lived above, and Abu Ayyub was uneasy walking over his head. The Prophet ﷺ told him the lower floor was easier, but Abu Ayyub said, \"I will not be above a roof with you beneath it,\" so the Prophet ﷺ moved upstairs and Abu Ayyub moved down.",
+   "reflection_ar": "حين يصل غريب إلى مدينة جديدة، ما الذي يحتاجه في رأيك ليشعر أنه في بيته؟",
+   "reflection_en": "When a newcomer arrives in a new city, what do you think they need in order to feel at home?",
+   "claim_ids": [
+    265,
+    267,
+    269,
+    277,
+    270,
+    280
+   ]
+  }
+ ],
+ "quiz": [
+  {
+   "question_ar": "عند وصول النبي ﷺ كان القادمون من الأنصار يحيون أبا بكر. ما الذي جعل الناس يعرفون النبي ﷺ؟",
+   "question_en": "When the Prophet ﷺ arrived, the Ansar who came kept greeting Abu Bakr. What made the people recognise the Prophet ﷺ?",
+   "options_ar": [
+    "أنه قام فخطب فيهم",
+    "أن أبا بكر ظلله بردائه لما أصابته الشمس",
+    "أن كلثوم بن الهِدْم قدمه إلى الناس",
+    "أنه جلس وحده في صدر المجلس"
+   ],
+   "options_en": [
+    "He stood up and addressed them",
+    "Abu Bakr shaded him with his cloak when the sun reached him",
+    "Kulthum ibn al-Hidm introduced him to the people",
+    "He sat alone in the place of honour"
+   ],
+   "answer_index": 1,
+   "explanation_claim_id": 192
+  },
+  {
+   "question_ar": "حين دعته قبائل الأنصار في الطريق أن ينزل عندها، لماذا لم ينزل عند من دعاه؟",
+   "question_en": "On the way, when the clans of the Ansar invited the Prophet ﷺ to stay with them, why did he not stay with those who invited him?",
+   "options_ar": [
+    "لأنه أراد أن ينزل عند أكثر القبائل عددًا وقوة",
+    "لأنهم لم يعدوه بالنصرة والحماية",
+    "لأنه أراد أن يرجع إلى بني عمرو بن عوف في قباء",
+    "لأنه كان يقول عن ناقته: خلوها فإنها مأمورة"
+   ],
+   "options_en": [
+    "Because he wanted to stay with the clan that had the most numbers and strength",
+    "Because they had not promised him support and protection",
+    "Because he wanted to go back to Banu Amr ibn Awf at Quba",
+    "Because he would say of his camel: \"Let her go, for she is under command\""
+   ],
+   "answer_index": 3,
+   "explanation_claim_id": 222
+  },
+  {
+   "question_ar": "كان موضع المسجد النبوي أرضًا لغلامين يتيمين، فلما أرادا أن يهباها له، ماذا فعل النبي ﷺ؟",
+   "question_en": "The site of the Prophet's ﷺ Mosque belonged to two orphan boys. When they wanted to give it to him, what did the Prophet ﷺ do?",
+   "options_ar": [
+    "أبى أن يقبلها هدية حتى اشتراها منهما",
+    "قبلها هدية ودعا لهما",
+    "قبلها وأعطاهما أرضًا غيرها",
+    "ترك المكان وبحث عن أرض أخرى"
+   ],
+   "options_en": [
+    "He refused to accept it as a gift until he had bought it from them",
+    "He accepted it as a gift and prayed for them",
+    "He accepted it and gave them another plot in exchange",
+    "He left the spot and looked for other land"
+   ],
+   "answer_index": 0,
+   "explanation_claim_id": 277
+  }
+ ]
+}

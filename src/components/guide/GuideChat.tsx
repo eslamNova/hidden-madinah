@@ -64,7 +64,9 @@ export function GuideChat({ place, journey, stop, lang = "ar" }: Props) {
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        // ~100 m is enough for distances; no need to send an exact position.
+        const round = (n: number) => Math.round(n * 1000) / 1000;
+        setLocation({ lat: round(pos.coords.latitude), lng: round(pos.coords.longitude) });
         setLocating(false);
       },
       () => setLocating(false),

@@ -1,0 +1,127 @@
+{
+ "slug": "uhud",
+ "intro_ar": "هذه رحلة في يوم أحد، في شوال من السنة الثالثة للهجرة. في ثلاث محطات، نبدأ عند سفح جبل أحد، الجبل الذي جعله النبي ﷺ خلف ظهره، ثم نمضي إلى جبل الرماة لنروي كيف انقلبت المعركة، ونختم عند شهداء أحد. إنها قصة عن الثبات حين يتراجع الآخرون، وعن الحزن والوفاء، وعن كلمة عفو قيلت في أصعب لحظة.",
+ "intro_en": "This journey follows the day of Uhud, in Shawwal of the third year after the Hijra. In three stops, we begin at the foot of Mount Uhud, the mountain the Prophet ﷺ kept at his back, then go on to the Archers' Hill to hear how the battle turned, and close with the martyrs of Uhud. It is a story of holding firm when others pull back, of grief and loyalty, and of a word of forgiveness spoken in the hardest moment.",
+ "stops": [
+  {
+   "stop_id": "e9ee6d9a-31be-4354-9ef5-9fe65a9bb7b5",
+   "sort_order": 1,
+   "script_ar": "نقف الآن عند سفح جبل أحد. حين بدا هذا الجبل للنبي ﷺ قال: «هذا جبل يحبنا ونحبه»، كما روى البخاري ومسلم. وذكر السهيلي أنه سُمّي أحدًا لتوحّده وانقطاعه عن الجبال من حوله. وكانت غزوة أحد في شوال من السنة الثالثة للهجرة، على قول جمهور العلماء. كان رأي النبي ﷺ أن يبقى المسلمون في المدينة، لكن كثيرًا من الناس أبوا إلا الخروج. فلما صلّى الجمعة لبس عُدّة الحرب. ثم ندم أهل الرأي وقالوا: امكث كما أمرتنا. فقال ﷺ: «ما ينبغي لنبيٍّ إذا أخذ لَأْمَةَ الحرب أن يرجع حتى يقاتل». فخرج بألف رجل، وكان جيش قريش ثلاثة آلاف. وعند موضع يُسمّى الشَّوط انسحب عبد الله بن أُبيّ بثلاثمائة رجل، فبقي مع النبي ﷺ سبعمائة، كما قال ابن عقبة. ومضى النبي ﷺ حتى نزل في الشِّعب من أحد، وجعل الجبل خلف ظهره. ونلتفت الآن إلى جبل الرماة، لنروي كيف دارت المعركة.",
+   "script_en": "We are now standing at the foot of Mount Uhud. When this mountain came into view, the Prophet ﷺ said: \"This is a mountain that loves us, and we love it,\" as al-Bukhari and Muslim report. Al-Suhayli explained that it was named Uhud, from the word for \"one\", because of its oneness and its separation from the mountains around it. The Battle of Uhud took place in Shawwal of the third year after the Hijra, according to the great majority of scholars. The Prophet's ﷺ own view was that the Muslims should stay inside Madinah, but many people insisted on going out. After the Friday prayer he put on his armour. Then the people of counsel regretted it and said: \"Stay, as you told us.\" He ﷺ said: \"It is not fitting for a prophet, once he has put on his armour, to turn back until he fights.\" So he marched out with a thousand men, while the Quraysh army numbered three thousand. At a place called al-Shawt, Abdullah ibn Ubayy withdrew with three hundred men, leaving seven hundred with the Prophet ﷺ, as Ibn Uqba says. The Prophet ﷺ went on until he camped in the ravine of Uhud, with the mountain at his back. Now we turn to the Archers' Hill, to hear how the battle unfolded.",
+   "script_kids_ar": "هذا جبل أحد، وقد قال عنه النبي ﷺ: «هذا جبل يحبنا ونحبه». وقبل المعركة كان رأي النبي ﷺ أن يبقى المسلمون في المدينة، لكن كثيرًا من الناس أرادوا الخروج، فلبس عُدّة الحرب. ثم ندم أهل الرأي وطلبوا منه أن يبقى، فقال: لا ينبغي لنبيٍّ إذا لبس عُدّة الحرب أن يرجع حتى يقاتل. فخرج حتى نزل عند جبل أحد، وجعله خلف ظهره. القائد الحكيم إذا عزم على أمر مضى فيه بثبات.",
+   "human_moment_ar": "كان رأي النبي ﷺ أن يبقوا في المدينة، وأبى كثير من الناس إلا الخروج، فلبس عُدّة الحرب. ولما ندم أهل الرأي وطلبوا منه البقاء، ثبت على ما عزم عليه ولم يرجع.",
+   "human_moment_en": "The Prophet's ﷺ view was that they should stay in Madinah, but many people insisted on going out, so he put on his armour. When the people of counsel regretted it and asked him to stay, he held to what he had resolved and did not turn back.",
+   "reflection_ar": "حين تقبل قرارًا جماعيًا لم يكن رأيك الأول، ما الذي يعينك على المضيّ فيه بإخلاص؟",
+   "reflection_en": "When you accept a group decision that was not your first choice, what helps you carry it through wholeheartedly?",
+   "claim_ids": [
+    159,
+    160,
+    144,
+    146,
+    148,
+    149
+   ]
+  },
+  {
+   "stop_id": "3f9ffcf7-7dbf-44a9-97e8-92721de8e56d",
+   "sort_order": 2,
+   "script_ar": "هذا جبل الرماة، ووصفه خبر نقله ابن شبة بالجبل الصغير في بطن الوادي. أمّر النبي ﷺ على الرماة عبد الله بن جبير، وكانوا خمسين رجلًا، وعهد إليهم ألا يتركوا مواضعهم. ونقل الأقشهري أنه جعلهم على جبل عينين، وهو جبل بحيال أحد. وفي كتاب الاكتفاء أنه قال لأميرهم: «إن كان لنا أو علينا فاثبت مكانك». وفي أول الأمر انهزمت قريش. وفي الصحيح من حديث البراء أن الرماة أخذوا عندها يقولون: الغنيمة، الغنيمة. فذكّرهم أميرهم بعهد النبي ﷺ فأبوا. ويُذكر أن جماعة منهم أخلوا مواضعهم، فكرّ خالد بخيل قريش، وتبعه عكرمة، فقُتل من ثبت من الرماة ومعهم أميرهم. وانقلب اليوم، وأُصيب من المسلمين سبعون قتيلًا. وفي الصحيح عن عائشة أن المسلمين اختلطوا يومها، فقتلوا والد حذيفة وحذيفة ينادي: أبي، أبي. فقال حذيفة: «يغفر الله لكم». ويذكر ابن عقبة أن النبي ﷺ ثبت حين انكشف عنه الناس، يدعوهم حتى رجع إليه بعضهم. ونختم مع شهداء أحد.",
+   "script_en": "This is Jabal al-Rumah, the Archers' Hill, which a report transmitted by Ibn Shabba describes as the small hill in the valley bed. The Prophet ﷺ put Abdullah ibn Jubayr in command of the archers, fifty men, and charged them not to leave their positions. Al-Aqshahri reports that he stationed them on the hill of Aynayn, a hill facing Uhud. According to the book al-Iktifa, he told their commander: \"Whether the day goes for us or against us, hold your place.\" At first Quraysh fled. In the Sahih collection of hadith, al-Bara relates that the archers then began calling: \"The spoils! The spoils!\" Their commander reminded them of the Prophet's ﷺ charge, but they refused. It is reported that a group of them then left their positions, and Khalid wheeled round with the Quraysh cavalry, followed by Ikrima, and the archers who had held their post were killed, their commander with them. The day turned, and seventy Muslims were killed. Aisha relates, also in the Sahih, that the Muslims became confused that day and killed Hudhayfa's father, while Hudhayfa was crying out: \"My father! My father!\" Hudhayfa said: \"May Allah forgive you.\" Ibn Uqba reports that when the people scattered away from him, the Prophet ﷺ held his ground and kept calling to them, until some of them came back to him. Next, we close with the Martyrs of Uhud.",
+   "script_kids_ar": "في يوم أحد طلب النبي ﷺ من خمسين راميًا ألا يتركوا أماكنهم. وقال لقائدهم عبد الله بن جبير: اثبت مكانك، سواء كان اليوم لنا أو علينا. ولما بدأ جيش قريش ينهزم، نادى بعض الرماة: الغنيمة! فذكّرهم قائدهم بوصية النبي ﷺ فلم يسمعوا، وتركوا أماكنهم. أما هو فبقي في مكانه مع من ثبت معه. الوفاء بالعهد يحتاج إلى شجاعة، حتى لو تركه الآخرون.",
+   "human_moment_ar": "في اضطراب المعركة قتل بعض المسلمين والد حذيفة، وحذيفة ينادي: أبي، أبي. فقال حذيفة: «يغفر الله لكم».",
+   "human_moment_en": "In the confusion of battle, some Muslims killed Hudhayfa's father while Hudhayfa was crying out: \"My father! My father!\" Hudhayfa said: \"May Allah forgive you.\"",
+   "reflection_ar": "ما الذي يجعل كلمة العفو ممكنة في لحظة ألم شديد؟",
+   "reflection_en": "What makes a word of forgiveness possible in a moment of deep pain?",
+   "claim_ids": [
+    176,
+    150,
+    171,
+    151,
+    156,
+    155,
+    153,
+    152
+   ]
+  },
+  {
+   "stop_id": "51d2b835-008b-43ca-bf60-5ddb53e3f3eb",
+   "sort_order": 3,
+   "script_ar": "نصل إلى شهداء أحد، ومنهم حمزة بن عبد المطلب، عمّ النبي ﷺ. وعد جبير بن مطعم غلامه وحشيًّا بالعتق إن قتل حمزة، ثأرًا لعمّ جبير، طعمة بن عدي. وروى البخاري عن وحشي أنه كمن لحمزة تحت صخرة، ثم رماه بحربته فقتله. ونقل ابن شبة أن حمزة بقي حيث سقط تحت جبل الرماة، ثم حُمل بأمر النبي ﷺ إلى الربوة التي دُفن فيها. وبعد أن أسلم وحشي جاء إلى النبي ﷺ، فسأله: «أنت قتلت حمزة؟» ثم قال له: «فهل تستطيع أن تغيّب وجهك عني؟» وفي الصحيح عن جابر أن النبي ﷺ أمر بدفن الشهداء بدمائهم. ولما بلغ ﷺ قبور الشهداء قال: «هذه قبور إخواننا». وفي صحيح البخاري أنه صلّى على قتلى أحد بعد ثماني سنين من الغزوة، كالمودّع للأحياء والأموات. رأينا في قصة أحد ثبات من بقي من الرماة، وعفو حذيفة، ووفاء النبي ﷺ لأصحابه. ويبقى أحدٌ الجبلَ الذي قال عنه النبي ﷺ: «هذا جبل يحبنا ونحبه».",
+   "script_en": "We have reached the Martyrs of Uhud, among them Hamza ibn Abd al-Muttalib, the uncle of the Prophet ﷺ. Jubayr ibn Mutim had promised his slave Wahshi his freedom if he killed Hamza, in revenge for Jubayr's own uncle, Tuma ibn Adi. Al-Bukhari records Wahshi's own account: he lay in wait for Hamza behind a rock, then threw his spear at him and killed him. Ibn Shabba transmits that Hamza lay where he fell, below the Archers' Hill, and was then carried, at the Prophet's ﷺ command, to the rise where he was buried. After Wahshi became Muslim he came to the Prophet ﷺ, who asked him: \"Are you the one who killed Hamza?\" Then he said to him: \"Could you keep your face out of my sight?\" In the Sahih collection of hadith, Jabir relates that the Prophet ﷺ ordered the martyrs to be buried in their blood. When the Prophet ﷺ reached the graves of the martyrs, he said: \"These are the graves of our brothers.\" In Sahih al-Bukhari, eight years after the battle, he prayed over the fallen of Uhud like someone bidding farewell to the living and the dead. In the story of Uhud we have seen the steadfastness of the archers who stayed, Hudhayfa's forgiveness, and the Prophet's ﷺ loyalty to his companions. And Uhud remains the mountain of which the Prophet ﷺ said: \"This is a mountain that loves us, and we love it.\"",
+   "script_kids_ar": "هذا موضع نتذكّر فيه شهداء أحد، ومنهم حمزة عمّ النبي ﷺ. خرج النبي ﷺ مع أصحابه يريد قبور الشهداء، فلما بلغها قال: «هذه قبور إخواننا». وبعد ثماني سنين من الغزوة صلّى على شهداء أحد، كالمودّع للأحياء والأموات. الوفاء لمن نحب لا ينتهي بالفراق، بل يبقى في قلوبنا سنين طويلة.",
+   "human_moment_ar": "خرج النبي ﷺ مع أصحابه يريد قبور الشهداء، فمرّوا بقبور في الطريق فقال: «قبور أصحابنا». فلما بلغوا قبور الشهداء قال: «هذه قبور إخواننا».",
+   "human_moment_en": "The Prophet ﷺ went out with his companions to visit the graves of the martyrs. Passing some graves on the way, he said: \"The graves of our companions.\" When they reached the martyrs' graves, he said: \"These are the graves of our brothers.\"",
+   "reflection_ar": "كيف تحفظ الوفاء لمن غابوا عنك؟",
+   "reflection_en": "How do you keep faith with those who are no longer with you?",
+   "claim_ids": [
+    170,
+    145,
+    172,
+    176,
+    173,
+    175,
+    168,
+    167,
+    155,
+    153,
+    159
+   ]
+  }
+ ],
+ "quiz": [
+  {
+   "question_ar": "ما كان رأي النبي ﷺ قبل معركة أحد؟",
+   "question_en": "Before the Battle of Uhud, what was the Prophet's ﷺ own view?",
+   "options_ar": [
+    "أن يخرجوا للقاء جيش قريش خارج المدينة",
+    "أن يبقى المسلمون داخل المدينة",
+    "أن يطلبوا الصلح من قريش",
+    "أن يرسلوا الرماة وحدهم إلى الجبل"
+   ],
+   "options_en": [
+    "To march out and meet the Quraysh army outside Madinah",
+    "For the Muslims to stay inside Madinah",
+    "To seek a truce with Quraysh",
+    "To send only the archers to the mountain"
+   ],
+   "answer_index": 1,
+   "explanation_claim_id": 146
+  },
+  {
+   "question_ar": "لماذا انقلبت المعركة على المسلمين بعد أن انهزم جيش قريش أول الأمر؟",
+   "question_en": "Why did the battle turn against the Muslims after the Quraysh army had first fled?",
+   "options_ar": [
+    "انسحب الرماة جميعًا قبل أن يبدأ القتال",
+    "وصل إلى جيش قريش مدد كبير في أثناء القتال",
+    "نادى الرماة بالغنيمة وأبوا أن يثبتوا كما عهد إليهم النبي ﷺ",
+    "انقطع الماء عن المسلمين في الشِّعب"
+   ],
+   "options_en": [
+    "All the archers withdrew before the fighting began",
+    "Large reinforcements reached the Quraysh army during the fighting",
+    "The archers called for the spoils and refused to hold their post as the Prophet ﷺ had charged them",
+    "The Muslims ran out of water in the ravine"
+   ],
+   "answer_index": 2,
+   "explanation_claim_id": 156
+  },
+  {
+   "question_ar": "حين بلغ النبي ﷺ قبور شهداء أحد، كيف وصفها؟",
+   "question_en": "When the Prophet ﷺ reached the graves of the martyrs of Uhud, how did he describe them?",
+   "options_ar": [
+    "قبور أصحابنا",
+    "قبور إخواننا",
+    "قبور أبطالنا",
+    "قبور أهل المدينة"
+   ],
+   "options_en": [
+    "The graves of our companions",
+    "The graves of our brothers",
+    "The graves of our heroes",
+    "The graves of the people of Madinah"
+   ],
+   "answer_index": 1,
+   "explanation_claim_id": 168
+  }
+ ]
+}

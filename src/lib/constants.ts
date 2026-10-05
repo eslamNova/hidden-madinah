@@ -35,7 +35,7 @@ export const REVALIDATE_SECONDS = 86400;
 export const CONTACT_EMAIL = "islam.a.i@outlook.com";
 
 /** Shown on /privacy so visitors can see when the notice last changed. */
-export const PRIVACY_UPDATED = "8 سبتمبر 2026";
+export const PRIVACY_UPDATED = "5 أكتوبر 2026";
 
 /**
  * Companion app «سيرة» (free Seerah audio journey) — recommended on place

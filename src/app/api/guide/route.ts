@@ -26,11 +26,11 @@ const db = createClient<Database>(
   { auth: { persistSession: false, autoRefreshToken: false } }
 );
 
-// Per-instance burst limit. Not a security boundary — the daily cap below is
-// global — but it stops one tab from hammering the model.
+// Per-instance burst limit: stops one tab from hammering the model. Overall
+// volume is bounded by the Gemini project's own quota, not by a table the
+// public anon key could write to.
 const hits = new Map<string, number[]>();
 const PER_MINUTE = 8;
-const DAILY_CAP = Number(process.env.GUIDE_DAILY_CAP ?? 2000);
 
 function rateLimited(ip: string): boolean {
   const now = Date.now();
@@ -63,10 +63,6 @@ export async function POST(request: Request) {
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
   if (rateLimited(ip)) return json(429, { error: "rate_limited" });
-  const { data: today } = await db.rpc("guide_calls_since", {
-    since: new Date(Date.now() - 24 * 3600_000).toISOString(),
-  });
-  if (typeof today === "number" && today >= DAILY_CAP) return json(429, { error: "daily_cap" });
 
   const location =
     body.location && Number.isFinite(body.location.lat) && Number.isFinite(body.location.lng)
@@ -84,7 +80,17 @@ export async function POST(request: Request) {
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
-      const send = (obj: unknown) => controller.enqueue(encoder.encode(JSON.stringify(obj) + "\n"));
+      // A visitor who closes the chat mid-answer closes the stream; keep going
+      // quietly so the answer is still logged.
+      let open = true;
+      const send = (obj: unknown) => {
+        if (!open) return;
+        try {
+          controller.enqueue(encoder.encode(JSON.stringify(obj) + "\n"));
+        } catch {
+          open = false;
+        }
+      };
       // Progress events let the chat show what is happening while the
       // (free-tier) model works: searching → N verified facts → writing.
       send({ t: "p", s: "search" });
@@ -148,7 +154,13 @@ export async function POST(request: Request) {
 
       const citations: CitationInfo[] = valid.map((id) => ctx.claims.get(id)!);
       send({ t: "m", type, citations, ...(replace ? { replace } : {}) });
-      controller.close();
+      if (open) {
+        try {
+          controller.close();
+        } catch {
+          // already closed by the client
+        }
+      }
 
       await db.from("guide_logs").insert({
         lang,
