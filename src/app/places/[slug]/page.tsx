@@ -13,6 +13,7 @@ import { Gallery } from "@/components/place/Gallery";
 import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
 import { RelatedPlaces } from "@/components/place/RelatedPlaces";
 import { SeerahAppCard } from "@/components/place/SeerahAppCard";
+import { GuideChat } from "@/components/guide/GuideChat";
 import { VisitInfoCard } from "@/components/place/VisitInfoCard";
 import { PlaceMapLazy } from "@/components/map/LazyMaps";
 import { TelegramIconLink } from "@/components/layout/TelegramIconLink";
@@ -210,6 +211,8 @@ export default async function PlacePage({
             )}
           </section>
         )}
+
+        <GuideChat place={place.slug} />
 
         <SeerahAppCard />
 

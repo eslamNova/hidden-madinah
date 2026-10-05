@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
@@ -24,8 +25,16 @@ export default async function AdminProtectedLayout({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
-      <div className="mb-6 flex items-center justify-between gap-4 border-b border-ink/10 pb-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 pb-4">
         <h1 className="text-2xl">{t("title")}</h1>
+        <nav className="flex gap-2">
+          <Link href="/admin" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
+            {t("navPlaces")}
+          </Link>
+          <Link href="/admin/claims" className="flex min-h-12 items-center rounded-xl bg-surface px-4 font-medium">
+            {t("navClaims")}
+          </Link>
+        </nav>
         <form action={signOutAction}>
           <button
             type="submit"

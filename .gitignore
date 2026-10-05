@@ -54,3 +54,6 @@ my_data/
 
 # Claude Code local session config (machine-specific paths)
 .claude/
+
+# Offline content cache (Turath downloads, per-place corpus)
+.cache/
