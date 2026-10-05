@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
 import { ChevronLeft, Eye, EyeOff, Loader2, Pause, Play, Volume2, VolumeX, X } from "lucide-react";
 import type { CoverImage } from "@/lib/content";

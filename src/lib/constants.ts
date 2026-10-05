@@ -2,6 +2,12 @@ export const SITE_NAME = "مزارات المدينة";
 export const SITE_DESCRIPTION =
   "دليل عملي لمزارات المدينة المنورة الأقل شهرة: مساجد أثرية وآبار وبساتين ومواقع تاريخية، مع المسافة من المسجد النبوي وكيفية الوصول وتكلفة المواصلات.";
 
+export const SITE_NAME_EN = "Mazarat Madinah";
+export const SITE_DESCRIPTION_EN =
+  "A practical guide to the lesser-known Seerah sites of Madinah: historic mosques, wells, gardens and battlefields, with sources, distances from the Prophet's Mosque, how to get there and what it costs.";
+export const siteName = (lang: "ar" | "en") => (lang === "en" ? SITE_NAME_EN : SITE_NAME);
+export const siteDescription = (lang: "ar" | "en") => (lang === "en" ? SITE_DESCRIPTION_EN : SITE_DESCRIPTION);
+
 /** Font size steps (px) applied on <html> via data-font-step. */
 export const FONT_STEPS = [18, 20, 23] as const;
 export const FONT_STEP_STORAGE_KEY = "hm-font-step";

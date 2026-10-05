@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { List, Map as MapIcon, Search } from "lucide-react";

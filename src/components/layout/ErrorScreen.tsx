@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-export default function ErrorPage({
+export function ErrorScreen({
   reset,
 }: {
   error: Error & { digest?: string };

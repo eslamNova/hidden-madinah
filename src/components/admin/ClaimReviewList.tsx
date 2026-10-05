@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, ExternalLink, Loader2, TriangleAlert, X } from "lucide-react";
 import type { Enums, Tables } from "@/lib/database.types";
-import { approveClaimsAction, reviewClaimAction } from "@/app/admin/(protected)/claims/actions";
+import { approveClaimsAction, reviewClaimAction } from "@/app/(ar)/admin/(protected)/claims/actions";
 
 export type ReviewClaim = Tables<"claims">;
 

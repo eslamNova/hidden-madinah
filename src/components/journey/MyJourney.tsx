@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
 import { CheckCircle2, Circle, QrCode, Share2 } from "lucide-react";
 import { readAllJourneyProgress, readVisits, VISITS_EVENT, type JourneyProgress, type Visit } from "@/lib/visits";

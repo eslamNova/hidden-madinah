@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { HERO_IMAGES } from "@/lib/hero-images";
+import { languageAlternates, type Lang } from "@/lib/i18n";
 import { getPlannerPlaces } from "@/lib/queries";
 import { PageHero } from "@/components/layout/PageHero";
 import { Planner } from "@/components/planner/Planner";
 
-export const revalidate = 86400;
-
-export async function generateMetadata(): Promise<Metadata> {
+/** /plan and /en/plan. The route files set the request locale before rendering. */
+export async function planMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("plan");
-  return { title: t("title"), description: t("subtitle") };
+  return { title: t("title"), description: t("subtitle"), alternates: languageAlternates("/plan", lang) };
 }
 
-export default async function PlanPage() {
+export async function PlanView({ lang }: { lang: Lang }) {
   const t = await getTranslations("plan");
-  const places = await getPlannerPlaces();
+  const places = await getPlannerPlaces(lang);
   const day = Math.floor(Date.now() / 86_400_000);
   return (
     <>

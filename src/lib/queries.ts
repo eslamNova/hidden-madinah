@@ -1,7 +1,13 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database, Tables } from "@/lib/database.types";
+import type { Lang } from "@/lib/i18n";
+import { claimText, localizeJourney, localizePlace, localizeQuiz, localizeRoute, localizeStop } from "@/lib/i18n-content";
 
 /**
+ * Every public query takes the page's language (default Arabic). English rows
+ * come back in the same shape with English in the display columns — see
+ * src/lib/i18n-content.ts.
+ *
  * Cookie-less anon client for public reads (safe during SSG/ISR where
  * next/headers is unavailable). RLS restricts anon to published content.
  */
@@ -24,7 +30,7 @@ function sortMedia<T extends { media: MediaRow[] | null }>(place: T): T & { medi
   };
 }
 
-export async function getPublishedPlaces(): Promise<PlaceWithMedia[]> {
+export async function getPublishedPlaces(lang: Lang = "ar"): Promise<PlaceWithMedia[]> {
   const { data, error } = await publicClient
     .from("places")
     .select("*, media(*)")
@@ -32,10 +38,10 @@ export async function getPublishedPlaces(): Promise<PlaceWithMedia[]> {
     .order("featured", { ascending: false })
     .order("distance_from_prophets_mosque_km", { ascending: true, nullsFirst: false });
   if (error) throw error;
-  return (data ?? []).map(sortMedia);
+  return (data ?? []).map((p) => localizePlace(sortMedia(p), lang));
 }
 
-export async function getFeaturedPlaces(limit = 4): Promise<PlaceWithMedia[]> {
+export async function getFeaturedPlaces(limit = 4, lang: Lang = "ar"): Promise<PlaceWithMedia[]> {
   const { data, error } = await publicClient
     .from("places")
     .select("*, media(*)")
@@ -44,10 +50,10 @@ export async function getFeaturedPlaces(limit = 4): Promise<PlaceWithMedia[]> {
     .order("distance_from_prophets_mosque_km", { ascending: true, nullsFirst: false })
     .limit(limit);
   if (error) throw error;
-  return (data ?? []).map(sortMedia);
+  return (data ?? []).map((p) => localizePlace(sortMedia(p), lang));
 }
 
-export async function getPlaceBySlug(slug: string): Promise<PlaceWithMedia | null> {
+export async function getPlaceBySlug(slug: string, lang: Lang = "ar"): Promise<PlaceWithMedia | null> {
   const { data, error } = await publicClient
     .from("places")
     .select("*, media(*)")
@@ -55,7 +61,7 @@ export async function getPlaceBySlug(slug: string): Promise<PlaceWithMedia | nul
     .eq("is_published", true)
     .maybeSingle();
   if (error) throw error;
-  return data ? sortMedia(data) : null;
+  return data ? localizePlace(sortMedia(data), lang) : null;
 }
 
 export async function getPublishedSlugs(): Promise<string[]> {
@@ -68,7 +74,7 @@ export async function getPublishedSlugs(): Promise<string[]> {
 }
 
 /** Published places among the given slugs, in the order the slugs are listed. */
-export async function getPlacesBySlugs(slugs: string[]): Promise<PlaceWithMedia[]> {
+export async function getPlacesBySlugs(slugs: string[], lang: Lang = "ar"): Promise<PlaceWithMedia[]> {
   if (slugs.length === 0) return [];
   const { data, error } = await publicClient
     .from("places")
@@ -76,38 +82,38 @@ export async function getPlacesBySlugs(slugs: string[]): Promise<PlaceWithMedia[
     .eq("is_published", true)
     .in("slug", slugs);
   if (error) throw error;
-  const bySlug = new Map((data ?? []).map((p) => [p.slug, sortMedia(p)]));
+  const bySlug = new Map((data ?? []).map((p) => [p.slug, localizePlace(sortMedia(p), lang)]));
   return slugs.flatMap((s) => {
     const p = bySlug.get(s);
     return p ? [p] : [];
   });
 }
 
-export async function getRoutes(): Promise<RouteRow[]> {
+export async function getRoutes(lang: Lang = "ar"): Promise<RouteRow[]> {
   const { data, error } = await publicClient.from("routes").select("*").order("title_ar");
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).map((r) => localizeRoute(r, lang));
 }
 
 /**
  * All routes with their stops in ONE round trip — used by the home and routes
  * pages, which previously issued a query per route.
  */
-export async function getRoutesWithStops(): Promise<RouteWithStops[]> {
+export async function getRoutesWithStops(lang: Lang = "ar"): Promise<RouteWithStops[]> {
   const { data, error } = await publicClient
     .from("routes")
     .select("*, route_places(sort_order, places(*, media(*)))")
     .order("title_ar");
   if (error) throw error;
   return (data ?? []).map(({ route_places, ...route }) => ({
-    ...route,
+    ...localizeRoute(route, lang),
     stops: (route_places ?? [])
       .sort((a, b) => a.sort_order - b.sort_order)
-      .flatMap((rp) => (rp.places && rp.places.is_published ? [sortMedia(rp.places)] : [])),
+      .flatMap((rp) => (rp.places && rp.places.is_published ? [localizePlace(sortMedia(rp.places), lang)] : [])),
   }));
 }
 
-export async function getRouteWithStops(slug: string): Promise<RouteWithStops | null> {
+export async function getRouteWithStops(slug: string, lang: Lang = "ar"): Promise<RouteWithStops | null> {
   const { data, error } = await publicClient
     .from("routes")
     .select("*, route_places(sort_order, places(*, media(*)))")
@@ -118,8 +124,8 @@ export async function getRouteWithStops(slug: string): Promise<RouteWithStops | 
   const { route_places, ...route } = data;
   const stops = (route_places ?? [])
     .sort((a, b) => a.sort_order - b.sort_order)
-    .flatMap((rp) => (rp.places && rp.places.is_published ? [sortMedia(rp.places)] : []));
-  return { ...route, stops };
+    .flatMap((rp) => (rp.places && rp.places.is_published ? [localizePlace(sortMedia(rp.places), lang)] : []));
+  return { ...localizeRoute(route, lang), stops };
 }
 
 /** Old /routes/<uuid> links redirect: id → slug (null when the id is unknown). */
@@ -163,7 +169,7 @@ type SupabaseLike = typeof publicClient;
 const isMissingTable = (err: { code?: string; message?: string } | null) =>
   !!err && (err.code === "42P01" || err.code === "PGRST205" || /does not exist|Could not find the table/i.test(err.message ?? ""));
 
-export async function getPublishedJourneys(): Promise<(JourneyRow & { stops: JourneyStopFull[] })[]> {
+export async function getPublishedJourneys(lang: Lang = "ar"): Promise<(JourneyRow & { stops: JourneyStopFull[] })[]> {
   const { data, error } = await publicClient
     .from("journeys")
     .select("*, journey_stops(*, places(*, media(*)))")
@@ -173,10 +179,13 @@ export async function getPublishedJourneys(): Promise<(JourneyRow & { stops: Jou
   if (error) throw error;
   return (data ?? [])
     .map(({ journey_stops, ...j }) => ({
-      ...j,
+      ...localizeJourney(j, lang),
       stops: [...(journey_stops ?? [])]
         .sort((a, b) => a.sort_order - b.sort_order)
-        .map(({ places, ...s }) => ({ ...s, place: places && places.is_published ? sortMedia(places) : null })),
+        .map(({ places, ...s }) => {
+          const place = places && places.is_published ? localizePlace(sortMedia(places), lang) : null;
+          return { ...localizeStop(s, lang, place?.name_ar), place };
+        }),
     }))
     // RLS hides unreviewed stops; a journey with none visible isn't ready.
     .filter((j) => j.stops.length > 0);
@@ -189,8 +198,15 @@ export async function getJourneySlugs(): Promise<string[]> {
   return (data ?? []).map((r) => r.slug);
 }
 
-/** One journey with stops, places, quiz and every claim its stops cite. */
-export async function getJourney(slug: string, client: SupabaseLike = publicClient): Promise<JourneyFull | null> {
+/**
+ * One journey with stops, places, quiz and every claim its stops cite.
+ * English: quiz items without a complete English version are dropped, and
+ * claims carry their reviewed English in text_ar (else the Arabic stays).
+ */
+export async function getJourney(
+  slug: string,
+  { client = publicClient, lang = "ar" }: { client?: SupabaseLike; lang?: Lang } = {}
+): Promise<JourneyFull | null> {
   const { data, error } = await client
     .from("journeys")
     .select("*, journey_stops(*, places(*, media(*))), quiz_items(*)")
@@ -202,7 +218,10 @@ export async function getJourney(slug: string, client: SupabaseLike = publicClie
   const { journey_stops, quiz_items, ...journey } = data;
   const stops = [...(journey_stops ?? [])]
     .sort((a, b) => a.sort_order - b.sort_order)
-    .map(({ places, ...s }) => ({ ...s, place: places ? sortMedia(places) : null }));
+    .map(({ places, ...s }) => {
+      const place = places ? localizePlace(sortMedia(places), lang) : null;
+      return { ...localizeStop(s, lang, place?.name_ar), place };
+    });
   // Stop citations plus quiz explanations (a quiz may explain with a claim
   // whose stop is hidden from this reader).
   const ids = [
@@ -215,12 +234,17 @@ export async function getJourney(slug: string, client: SupabaseLike = publicClie
   if (ids.length) {
     const { data: rows, error: claimsErr } = await client.from("claims").select(PUBLIC_CLAIM_COLUMNS).in("id", ids);
     if (claimsErr) throw claimsErr;
-    for (const c of rows ?? []) claims.set(c.id, c);
+    for (const c of rows ?? []) claims.set(c.id, lang === "ar" ? c : { ...c, text_ar: claimText(c, lang) ?? c.text_ar });
   }
   return {
-    ...journey,
+    ...localizeJourney(journey, lang),
     stops,
-    quiz: [...(quiz_items ?? [])].sort((a, b) => a.sort_order - b.sort_order),
+    quiz: [...(quiz_items ?? [])]
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .flatMap((q) => {
+        const localized = localizeQuiz(q, lang);
+        return localized ? [localized] : [];
+      }),
     claims,
   };
 }
@@ -232,27 +256,30 @@ export async function getJourney(slug: string, client: SupabaseLike = publicClie
  * verified, cited fact each (a human moment or virtue first, level A first,
  * then the shortest) — the planner shows sources, never generated text.
  */
-export async function getPlannerPlaces(): Promise<import("@/lib/planner/solver").PlannerPlace[]> {
+export async function getPlannerPlaces(lang: Lang = "ar"): Promise<import("@/lib/planner/solver").PlannerPlace[]> {
   const { data: places, error } = await publicClient
     .from("places")
-    .select("id, slug, name_ar, category, lat, lng, featured, visit_minutes, has_stairs, walking_effort")
+    .select("id, slug, name_ar, name_en, category, lat, lng, featured, visit_minutes, has_stairs, walking_effort")
     .eq("is_published", true);
   if (error) throw error;
   const { data: claims, error: claimsErr } = await publicClient
     .from("claims")
-    .select("place_id, text_ar, vol, page, kind, content_level")
+    .select("place_id, text_ar, text_en, en_reviewed, vol, page, kind, content_level")
     .eq("status", "verified")
     .not("place_id", "is", null);
   if (claimsErr && !isMissingTable(claimsErr)) throw claimsErr;
 
   const rank = (c: { kind: string; content_level: string; text_ar: string }) =>
     (c.kind === "humane" ? 0 : c.kind === "virtue" ? 1 : 2) * 10 + (c.content_level === "A" ? 0 : 5) + c.text_ar.length / 1000;
-  const best = new Map<string, { text_ar: string; vol: number | null; page: number | null; score: number }>();
+  const best = new Map<string, { text: string; vol: number | null; page: number | null; score: number }>();
   for (const c of claims ?? []) {
     if (!c.place_id) continue;
+    // English pages show only claims whose English was reviewed.
+    const text = claimText(c, lang);
+    if (!text) continue;
     const score = rank(c);
     const prev = best.get(c.place_id);
-    if (!prev || score < prev.score) best.set(c.place_id, { text_ar: c.text_ar, vol: c.vol, page: c.page, score });
+    if (!prev || score < prev.score) best.set(c.place_id, { text, vol: c.vol, page: c.page, score });
   }
 
   return (places ?? [])
@@ -261,7 +288,7 @@ export async function getPlannerPlaces(): Promise<import("@/lib/planner/solver")
       const fact = best.get(p.id);
       return {
         slug: p.slug,
-        name: p.name_ar,
+        name: localizePlace(p, lang).name_ar,
         category: p.category,
         lat: Number(p.lat),
         lng: Number(p.lng),
@@ -269,7 +296,7 @@ export async function getPlannerPlaces(): Promise<import("@/lib/planner/solver")
         visitMinutes: p.visit_minutes,
         hasStairs: p.has_stairs,
         walkingEffort: (p.walking_effort as "low" | "medium" | "high" | null) ?? null,
-        fact: fact ? { text: fact.text_ar, vol: fact.vol, page: fact.page } : null,
+        fact: fact ? { text: fact.text, vol: fact.vol, page: fact.page } : null,
       };
     });
 }

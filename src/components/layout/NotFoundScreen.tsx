@@ -1,7 +1,7 @@
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { getTranslations } from "next-intl/server";
 
-export default async function NotFound() {
+export async function NotFoundScreen() {
   const t = await getTranslations("errors");
 
   return (

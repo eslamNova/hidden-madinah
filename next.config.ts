@@ -16,6 +16,9 @@ const withSerwist = withSerwistInit({
 // Images are served straight from the pre-generated variant set (400/800/1600)
 // by src/components/place/PlaceImage.tsx — no optimizer, no custom loader.
 const nextConfig: NextConfig = {
+  // Two root layouts (src/app/(ar), src/app/(en)): URLs outside both get
+  // src/app/global-not-found.tsx.
+  experimental: { globalNotFound: true },
   async headers() {
     return [
       {

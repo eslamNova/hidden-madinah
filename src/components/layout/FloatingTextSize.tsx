@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Moon, Sun } from "lucide-react";
 import { TextSizeControl } from "@/components/TextSizeControl";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
+import { useBarePath } from "@/lib/use-lang";
 
 /**
  * The أ−/أ+ font stepper as a floating corner control — the top navbar is
@@ -21,7 +22,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
  */
 export function FloatingTextSize() {
   const t = useTranslations("fontSize");
-  const pathname = usePathname();
+  const pathname = useBarePath();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -80,18 +81,20 @@ export function FloatingTextSize() {
             Both theme icons render; globals.css hides the wrong one off
             data-theme, so the pill is never wrong on the first paint. */}
         <span aria-hidden="true" className="text-xl font-bold leading-none">
-          أ
+          {t("glyph")}
         </span>
         <span aria-hidden="true" className="h-4 w-px bg-current/25" />
         <Sun aria-hidden="true" className="theme-dark-only h-5 w-5" />
         <Moon aria-hidden="true" className="theme-light-only h-5 w-5" />
       </button>
+      {/* Before the panel: the closed panel keeps its (invisible) width. */}
+      {!open && <LanguageSwitch className={shell} />}
       <div
         id={panelId}
         className={`rounded-full border p-1.5 shadow-lg transition-[opacity,transform] duration-200 ease-out ${shell} ${
           open
             ? "translate-x-0 opacity-100"
-            : "pointer-events-none translate-x-2 opacity-0"
+            : "pointer-events-none opacity-0 ltr:-translate-x-2 rtl:translate-x-2"
         }`}
         // Keep the controls out of the tab order while visually hidden.
         {...(!open && { inert: true })}

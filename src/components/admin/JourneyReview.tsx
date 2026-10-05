@@ -10,7 +10,7 @@ import {
   setJourneyPublishedAction,
   setQuizStatusAction,
   setStopStatusAction,
-} from "@/app/admin/(protected)/journeys/actions";
+} from "@/app/(ar)/admin/(protected)/journeys/actions";
 
 export type ReviewJourney = {
   slug: string;

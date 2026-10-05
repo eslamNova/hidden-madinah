@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
 import { Clock, MapPin, Star } from "lucide-react";
 import { coverImage, stripVerify, type CoverImage } from "@/lib/content";

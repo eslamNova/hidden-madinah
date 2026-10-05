@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, Clock, PartyPopper, RotateCcw, Share2 } from "lucide-react";
 import type { PlayerJourney } from "@/lib/journey-view";

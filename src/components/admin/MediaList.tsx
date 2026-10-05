@@ -9,7 +9,7 @@ import {
   deleteMediaAction,
   reorderMediaAction,
   updateMediaCaptionAction,
-} from "@/app/admin/(protected)/actions";
+} from "@/app/(ar)/admin/(protected)/actions";
 
 type MediaRow = Tables<"media">;
 

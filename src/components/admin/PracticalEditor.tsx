@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Loader2 } from "lucide-react";
-import { savePracticalAction, type PracticalInput } from "@/app/admin/(protected)/practical/actions";
+import { savePracticalAction, type PracticalInput } from "@/app/(ar)/admin/(protected)/practical/actions";
 
 export type PracticalRow = Omit<PracticalInput, "id" | "slug"> & {
   id: string;

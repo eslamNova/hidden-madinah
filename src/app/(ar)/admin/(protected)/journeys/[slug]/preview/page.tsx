@@ -12,7 +12,7 @@ import { JourneyPlayer } from "@/components/journey/JourneyPlayer";
 export default async function JourneyPreviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const t = await getTranslations("admin.journeys");
-  const journey = await getJourney(decodeURIComponent(slug), await createClient());
+  const journey = await getJourney(decodeURIComponent(slug), { client: await createClient() });
   if (!journey) notFound();
   return (
     <div className="space-y-4">

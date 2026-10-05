@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
 import { Cookie } from "lucide-react";
 

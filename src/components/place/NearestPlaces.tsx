@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
 import { ChevronLeft, LocateFixed } from "lucide-react";
 import { haversineKm } from "@/lib/geo";

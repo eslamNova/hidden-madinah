@@ -11,7 +11,7 @@ import {
   deletePlaceAction,
   savePlaceAction,
   type PlaceFormInput,
-} from "@/app/admin/(protected)/actions";
+} from "@/app/(ar)/admin/(protected)/actions";
 import { PinPicker, type PinChange } from "@/components/admin/PinPicker";
 import { MediaUploader } from "@/components/admin/MediaUploader";
 import { MediaList } from "@/components/admin/MediaList";

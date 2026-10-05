@@ -17,7 +17,7 @@ import {
   videoPosterPath,
   WEBP_QUALITY,
 } from "@/lib/media-spec";
-import { saveMediaRowAction } from "@/app/admin/(protected)/actions";
+import { saveMediaRowAction } from "@/app/(ar)/admin/(protected)/actions";
 
 type ItemStatus = "processing" | "uploading" | "done" | "failed";
 type Item = { key: string; name: string; status: ItemStatus; file: File };

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { ExternalLink, Play, Star } from "lucide-react";
 import { coverImage, stripVerify, toPublicPlaceView } from "@/lib/content";
 import { CATEGORY_META, googleMapsUrl } from "@/lib/maps";

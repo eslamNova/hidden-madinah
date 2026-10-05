@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { getTranslations } from "next-intl/server";
 import { Clock, Footprints } from "lucide-react";
 import { coverImage, stripVerify } from "@/lib/content";

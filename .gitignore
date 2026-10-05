@@ -57,3 +57,6 @@ my_data/
 
 # Offline content cache (Turath downloads, per-place corpus)
 .cache/
+
+.tmp-wf/
+.tmp-skeptic/

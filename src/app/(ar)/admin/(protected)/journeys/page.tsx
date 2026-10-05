@@ -13,7 +13,7 @@ export default async function AdminJourneysPage({
   const supabase = await createClient();
   const { data: list } = await supabase.from("journeys").select("slug, title_ar, is_published").order("sort_order");
   const selected = (await searchParams).j ?? list?.[0]?.slug;
-  const journey = selected ? await getJourney(selected, supabase) : null;
+  const journey = selected ? await getJourney(selected, { client: supabase }) : null;
 
   const review: ReviewJourney | null = journey && {
     slug: journey.slug,

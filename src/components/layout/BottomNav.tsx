@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
+import { useBarePath } from "@/lib/use-lang";
 import { Home, MapPin, Map, Route } from "lucide-react";
 
 const ITEMS = [
@@ -20,7 +20,7 @@ const ITEMS = [
  */
 export function BottomNav() {
   const t = useTranslations("nav");
-  const pathname = usePathname();
+  const pathname = useBarePath();
 
   const onStory = pathname === "/";
 

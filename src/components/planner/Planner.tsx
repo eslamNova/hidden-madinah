@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { useTranslations } from "next-intl";
 import { BookOpen, Car, Footprints, Hotel, Loader2, LocateFixed, Map as MapIcon, Share2, Sparkles, TriangleAlert, Undo2 } from "lucide-react";
 import { formatDistance, type LatLng } from "@/lib/geo";

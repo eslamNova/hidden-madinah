@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/i18n/Link";
 import { getTranslations } from "next-intl/server";
 import { Route as RouteIcon } from "lucide-react";
 import { coverImage, stripVerify } from "@/lib/content";
