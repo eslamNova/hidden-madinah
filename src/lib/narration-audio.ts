@@ -9,6 +9,10 @@ export const NARRATION_FILES: ReadonlySet<string> = new Set<string>([
   "hijra-1-en",
   "hijra-2-ar",
   "hijra-2-en",
+  "hijra-3-ar",
+  "hijra-3-en",
+  "hijra-4-ar",
+  "hijra-4-en",
 ]);
 
 /** URL of a journey stop's recording, or null when there is none (the player then uses the device's voice). */
