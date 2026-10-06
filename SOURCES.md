@@ -8,7 +8,7 @@ This file is the content and sources documentation the participant guide require
 Snapshot date: **6 October 2026**. Build window: 4–6 October 2026. Baseline tag: `pre-hackathon`. See `CHANGELOG.md`.
 
 > **COORDINATOR TODO: resolve, then delete this block before submission**
-> 1. **Claims C1, C2 and C3 need re-review** (section 15.1). These are three of the four claims approved from the early Gemini extraction test. All three cite the list of Madinah's merits in vol. 1 p. 66, which does not support them as claims about Quba. Return them to pending or reject them in `/admin/claims?place=masjid-quba&status=verified`. C2 and C3 are also in the `claim_ids` of the first (Quba) stop of the published Hijra journey. After changing their status, re-read that stop and confirm that each sentence is still supported by its other cited claims. Then update section 15.1 to say they were corrected.
+> 1. **Claims C1, C2 and C3: rejected on 6 October** (section 15.1 is updated). One check remains: C2 and C3 are in the `claim_ids` of the first (Quba) stop of the published Hijra journey, and RLS now hides them from that stop's source list. Re-read that stop and confirm that each sentence is still supported by its other cited claims.
 > 2. **"Specialist" wording** (section 16). Several visitor-facing strings say a specialist or scholar reviewed the content. Either align them with the current reviewer, or keep the limitation stated in section 16.
 
 ---
@@ -20,7 +20,7 @@ Snapshot date: **6 October 2026**. Build window: 4–6 October 2026. Baseline ta
 - **المراجعة البشرية:** لا تظهر معلومة للزائر ولا للمرشد الذكي إلا بعد اعتمادها يدويًا في لوحة `/admin/claims`. وتفرض قاعدة البيانات ذلك بسياسات أمان الصفوف (RLS).
 - **المرشد الذكي:** يجيب من المعلومات المعتمدة فقط، مع إحالة [C‹رقم›] يتحقق منها الخادم. فإن لم يجد مصدرًا قال: «لا أملك مصدرًا موثقًا لهذا…». ويحيل أسئلة الفتوى الشخصية إلى التوجيه الرسمي (risala.prh.gov.sa).
 - **الترجمة الإنجليزية:** لم تراجعها جهة علمية بعد، ويُصرَّح بذلك في صفحات المواضع والجولات والرحلات والقصص الإنجليزية.
-- **حدود العمل:** المراجِع اليوم هو صاحب المشروع، والمعتمد حتى الآن 30 معلومة من 198. ومراجعة عالم متخصص لكل ما اعتُمد مخطط لها بعد التحدي.
+- **حدود العمل:** المراجِع اليوم هو صاحب المشروع، والمعتمد حتى الآن 27 معلومة من 198 (بعد رفض ثلاث معلومات معتمدة في 6 أكتوبر، القسم 15.1). ومراجعة عالم متخصص لكل ما اعتُمد مخطط لها بعد التحدي.
 
 ---
 
@@ -87,9 +87,9 @@ Implemented in `scripts/content/build_wafa_corpus.py` (Python standard library o
 
 Every claim is imported with `needs_samarrai_check = true`, **even when a match exists**. An automatic match is treated as a lead to check, never as a confirmation.
 
-**What the visitor sees.** Citations under guide answers and journey stops show the Dar al-Kutub al-'Ilmiyya vol/page. When a match exists they add the critical-edition reference, for example "al-Samarrai ed., vol. 3, p. 139" (`GuideChat.tsx`, `StopView.tsx`). 26 of the 30 claims verified so far carry this reference.
+**What the visitor sees.** Citations under guide answers and journey stops show the Dar al-Kutub al-'Ilmiyya vol/page. When a match exists they add the critical-edition reference, for example "al-Samarrai ed., vol. 3, p. 139" (`GuideChat.tsx`, `StopView.tsx`). 23 of the 27 claims verified so far carry this reference.
 
-Limitation: the flag is advisory. Approving a claim does not yet require the reviewer to tick "checked in al-Samarrai", and the database does not record that check. All 30 verified claims still have `needs_samarrai_check = true` (section 16).
+Limitation: the flag is advisory. Approving a claim does not yet require the reviewer to tick "checked in al-Samarrai", and the database does not record that check. All 27 verified claims still have `needs_samarrai_check = true` (section 16).
 
 ---
 
@@ -109,7 +109,7 @@ A **claim** is one sentence the product may say about history or religion. Each 
 
 1. **Corpus.** `build_wafa_corpus.py` writes `.cache/wafa/<place>.json`: numbered paragraphs with headings, printed vol/page and the al-Samarrai match.
 2. **Drafting, outside the visitor path.** Claude, an AI assistant used in the development pipeline, read the numbered paragraphs for each place. It drafted claims into `content/claims/<place>.json`, each pointing at one paragraph number and carrying a verbatim excerpt. The drafts are to be written **from the given paragraphs only, never from the model's memory**. The excerpt check in section 6 enforces part of this mechanically: a claim whose excerpt is not in its cited paragraph cannot be imported. Whether the claim text adds anything beyond its excerpt is left to human review.
-3. **Earlier pass.** `scripts/extract-claims.ts` does the same job with Gemini. It was used in M1. Five Quba claims from that test run remain in the database: four were approved (C1, C2, C3, C22; see section 15.1) and one was rejected (C14). Since M2, drafting is done offline as above, and Gemini runs only on the visitor path (guide and planner).
+3. **Earlier pass.** `scripts/extract-claims.ts` does the same job with Gemini. It was used in M1. Five Quba claims from that test run remain in the database: four were approved (C1, C2, C3, C22) and one was rejected (C14). C1, C2 and C3 were rejected on 6 October (section 15.1), so C22 is the only one still verified. Since M2, drafting is done offline as above, and Gemini runs only on the visitor path (guide and planner).
 
 **Drafting rules** (written out in the extraction prompt in `scripts/extract-claims.ts`; the Claude drafts follow the same schema):
 
@@ -182,11 +182,11 @@ The reviewer can then approve (optionally after editing the text and adding a no
 | Status | Count | How obtained |
 |---|---|---|
 | In the database | **198**: 193 imported from the 194 repo drafts, plus 5 left from the earlier Gemini test (C1, C2, C3, C22, C14) | Database count by status, 6 Oct 2026 (`select status, count(*) from claims group by status;`) |
-| **Verified** (visible to visitors) | **30** | Same count. Anyone can reproduce it: `GET /rest/v1/claims?select=id` with the public anon key returns verified claims only |
+| **Verified** (visible to visitors) | **27** | Same count. Anyone can reproduce it: `GET /rest/v1/claims?select=id` with the public anon key returns verified claims only |
 | Pending | **167** | Same count |
-| Rejected | **1** (C14, from the Gemini test) | Same count |
+| Rejected | **4**: C14 (from the Gemini test), and C1, C2, C3 (rejected on 6 October, section 15.1) | Same count |
 
-The 30 verified claims were approved on 5 October 2026 and cover the places of the published Hijra journey: Masjid Quba 11, Masjid al-Jumu'ah 8, the Prophet's Mosque (topic claims) 6, Masjid Bani Unayf 5. By level: A 18, B 6, C 6. 26 have a reviewed English translation; the other 4 are the early test claims, which have no English. The Hijra journey is published with 4 reviewed stops and 3 reviewed quiz items. The other four journeys are drafted but not yet published; they are reviewed in `/admin/journeys`.
+The 27 verified claims were approved on 5 October 2026 and cover the places of the published Hijra journey: Masjid Quba 8, Masjid al-Jumu'ah 8, the Prophet's Mosque (topic claims) 6, Masjid Bani Unayf 5. By level: A 15, B 6, C 6. 26 have a reviewed English translation; the other one is C22, the remaining early test claim, which has no English. The Hijra journey is published with 4 reviewed stops and 3 reviewed quiz items. The other four journeys are drafted but not yet published; they are reviewed in `/admin/journeys`.
 
 ---
 
@@ -195,7 +195,7 @@ The 30 verified claims were approved on 5 October 2026 and cover the places of t
 - **Database guarantee.** The RLS policy "public read verified claims" (migration 006) lets visitors read a claim only if `status = 'verified'` and its place is published, or it belongs to no place. Migration 008 also limits the visitor's column grant so `reviewer_note` stays internal. Every public read in the app uses the anon key, so a pending claim cannot leak through any page.
 - **Journeys** (`/journeys`). Stop narration, children's versions, human moments, reflections and quiz items were drafted **from the claims only**. `scripts/content/validate_journeys.py` checks that every stop cites only claims available for that stop. Each sentence then went through two independent AI review passes (factual support; scholarly care) before human review in `/admin/journeys`. Each stop lists its sources (vol/page, al-Samarrai reference).
 - **Trip planner** (`/plan`). When a place has verified claims, its stop shows one of them with its vol/page, chosen in code (humane or virtue first, level A first; `getPlannerPlaces` in `src/lib/queries.ts`). The plan itself contains no generated text.
-- **Human stories** (`/stories`, M6). The page lists verified claims of kind `humane`, grouped by theme, each with its vol/page and its place (`src/lib/stories.ts`). English shows only claims with a reviewed translation. Today 6 of the 30 verified claims are `humane`.
+- **Human stories** (`/stories`, M6). The page lists verified claims of kind `humane`, grouped by theme, each with its vol/page and its place (`src/lib/stories.ts`). English shows only claims with a reviewed translation. Today 6 of the 27 verified claims are `humane`.
 - **AI guide.** See section 9.
 
 ---
@@ -330,7 +330,7 @@ Participant guide judging criteria (pp. 37–38): *reliability and scholarly sou
 - **Validation:** `python scripts/content/validate_claims.py masjid-quba` re-checks every draft's excerpt against the corpus. Building the corpus first takes `python scripts/content/build_wafa_corpus.py`. Without the al-Samarrai scans, which are not public, every paragraph stays flagged as unmatched.
 - **Guard tests:** `npm test`.
 
-### 15.1 Known content issue found while writing this document
+### 15.1 Known content issue found while writing this document (resolved 6 October)
 
 Four claims (C1, C2, C3 and C22, all about Masjid Quba) came from the early Gemini extraction test and were approved before the Claude-drafted pipeline existed. Re-reading their source on 6 October 2026 showed that **C1, C2 and C3 cite vol. 1 p. 66**. That page is al-Samhudi's numbered list of Madinah's merits. The items behind C1 and C2 refer to **the Prophet's Mosque**, and the item behind C3 does not name Quba:
 
@@ -338,14 +338,16 @@ Four claims (C1, C2, C3 and C22, all about Masjid Quba) came from the early Gemi
 - **C2** concerns the Prophet ﷺ founding "its noble mosque", that is, Madinah's mosque.
 - **C3** treats the identification of the "mosque founded on piety" as settled for Quba. The passage does not say that, and the identification is a known dispute, so it would be level C at most.
 
-The corpus builder's 60-character minimum dropped the short line that introduces item 22, which helped cause the misreading. C2 and C3 are also among the sources listed for the first (Quba) stop of the published Hijra journey. That stop's narration presents the "founded on piety" identification as disputed. **TODO (coordinator):** after the claims are returned to review or rejected, replace this paragraph with a one-line note that they were corrected.
+The corpus builder's 60-character minimum dropped the short line that introduces item 22, which helped cause the misreading.
+
+**Corrected:** on 6 October 2026 (08:20 Riyadh) the owner rejected C1, C2 and C3, with a reviewer note giving this reason. They are no longer shown to visitors or given to the guide. C2 and C3 were among the sources of the first (Quba) stop of the published Hijra journey; that stop no longer lists them, and 26 of the journey's 28 cited claims remain verified. The stop's narration presents the "founded on piety" identification as disputed. The two guide-evaluation cases that had cited C1 (F04, Q01) were re-run and now pass ([docs/EVAL.md](docs/EVAL.md)).
 
 ---
 
 ## 16. Known limitations
 
 - **Reviewer.** Today the owner approves every claim. No independent scholar has reviewed the content yet. Several visitor-facing texts say otherwise: the guide disclosure and the guide's instructions ("reviewed by a specialist"), the stories page ("after a specialist has reviewed it"), and the English guide note ("a scholar-reviewed translation"). Read them as "reviewed by the project's content reviewer" until the scholar review happens.
-- **Coverage.** 30 of 198 claims are verified, all on the Hijra journey's places. Places and journeys without verified claims get refusals from the guide by design.
+- **Coverage.** 27 of 198 claims are verified, all on the Hijra journey's places. Places and journeys without verified claims get refusals from the guide by design.
 - **Advisory critical-edition flag.** Approval does not require or record the al-Samarrai check. 12 drafted claims cite passages with no automatic match.
 - **Context loss in the corpus.** Paragraphs under 60 characters (mostly headings) are dropped, which can separate a sentence from its subject (section 15.1). Reviewers should open the Turath page whenever an excerpt starts mid-thought.
 - **Edited claims and their English.** If a reviewer edits a claim before approving it, its English stays hidden on English pages (`en_reviewed = false`). The console has no step yet to re-translate and re-approve that English. Saving a reviewer note also counts as an edit.

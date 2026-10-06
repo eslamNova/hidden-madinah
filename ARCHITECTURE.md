@@ -149,10 +149,10 @@ Content levels follow the organisers' scientific package. **A** is settled fact,
 
 | | |
 |---|---|
-| Claims | **198** in total: **30 verified**, 167 pending, 1 rejected |
+| Claims | **198** in total: **27 verified**, 167 pending, 4 rejected (C1–C3 on 6 October; see section 13) |
 | Claims with reviewed English | 26 |
 | Content levels | A 67 · B 66 · C 65 · D 0 |
-| Verified claims by place | 24 on the three Hijra-journey places (Quba, Masjid al-Jumu'ah, Masjid Bani Anif) and 6 topic claims on the Prophet's Mosque; 6 of the 30 are of kind `humane` (the human-stories page) |
+| Verified claims by place | 21 on the three Hijra-journey places (Quba 8, Masjid al-Jumu'ah 8, Masjid Bani Anif 5) and 6 topic claims on the Prophet's Mosque; by level A 15, B 6, C 6; 6 of the 27 are of kind `humane` (the human-stories page) |
 | al-Samarrai cross-reference | An automatic match is recorded on 186 of the 198. A human has not yet confirmed any of them: `needs_samarrai_check` is still true on all 198. |
 | Published places | 10, plus the Prophet's Mosque as the topic `nabawi` |
 | Journeys | 5 seeded, **1 published** (Hijra: 4 verified stops, 3 verified quiz items) |
@@ -191,7 +191,7 @@ flowchart LR
 
 **Journeys** go through a similar flow:
 
-1. Drafts (`content/journeys/*.json`) are written from the claims each stop may cite. The published Hijra journey cites only verified claims (28 of 28). The four unpublished drafts cite claims that are mostly still pending (khandaq 25 of 25, uhud 21 of 21, ancient-mosques 19 of 24, quba-wells 14 of 19).
+1. Drafts (`content/journeys/*.json`) are written from the claims each stop may cite. The published Hijra journey cited only verified claims (28 of 28) when it was published; 26 remain verified after C2 and C3, cited by its Quba stop, were rejected on 6 October, and RLS hides those two. The four unpublished drafts cite claims that are mostly still pending (khandaq 25 of 25, uhud 21 of 21, ancient-mosques 19 of 24, quba-wells 14 of 19).
 2. `scripts/content/validate_journeys.py` runs structural checks on them, including that each stop cites only the claims allowed for it.
 3. `scripts/import-journeys.ts` imports them as `pending`. Re-importing resets the affected stops to pending.
 4. Each stop and quiz item is reviewed in `/admin/journeys`, next to the claims the stop cites. The reviewer can approve a stop together with its still-pending claims in one step (`withClaims` in `src/app/(ar)/admin/(protected)/journeys/actions.ts`). In every case RLS keeps any claim that is not verified off the public pages.
@@ -474,9 +474,9 @@ Monthly cost for hosting and services is about **$0** (README); the domain regis
 
 ## 13. Known limitations
 
-- **Content review is early.** Only 30 of 198 claims are verified, and only 1 of 5 journeys is published; the other four journey drafts cite mostly pending claims. The reviewer today is the project owner; a scholar's re-check is planned after the challenge. Until then, the guide's disclosure and prompt wording "reviewed by a specialist" means the project's own reviewer. None of the automatic al-Samarrai cross-references has been confirmed by hand yet.
+- **Content review is early.** Only 27 of 198 claims are verified, and only 1 of 5 journeys is published; the other four journey drafts cite mostly pending claims. The reviewer today is the project owner; a scholar's re-check is planned after the challenge. Until then, the guide's disclosure and prompt wording "reviewed by a specialist" means the project's own reviewer. None of the automatic al-Samarrai cross-references has been confirmed by hand yet.
 - **Place-page texts from before the challenge** (story, virtue, featured quote) are not tied to claims or to a printed page; they rely on the owner's earlier review and the `[VERIFY]` marker system.
-- **A known content error is still live.** Claims C1, C2 and C3 (from the early Gemini test, about Masjid Quba) cite vol. 1 p. 66, a passage that refers to the Prophet's Mosque. They were still `verified` on 6 October and are flagged for re-review (`SOURCES.md`, section 15.1).
+- **A content error reached visitors before review caught it.** Claims C1, C2 and C3 (from the early Gemini test, about Masjid Quba) cite vol. 1 p. 66, a passage that refers to the Prophet's Mosque; C1 also said a Hajj where the hadith says an Umrah. They were approved early and rejected on 6 October, so they are no longer shown to visitors or given to the guide (`SOURCES.md`, section 15.1). Two guide-evaluation cases had cited C1; after the rejection both were re-run and pass, which brings the evaluation to 33/34 (`docs/EVAL.md`).
 - **The English translation** has not had a scholar's review, and the English pages say so. On English pages the guide translates verified claims that have no reviewed English itself.
 - **What the guard checks.** It checks that citations exist and were supplied by the server. It does not check that each sentence is actually supported by the claim it cites. The handling of level C (disputed matters) is enforced by the prompt, not by code. The anonymous `guide_logs` allow answers to be audited after the fact.
 - **Streaming order.** Streamed text appears before the guard runs, and the final event replaces it when the guard rejects it. If the connection drops before that final event, the chat keeps the partial, unguarded text.
