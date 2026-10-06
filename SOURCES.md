@@ -7,9 +7,6 @@ This file is the content and sources documentation the participant guide require
 
 Snapshot date: **6 October 2026**. Build window: 4–6 October 2026. Baseline tag: `pre-hackathon`. See `CHANGELOG.md`.
 
-> **COORDINATOR TODO: resolve, then delete this block before submission**
-> 1. **Claims C1, C2 and C3: rejected on 6 October** (section 15.1 is updated). One check remains: C2 and C3 are in the `claim_ids` of the first (Quba) stop of the published Hijra journey, and RLS now hides them from that stop's source list. Re-read that stop and confirm that each sentence is still supported by its other cited claims.
-> 2. **"Specialist" wording** (section 16). Several visitor-facing strings say a specialist or scholar reviewed the content. Either align them with the current reviewer, or keep the limitation stated in section 16.
 
 ---
 
@@ -270,7 +267,7 @@ The levels follow the organizers' scientific package (p. 2) and are stored as th
   - the package's glossary terms are kept, such as Tawhid, Hadith and Sunnah (p. 7); Seerah is kept as a term too
 - **Hash stamping.** Each English place or route text in `content/i18n/en.json` stores a hash of the Arabic it was translated from (`sourceHash` in `src/lib/i18n-content.ts`). `scripts/i18n/assemble-en.mts` writes the hashes. If the Arabic is edited later, the hash no longer matches and **the stale English is hidden** instead of shown. Place names fall back to the stored English name, then to the Arabic.
 - **Claims** appear on English pages only when their translation was reviewed (`claimText`: `en_reviewed && text_en`). Otherwise the English page hides them.
-- **Guide in English.** On English pages the guide translates the verified Arabic facts that have no reviewed English. The page says so: "In English, the guide translates the reviewed Arabic facts itself; only some of them have a scholar-reviewed translation."
+- **Guide in English.** On English pages the guide translates the verified Arabic facts that have no reviewed English. The page says so: "In English, the guide translates the reviewed Arabic facts itself; only some of them have a reviewed translation."
 - **Journeys.** The English is drafted with the Arabic and reviewed with the stop. The children's version is Arabic only.
 - **Disclosure.** English place, tour, journey, stop and story pages state: "Translated from the reviewed Arabic text. The English translation has not yet had a scholar's review."
 
@@ -344,9 +341,11 @@ The corpus builder's 60-character minimum dropped the short line that introduces
 
 ---
 
+**Hijra journey, Quba stop — re-checked after the rejection.** C2 and C3 were among the stop's cited claims. Every sentence of the stop was re-read against its remaining verified claims (C184, C185, C186, C189, C192, C200, C203). One sentence relied on C2 alone ("he worked on it himself with the Muhajirun and the Ansar"); it was narrowed to what C200 supports ("…with his Companions") in Arabic and English, in the database and in `content/journeys/hijra.json`.
+
 ## 16. Known limitations
 
-- **Reviewer.** Today the owner approves every claim. No independent scholar has reviewed the content yet. Several visitor-facing texts say otherwise: the guide disclosure and the guide's instructions ("reviewed by a specialist"), the stories page ("after a specialist has reviewed it"), and the English guide note ("a scholar-reviewed translation"). Read them as "reviewed by the project's content reviewer" until the scholar review happens.
+- **Reviewer.** Today the owner approves every claim; no independent scholar has reviewed the content yet. Visitor-facing texts say exactly that: the guide disclosure and the stories page say material is shown "only after review" («بعد المراجعة»), and the guide's instructions say the facts were "approved after human review" (changed on 6 October; they previously said "reviewed by a specialist"). A scholar's review of everything approved is planned after the challenge.
 - **Coverage.** 27 of 198 claims are verified, all on the Hijra journey's places. Places and journeys without verified claims get refusals from the guide by design.
 - **Advisory critical-edition flag.** Approval does not require or record the al-Samarrai check. 12 drafted claims cite passages with no automatic match.
 - **Context loss in the corpus.** Paragraphs under 60 characters (mostly headings) are dropped, which can separate a sentence from its subject (section 15.1). Reviewers should open the Turath page whenever an excerpt starts mid-thought.
