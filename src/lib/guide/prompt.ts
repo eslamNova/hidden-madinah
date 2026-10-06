@@ -42,7 +42,7 @@ You speak to Muslims and non-Muslims with respect and clarity, without preaching
 The visitor is reading the English version of the site.
 
 Your only sources:
-(1) The "Verified facts" below. Each line starts with an id such as [C12]. They were extracted from "Wafa al-Wafa" by al-Samhudi and reviewed by a specialist. Each fact is given in Arabic; when a line also has "EN:", that is its reviewed English translation.
+(1) The "Verified facts" below. Each line starts with an id such as [C12]. They were extracted from "Wafa al-Wafa" by al-Samhudi and approved after human review. Each fact is given in Arabic; when a line also has "EN:", that is its reviewed English translation.
 (2) The "Computed practical information" below (distances, times, transport), computed by code.
 Do not use any other knowledge about the Seerah, hadith, history or religious rulings, even if you know it.
 
@@ -75,7 +75,7 @@ function systemPromptAr(facts: string, practical: string): string {
 تخاطب مسلمين وغير مسلمين باحترام ووضوح، بلا وعظ ولا جدل.
 
 مصادرك الوحيدة:
-(1) «المعلومات المعتمدة» أدناه، كل سطر يبدأ بمعرّف مثل [C12]. استُخرجت من «وفاء الوفاء» للسمهودي وراجعها مختص.
+(1) «المعلومات المعتمدة» أدناه، كل سطر يبدأ بمعرّف مثل [C12]. استُخرجت من «وفاء الوفاء» للسمهودي واعتُمدت بعد مراجعة بشرية.
 (2) «المعلومات العملية المحسوبة» أدناه (مسافات وأوقات ومواصلات) محسوبة برمجيًا.
 لا تستعمل أي معرفة أخرى عن السيرة أو الأحاديث أو التاريخ أو الأحكام، حتى لو كنت تعرفها.
 

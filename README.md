@@ -1,303 +1,303 @@
 # مزارات المدينة — Mazarat Madinah
 
-**A field guide to the Madinah that visitors never find.**
-
-Millions come to Madinah every year. Almost all of them see the same three places. This app is for the rest of the city — the wells, gardens, early mosques and battle positions that are historically real, physically reachable, and effectively invisible to the people standing a few kilometres away from them.
-
-**Live:** <https://mazarat-madinah.com> · **Channel:** [Telegram](https://t.me/+j_RAlim-5ZE2MTJk)
-
----
-
-# Part 1 — The idea
-
-## The problem
-
-A visitor with a free afternoon in Madinah has no usable way to find anything beyond المسجد النبوي، قباء، أحد.
-
-- **The information is scattered.** It lives in seerah literature, local knowledge, and forum posts — not in one place, and rarely in a form you can act on while standing on a street.
-- **Authenticity is unclear.** Sites of genuine historical significance sit alongside folklore with no way for a visitor to tell them apart. Getting this wrong in a religious context is not a small error.
-- **The practical half is missing entirely.** Even when a visitor learns a site exists, nothing tells them how far it is, how to get there, what a taxi should cost, when to go, or whether it is open.
-- **Operators have no incentive to fix it.** Tour packages sell the same fixed circuit, because that circuit is what people already know to ask for.
-
-The result: a visitor who wanted to see more leaves having seen what everyone else saw.
-
-## What it is
-
-An Arabic-first, installable web app. Every place carries three things:
-
-1. **The story** (القصة) — what happened here, and why it matters.
-2. **The virtue** (الفضل) — with the hadith sourced, or marked as unverified and withheld.
-3. **The logistics** — distance from the Prophet's Mosque, drive time, taxi cost range, best time of day, opening status, and how to actually get there.
-
-Plus the owner's own photography and video of each site, a map, curated multi-stop routes, and a full-screen photo tour for browsing before you go.
-
-## Why it works
-
-**It is built for the trip, not for the desk.** Offline-capable PWA, map bounds-locked to Madinah, nearest-places from your location. It is meant to be open in your hand at the site, on a phone, possibly with weak signal.
-
-**It is built for who actually goes.** The audience skews older than a typical app's. So: 18px base type with a persistent size stepper, zoom never disabled, ≥48px touch targets everywhere, labeled navigation, and a two-tone focus ring that survives dark photography. These are not afterthoughts — they are structural constraints the whole design answers to.
-
-**Provenance is enforced in the tooling.** Any unverified claim gets a `[VERIFY]` marker; marked text is stripped from every public payload automatically and surfaces in the admin as a review badge. Nothing uncertain reaches a visitor by accident.
-
-**The media is original.** Every photo and video is the owner's own, shot on site. Not stock, not scraped.
-
-## Where it stands today
-
-Verified against the production database, 15 September 2026:
+> **بالعربية:** منصة تحوّل مواضع السيرة النبوية غير المعروفة في المدينة المنورة إلى رحلات معرفية يعيشها الزائر في المكان نفسه. كل معلومة تاريخية في رحلاتها وفي إجابات مرشدها الذكي تُحال إلى صفحة من «وفاء الوفا» للسمهودي، والمرشد يعتذر حين لا يجد مصدرًا موثقًا.
+>
+> **In English:** A bilingual web app you can install on your phone. It turns the little-known places of the Prophet's ﷺ life in Madinah into guided knowledge journeys. Every historical statement in the journeys and in the AI guide's answers points to a page of al-Samhudi's *Wafa al-Wafa*, and the guide declines to answer when it has no verified source.
 
 | | |
 |---|---|
-| Published places | **10** |
-| In the pipeline (drafted, awaiting content/photos) | 8 |
-| Original media assets | **84** — 65 photos, 19 videos |
-| Categories covered | Mosques (6), historical sites (2), gardens (1), wells (1) |
-| Curated routes | 1 (جولة قباء) |
-| Monthly infrastructure cost | **≈ $0** — Vercel Hobby, Supabase free tier, Cloudflare R2 (zero egress) |
-
-**Signals so far:**
-
-- Live on a custom domain, installable, fully offline-capable.
-- **Unsolicited inbound interest from companies wanting to advertise** — before any outreach, any media kit, or any ad product existing.
-- Analytics instrumented 8 September 2026 (GA4 + Vercel Analytics, consent-gated). Measurement is young by design — the history starts here.
-
-> **To fill before sending:** current monthly visitors and top pages (GA → Reports → Engagement → Pages and screens), and a sourced figure for annual Umrah/ziyarah visitors to Madinah. Both are deliberately left blank rather than estimated.
-
-## Business model
-
-**Direct sponsorships from vetted, relevant businesses.** Umrah operators, hotels near the Haram, ziyarah transport, Islamic publishers. Flat monthly placement in list and index views, clearly labeled.
-
-**Explicitly not programmatic advertising.** An ad exchange serving interest-based loans, gambling or immodest creative next to content about Madinah's sacred sites is an unrecoverable trust failure, and trust is the entire asset. Direct deals mean every creative is approved. They also pay materially better at this scale than display RPM would.
-
-Constraints held deliberately: no interstitials, nothing that interrupts a tour, no third-party tracking pixels, sponsor media served from the same zero-egress CDN as everything else.
-
-**Adjacent, later:** operator partnerships (routes as bookable itineraries), audio narration, per-site QR signage.
-
-## What comes next
-
-**Content is the bottleneck, and it is the whole product.** Internal research sets 30–50 published places as the threshold where the app stops being a curiosity and starts being the reference. That is the primary use of any investment: field trips, photography, and historical verification.
-
-Then, in order: English localization (the i18n layer is already in place), audio narration per place, a route builder in the admin, and favorites/trip planning.
-
-## Honest risks
-
-- **Content velocity depends on one person.** Every place requires a site visit, original photography, and historical verification. This does not parallelize easily and is the real constraint on growth.
-- **Seasonality.** Traffic will concentrate around Ramadan and Hajj. Annualized figures will mislead in both directions.
-- **Infrastructure is on free tiers.** Supabase pauses after ~1 week idle — fine today, must be paid before any promotion.
-- **Analytics history is one week old.** Anyone evaluating traction should know the measurement, not just the product, is new.
+| **Live (Arabic)** | <https://www.mazarat-madinah.com> |
+| **Live (English)** | <https://www.mazarat-madinah.com/en> |
+| **Challenge** | AI Challenge Serving Islamic Content (Bathel Foundation), **Track 3: Interactive experiences and knowledge journeys** |
+| **Built during the challenge** | 4–6 October 2026. See [CHANGELOG.md](CHANGELOG.md); the starting point is the tag [`pre-hackathon`](https://github.com/eslamNova/hidden-madinah/compare/pre-hackathon...master) (commit `94b5b49`) |
+| **Authenticity** | [SOURCES.md](SOURCES.md): sources, editions, the claim pipeline and the review rules |
+| **Architecture** | [ARCHITECTURE.md](ARCHITECTURE.md) |
 
 ---
 
-# Part 2 — Technical documentation
+## 60-second tour · جولة في 60 ثانية
 
-**Stack:** Next.js 15 (App Router, SSG/ISR) + TypeScript · Supabase (Postgres, Auth, Storage) · Cloudflare R2 for media delivery · MapLibre GL v5 with OpenFreeMap tiles · Serwist PWA (offline) · Tailwind CSS v4 · next-intl · motion/react · GA4 (consent-gated) + Vercel Analytics.
+Every link works on the live site. Add `/en` at the start of any path to see the English version of that page.
 
-## What the app has
+1. **A knowledge journey (about 20 s).** Open [/journeys/hijra](https://www.mazarat-madinah.com/journeys/hijra) ([English](https://www.mazarat-madinah.com/en/journeys/hijra)).
+   - Answer the three-question pre-quiz.
+   - Walk the four stops: Quba → Masjid al-Jumu'ah → Masjid Bani Anif → the Prophet's Mosque. Each stop can be read aloud by your device's voice, with play, pause and speed controls.
+   - Answer the same questions again. The completion card shows your before and after scores. Sending the result is optional and anonymous.
+2. **The AI guide, including a refusal (about 20 s).** Open [Masjid Quba](https://www.mazarat-madinah.com/places/masjid-quba) and press «اسأل المرشد» (*Ask the Guide*).
+   - Ask «ما قصة هذا المكان؟» (*What is the story of this place?*). The answer cites claim ids, and its sources are listed under it with the book, volume and page.
+   - Ask something the sources do not cover, such as *"Who designed the current building?"*. The guide should reply «لا أملك مصدرًا موثقًا لهذا…» (*I don't have a verified source for this…*). The place page mentions the architect, but that page text is not an approved claim, so the guide may not use it.
+   - Ask for a personal religious ruling, such as *"Can I pray here on behalf of my late father?"*. The guide is instructed not to give a ruling, and the server adds the referral to the official guidance at [risala.prh.gov.sa](https://risala.prh.gov.sa).
+3. **The trip planner (about 15 s).** Open [/plan](https://www.mazarat-madinah.com/plan) and type the example from our proposal: «معي ثلاث ساعات بعد العصر، ومعي والدتي وتصعب عليها المشي الطويل، ويهمنا مواضع السيرة القريبة من قباء» (*I have three hours after Asr, my mother can't walk far, and we're interested in Seerah sites near Quba*).
+   - You get a door-to-door route with stops, times and a taxi fare range, and a Google Maps link. When a stop has stairs, the plan warns about it and suggests a step-free alternative if one fits.
+   - The planner keeps working if the AI is down.
+4. **English and QR (about 5 s).** Switch the language next to the «أ» text-size control. Then open [/places/masjid-quba?via=qr](https://www.mazarat-madinah.com/places/masjid-quba?via=qr), the address a site QR code opens (the QR sheet is printed from `/admin/qr`). Next, open [/my-journey](https://www.mazarat-madinah.com/my-journey). The visit is recorded on your device only.
 
-### Public experience
-
-- **Story landing (`/`)** — a full-screen cinematic snap-scroll "cover": daily-rotating hero photo of المسجد النبوي (static asset pool in `public/hero`, regenerated by `scripts/build-hero.ts`), featured-place panels, category tiles, routes, and a farewell panel. Progress dots, floating next-button, scroll hint.
-- **Photo tour (`/tour`)** — an auto-playing, full-bleed, reels-style slideshow through *every* published place's media (photos 6s, video posters 9s), with a per-slide progress bar, pause/play, full place summary under each frame, and an open-place link. The clock waits for each frame to actually load (spinner on slow links, next frame pre-fetched). Videos never autoplay; if tapped, the show waits for the clip to end. Entered via the sheen "جولة مصوّرة" CTA on the landing's opening and closing panels.
-- **Per-place tour (`/places/[slug]/tour`)** — the same viewer scoped to one place, opened from the sheen "شاهد الصور والفيديو" button in every place hero; big labeled "إنهاء" exit returns to the place.
-- **Places (`/places`)** — photo-led page header, Arabic-normalized search, category/distance/best-time filter chips, photographic card grid (title + distance/time chips over a dark scrim), and on-request geolocation "nearest places".
-- **Place pages (`/places/[slug]`)** — 62dvh photo hero with the media-tour button, quote callout (آية/حديث in thmanyah Serif Display), visit-info card, swipeable gallery (labeled next/prev + dots, pinch-zoom, video players), story, virtue, tips, lazy map with pin, the «سيرة» companion-app card, related places.
-- **Map (`/map`)** — full-screen MapLibre map bounds-locked to Madinah, category-colored 48px pins with name captions, legend, bottom-sheet place preview. Pins are SSG-rendered (no client fetch).
-- **Routes (`/routes`, `/routes/[slug]`)** — curated multi-stop walking/driving tours with cover photos, connecting map line, and total distance. Legacy UUID URLs redirect to slugs.
-- **Privacy notice (`/privacy`)** — what is collected, what never is, and a one-tap control to grant or withdraw analytics consent.
-- **Companion app** — every place page and the landing's farewell panel recommend «سيرة — السيرة النبوية» (free third-party Seerah audio journey); links live in `src/lib/constants.ts` (`SEERAH_APP`).
-- **Telegram channel** — a 48px icon in the free top corner of every hero (physical top-LEFT in RTL, mirroring the أ control), a slim row on the landing's closing panel, and a full card at the foot of `/places`. Not on `/map` (its physical left holds the legend and zoom controls) and not on tours, which are deliberately chrome-less.
-- **Share previews** — `public/og-image.jpg` (1200×630, 56 kB) is the `og:image`/Twitter card for every non-place page; place pages use their own photo. Icons (tab, Apple touch, PWA, maskable) and the share image are all generated by `scripts/generate-icons.ts`.
-
-### Design system
-
-**Light and dark themes.** The floating top control (أ + ☾/☀) holds the أ−/أ+ font stepper and the theme toggle; the choice persists (`hm-theme`), defaults to dark, and is applied pre-paint. Color tokens come in two families (see `globals.css`): THEMED ones flip in dark mode (`sand`, `surface`, `ink`, `muted`, `brand`) while CONSTANT ones never do (`basalt` for scrims/pins/dark glass, `paper` for light text on dark, `primary` for brand buttons). Rule of thumb: `text-ink` on themed surfaces, `text-paper` on photography/dark glass. Maps switch to OpenFreeMap's dark style and re-create in place (camera preserved).
-
-Light, elevated look: soft surface→sand gradient ground (`body::before`), photo-led page headers that melt into the body (`PageHero` + `.hero-melt`), elevated cards (`.card-elevated`), floating dock navigation (no top navbar), floating أ text-size control, iOS-feel motion (`.press` tap feedback, sheet slide-up, image fade-in, sheen CTA) — all `backdrop-blur`-free over scrolling content, all respecting `prefers-reduced-motion`. Cosmetic scrollbars hidden (`.scrollbar-hidden`); the document scrollbar is thin and brand-tinted.
-
-**Typeface — thmanyah (licensed, read before touching `src/fonts/`).** thmanyah Sans for headings and body (400/500/700), thmanyah Serif Display for the wordmark and featured quotes (700, deliberately not preloaded). Self-hosted via `next/font/local` from `src/fonts/`.
-
-The licence (`my_data/Thmanyah-Font-Family.zip` → `LICENSE.pdf`; the Arabic text prevails) forbids hosting the font for download, hotlinking, and *modification*. Self-hosting for on-site rendering was granted in writing by thmanyah (Khalid, 2026-09-08) on the conditions that we publish no direct download link and block hotlinking. Therefore:
-
-- **Never subset, convert or otherwise process these files** — subsetting is modification (تعديل/تكييف) and is not covered by the grant. `next/font/local` ships local files byte-for-byte; keep it that way.
-- The CORS rule in `next.config.ts` narrows `Access-Control-Allow-Origin` on `/_next/static/media/*.woff2` to the production origin. Vercel's default is `*`, which is precisely what allows hotlinking — do not remove that rule. If the production domain ever changes, update it there too.
-- `next/font/local` emits content-hashed filenames, so there is no guessable path and no download link.
-
-### iOS specifics
-
-`viewport-fit=cover` lets the landing and tours extend under the notch/home bar; immersive routes mark `<html data-immersive>` so the page ground behind them is dark (no sand bands in safe areas or overscroll). Videos need a tap (iOS never autoplays; neither do we).
-
-### Accessibility (elderly-first, non-negotiable)
-
-18px base font with a persisted أ−/أ+ stepper (18/20/23px, applied pre-paint), zoom never disabled, ≥48px touch targets everywhere (including map pins and zoom controls), two-tone focus ring that survives dark photography, labeled nav, aria-live announcements, reduced-motion coverage including programmatic scrolls.
-
-### Analytics and consent
-
-Two trackers on purpose, failing in opposite directions:
-
-- **Vercel Analytics** — cookieless, served first-party, so blockers cannot shave it. This is the count to quote.
-- **GA4** (`NEXT_PUBLIC_GA_ID`, production only) — undercounts, but carries geography, referrer and retention detail that partners recognise.
-
-GA4 writes a first-party cookie, which Saudi PDPL treats as personal data, so the tag is not merely gated but **unmounted** until consent: nothing is requested and no cookie is written before the visitor answers. `SiteAnalytics` owns the decision; `src/lib/consent.ts` persists it (`hm-consent`) and broadcasts changes so the notice, the tag and the `/privacy` control stay in sync. The notice floats above the dock rather than covering it, and is withheld on `/tour` and `/admin`.
-
-gtag is hand-rolled rather than `@next/third-parties` so the mount can be conditional, and uses `usePathname` only — `useSearchParams` at that level would opt every page out of static rendering. Analytics hosts are `NetworkOnly` in the service worker: `defaultCache`'s cross-origin rule would otherwise cache beacons, and a replayed beacon is a visit that never happened.
-
-### Admin CMS (`/admin`)
-
-Auth-gated (Supabase Auth + `admin_users` allowlist + RLS). Place editor covering every content field, transport-options editor, draggable map pin with auto-distance, client-side media upload (EXIF pin pre-fill, canvas resize, EXIF stripped), media reorder/captioning, publish toggle, and "يحتاج مراجعة" badges driven by `[VERIFY: …]` markers.
-
-### Content model
-
-Postgres: `places` (bilingual names, category enum, story/virtue/quote/logistics fields, `related_place_slugs`, pin + distance, publish/featured flags), `media` (photo/video, storage/bunny/youtube providers, variants keyed on URL), `routes` + `route_places`, `admin_users`. RLS: anon reads published content only; `PublicPlaceView` DTO strips `[VERIFY]` markers and `admin_notes_ar` from every public payload (routes descriptions and media captions included).
+> The guide runs on the free tier of Gemini. When it is busy, an answer can take up to a minute; the progress line shows each step. Only places whose claims a reviewer has approved can be answered from sources. Today those are the four places of the Hijra journey (see [Status](#status-on-6-october-2026--الحالة)). Elsewhere, the guide declines to answer history questions, which is the intended behaviour.
 
 ---
 
-## Getting started
+## بالعربية باختصار
+
+**المشكلة:** يزور المدينة المنورة ملايين الزوار، وكثير منهم يغادر بعد ثلاثة مواضع فقط. السبب أن المعرفة بالمواضع الأخرى محبوسة في كتب لا يقرؤها الزائر، ومختلطة بروايات لا سند لها، ومنفصلة عن أي معلومة عملية.
+
+**ما بُني خلال التحدي (4–6 أكتوبر 2026):**
+- **قاعدة معرفة موثّقة.** 198 دعوى تاريخية لأحد عشر موضعًا، صيغت (بمساعدة الذكاء الاصطناعي) من «وفاء الوفا بأخبار دار المصطفى» للسمهودي. لكل دعوى نصّ حرفي يُتحقَّق آليًا من وجوده في الفقرة المحال إليها، وتُقابَل الفقرات آليًا بتحقيق السامرائي (طوبق منها 753 من 813، وما لم يطابَق يُعلَّم للمراجع). لا تُنشر دعوى إلا بعد اعتماد بشري.
+- **مرشد ذكي يمتنع حين لا يجد مصدرًا.** يجيب من الدعاوى المعتمدة فقط ويذكر رقمها [C‹رقم›]، ويتحقق الخادم من كل إحالة. وإن لم يجد مصدرًا قال: «لا أملك مصدرًا موثقًا لهذا». أما الفتوى الشخصية فيحيلها إلى التوجيه الرسمي ولا يُفتي.
+- **خمس رحلات معرفية مكتوبة:** الهجرة، وقباء والآبار، وأحد، والخندق، والمساجد الأثرية. في كل رحلة اختبار قبلي وبعدي لقياس الفهم، وسرد صوتي بصوت الجهاز. ولكل موضع تسجيل حضور برمز QR.
+- **مخطِّط «عندي ساعتين، وش أزور؟».** الذكاء الاصطناعي يفهم الطلب فقط، أما المسار فيبنيه برنامج حتمي له اختبارات آلية.
+- **نسخة إنجليزية كاملة** تحت ‎/en‎، تُرجمت مع مراعاة ضوابط الحزمة العلمية للتحدي.
+
+**بصراحة:** حتى 6 أكتوبر 2026 اعتُمدت 30 دعوى فقط من 198، ونُشرت رحلة الهجرة وحدها، والبقية بانتظار المراجعة. والمراجِع اليوم هو صاحب المشروع، ومراجعة عالم متخصص مخطط لها بعد التحدي. وثلاث من الدعاوى المعتمدة (من تجربة استخراج مبكرة) تبيّن في 6 أكتوبر أنها تحيل إلى نص يخص المسجد النبوي لا قباء، وهي معلَّمة لإعادة المراجعة (التفاصيل في [SOURCES.md](SOURCES.md)). الترجمة الإنجليزية لم يراجعها مختص شرعي بعد. المرشد يعمل على الطبقة المجانية من Gemini فقد يبطئ أحيانًا. وعيّنة المستخدمين ما زالت صغيرة جدًا. التفاصيل في قسم [الحدود](#limitations--حدود-الحل).
+
+---
+
+## Why this exists · لماذا
+
+Millions of people visit Madinah every year, and many of them leave having seen only the same three places: the Prophet's Mosque, Quba and Uhud. The city is full of other places where the Seerah actually happened: early mosques, wells, gardens and battle positions, some of them 500 m from Quba. Visitors miss them for three reasons:
+
+- **Knowledge is locked away.** It sits in classical books that visitors don't read, mixed with oral stories that have no chain of transmission.
+- **Authenticity is unclear.** Visitors can't tell sourced history from folklore, and in a religious setting that mistake matters.
+- **Practical help is missing.** Nothing tells a visitor standing in the street how far a site is, whether to walk, what a taxi costs, or whether the site is open.
+
+Mazarat Madinah answers all three. It offers journeys that tell one connected story across real places. Every historical statement in a journey or a guide answer comes from a cited claim that a reviewer has approved. Practical facts are computed for the visitor's situation. The audience includes **Muslims and non-Muslims**: the human side of the Prophet ﷺ (mercy, forgiveness, humility) comes across through what happened in real places, without preaching. All photos and videos are the owner's own, shot on site.
+
+The design starts from **who actually visits**, and many visitors are older. The base text is 18px with a text-size stepper, zoom is never disabled, every touch target is at least 48px, journeys can be listened to, and pages already opened stay available offline (the guide and the planner's AI need a connection). Arabic is the first language (right-to-left from the first byte) and English is a full twin.
+
+---
+
+## What was built during the challenge · ما بُني خلال التحدي
+
+The project existed before the challenge as a place guide: place pages, a map, curated routes, a photo tour, an admin CMS, a media pipeline, an offline-capable PWA and hidden `[VERIFY]` markers. **Everything that uses AI, plus the knowledge base, journeys, planner and English, was built inside the challenge window.** You can diff it: `git diff pre-hackathon..master` covers 176 files and about 14.6k added lines.
+
+| Milestone | What it delivers | Evidence |
+|---|---|---|
+| **M0** Scaffolding | Gemini client with JSON-schema and streaming helpers, model names read from the environment. The service worker never caches AI responses. | `src/lib/ai/gemini.ts`, `src/app/sw.ts`, `scripts/gemini-models.ts` |
+| **M1** Verified knowledge base | Tables for sources, claims (page, verbatim quote, al-Samarrai cross-reference, level A–D, themes, review status), journeys, quizzes and anonymous logs. Row-level security means visitors read **verified** claims only. Review console. | `supabase/migrations/006_knowledge.sql`, `scripts/content/build_wafa_corpus.py`, `scripts/content/validate_claims.py`, `scripts/import-claims.ts`, `/admin/claims` |
+| **M2** AI guide with refusal | Answers only from verified claims. The server validates every citation, and an uncited factual answer is replaced by the refusal. Fatwa, family, legal and medical questions get a referral. Distances, times, opening status and stairs are computed in code. Progress is streamed live and the guide falls back to another model when one is busy. | `src/app/api/guide/route.ts`, `src/lib/guide/*`, `src/components/guide/GuideChat.tsx` |
+| **M3** Journeys, QR, My journey | Five journeys written (one published so far), each with a pre-quiz, stops, a post-quiz and a completion card. Every stop script and quiz item is reviewed before it is published. Each stop also has a simplified Arabic version for children. Narration uses the device's voice. QR check-in, and a "My journey" page stored on the device. An adversarial review confirmed 33 issues, all fixed. | `content/journeys/*`, `src/components/journey/*`, `/admin/journeys`, `/admin/qr`, `supabase/migrations/008_hardening.sql` |
+| **M4** Trip planner | Gemini only turns free text into five answers. A deterministic solver builds the route: door-to-door time, walking limits, stairs warnings, fare ranges. A keyword reader on the device fills the form instantly. Hotel mode prints a reception card with a QR code. | `src/lib/planner/solver.ts`, `src/lib/planner/parse.ts`, `src/app/api/plan/parse`, `/admin/hotel` |
+| **M5** English | Every public page has a twin under `/en`. 471 texts were translated through three passes: translation, a faithfulness check, then an English edit. Each English place and route text is stamped with a hash of its Arabic source, so a stale translation is hidden. The guide answers in English under the same citation rules. | `src/app/(en)/`, `content/i18n/en.json`, `scripts/i18n/*`, `src/lib/i18n-content.ts` |
+| **M6** Stories, tags, testimonials | `/stories`: the verified human moments grouped by theme, each with its source and place. Journey tags with filters. Visitor testimonials with explicit consent, moderated in `/admin/testimonials` before they appear on the home page. "How far am I?" on place pages, computed on the device. | `src/views/stories.tsx`, `src/lib/stories.ts`, `src/components/journey/TestimonialForm.tsx`, `src/components/place/DistanceToHere.tsx` |
+| **M7** Evidence | A deterministic evaluation of the live guide (34 cases: grounded answers, refusals, fabrication traps, fatwa referrals, practical, language) and a report generator for the journeys' before/after quiz results. | `scripts/eval/*`, [docs/EVAL.md](docs/EVAL.md), `docs/USER_TEST.md` (generated from real results) |
+
+Quality checks: **39 unit tests** (`npm test`) cover the planner solver (15), the keyword reader (10) and the guide's answer guard (14), plus `tsc --noEmit` and ESLint with zero warnings. No automated tests cover the API routes, the RLS policies or the UI; those were checked by hand.
+
+---
+
+## How authenticity is protected · كيف نحمي الموثوقية
+
+The rule behind the design is that **the model is never the source of truth**. It rephrases and connects claims that a person has approved. When no claim supports an answer, the answer is a refusal. The full method is in **[SOURCES.md](SOURCES.md)**.
+
+1. **One primary source.** The text is *Wafa al-Wafa bi-Akhbar Dar al-Mustafa* by al-Samhudi (d. 911 AH), in the Dar al-Kutub al-'Ilmiyya edition (1419 AH), taken from Turath (book 23695) with printed volume and page numbers.
+2. **Cross-checked against the critical edition.** Each paragraph is matched against Qasim al-Samarrai's critical edition (Al-Furqan) by normalised 6-gram matching. A confident match records the critical edition's volume and page; in this build 753 of 813 paragraphs matched. A match is shown to the reviewer as a lead to check, not a confirmation, and paragraphs without a match are flagged "verify against al-Samarrai". (`scripts/content/build_wafa_corpus.py`)
+3. **Small, cited claims.** Each claim records its source page, a **verbatim quote**, a content level and themes. The importer **rejects any claim whose quote does not appear word for word in the paragraph it cites**; diacritics and punctuation are ignored in the comparison. Claims enter as *pending*. (`scripts/content/validate_claims.py`, `scripts/import-claims.ts`)
+4. **Human approval before publication.** In `/admin/claims` the reviewer approves, edits or rejects each claim, next to its verbatim quote and a link to the cited page on Turath. Database row-level security lets visitors read only **verified** claims of published places. The guide reads claims with the public key, so the database itself, not application code, keeps unreviewed text away from the model.
+5. **A guarded answer.** The model sees only the verified claims of the current place, the current journey's places or the nearest places, each tagged `[C<id>]`, plus practical facts computed in code. The server strips any citation id it did not provide. An uncited historical answer is replaced by the refusal and a referral. (`src/lib/guide/answer.ts`, with tests)
+
+**Content levels.** These follow the organizers' scientific package.
+
+| Level | Scope | How the app handles it |
+|---|---|---|
+| **A** Established facts | Core Seerah events, authentic texts | Answered directly, with the citation |
+| **B** Explanation and inference | Context, meaning | Answered from the approved claim, showing the reference, without overstating certainty |
+| **C** Disputed or sensitive | Differing reports | Each view is attributed to whoever holds it, and the guide does not settle the matter |
+| **D** Personal rulings | A fatwa for a specific case; family, legal, medical | Never stored as a claim (the validator rejects level D) and never ruled on. General information if it is sourced, then a referral to [risala.prh.gov.sa](https://risala.prh.gov.sa) |
+
+**Translation.** Quran verses on place pages use the Saheeh International translation, labelled "translation of the meaning", with surah and ayah; whether it is on the package's approved list is still to be confirmed. Hadith keep their narrator and source. Arabic hedges («يُروى», «قيل») are kept. A claim's English text is shown only after the reviewer approves it together with the Arabic. On English pages the guide translates approved Arabic claims that have no reviewed English itself, and the page says so. English pages state that the translation still awaits scholarly review.
+
+**Transparency.** An AI disclosure sits above the chat. Every cited answer lists its sources, and every guide exchange is logged anonymously (question, answer, cited claim ids, refused or not, model, latency) for review.
+
+---
+
+## How AI is used, and where it is not · دور الذكاء الاصطناعي
+
+| Feature | What the model does | What code does | Safeguard |
+|---|---|---|---|
+| Guide | Writes a short answer from the claims it is given, in the visitor's language | Picks the claims for this place, computes distances, times, opening status and stairs, validates citations | Refusal when nothing valid is cited; referral for level D; rate limit; model fallback |
+| Planner | Turns a free-text request into constraints (time, companions, mobility, interests, start) | Chooses and orders the stops, adds travel time and fares, handles stairs and step-free alternatives | Keyword reader on the device fills the form instantly; the AI answer is used only if it arrives within 8 seconds |
+| Claim drafting (development time) | Proposes small claims with a quote from a numbered source paragraph | Checks every quote verbatim against its cited paragraph | Pending until a person approves it |
+| Journey texts and translation (development time) | Drafts stop scripts and quiz items from the knowledge-base claims only; translates in three passes (translation, faithfulness check, English edit) | Checks that each stop cites only claims available to it (`validate_journeys.py`); hashes the Arabic source and hides English that is out of date | Human review before publication; scholarly review of the English still pending (stated on English pages) |
+
+**Which models.** On the live site the only model is Google Gemini, called through `@google/genai` for the guide and the planner. Model names come from the environment and fall back along a list of models when the free tier is at capacity (`src/lib/ai/gemini.ts`). At development time, Claude (Anthropic) drafted 194 of the 198 claims, the journey texts and the translations, and helped write the code; it is never called by the site. The other 4 claims came from an early test of `scripts/extract-claims.ts`, which uses Gemini.
+
+---
+
+## Measuring learning · قياس الأثر
+
+Track 3 asks whether a solution, tested with its audience, improves understanding of an Islamic concept or the fit and flow of the learner's journey, while respecting privacy and without inferring visitors' religious traits. Each journey therefore has a **pre-quiz and a post-quiz on the same questions**. At the end, the visitor can send an **anonymous** result: journey, language, pre and post score, stops completed, and a 1–5 rating for clarity and for flow. The only background question is optional and self-declared: how familiar the visitor is with the topic. **The app never asks about religion.** No account, name, email or location is stored (`quiz_results` in `006_knowledge.sql`; only the admin can read it).
+
+*Status:* collection is live, but on 6 October there were fewer than five results, far too few to report anything. This README claims no result.
+
+---
+
+## Status on 6 October 2026 · الحالة
+
+| | |
+|---|---|
+| Published places | 10 (public API) |
+| Claims | 198 in the database (194 drafts in `content/claims/` plus 4 from an early test run), each quote checked word for word. **30 approved and public**: Quba 11, Masjid al-Jumu'ah 8, the Prophet's Mosque 6, Masjid Bani Anif 5. 167 pending, 1 rejected. 3 of the 30 are flagged for re-review (see [Limitations](#limitations--حدود-الحل)) |
+| Journeys | 5 written. **1 published** (Hijra, 4 stops, 3 quiz questions); 4 await review |
+| English | 471 texts translated; scholarly review pending |
+| Tests | 39 passing (`npm test`) |
+| Running cost | About $0 a month on free tiers, apart from the domain (Vercel Hobby, Supabase free, Cloudflare R2 with zero egress, Gemini free tier) |
+
+---
+
+## Architecture · البنية
+
+**Stack:** Next.js 15 (App Router, static pages with ISR) and React 19 · TypeScript · Supabase (Postgres, Auth, row-level security, Storage) · Google Gemini · Vercel · Cloudflare R2 for media · MapLibre GL 5 with OpenFreeMap tiles · Serwist (offline PWA) · next-intl · Tailwind CSS 4. Details are in **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+
+```mermaid
+flowchart LR
+  Q[Visitor question] --> R["/api/guide"]
+  R --> C["Verified claims for this place<br/>(public key + RLS: verified only)"]
+  R --> P["Practical facts computed in code<br/>(distance, time, open now, stairs)"]
+  C --> G["Gemini<br/>(model fallback chain)"]
+  P --> G
+  G --> V{"Citation guard<br/>src/lib/guide/answer.ts"}
+  V -- "cites claims it was given" --> A["Answer + source chips<br/>(volume / page)"]
+  V -- "cites nothing valid" --> X["Refusal + referral"]
+  R -.-> L[("guide_logs<br/>anonymous")]
+```
+
+- **Two root layouts.** `src/app/(ar)` and `src/app/(en)/en` set the right `lang`/`dir` from the first byte. Page bodies are shared through `src/views/`, and every public page stays static.
+- **Reads and writes.** Public pages read only published or verified rows through RLS. Admin writes go through Supabase Auth plus an `admin_users` allowlist, and an admin edit refreshes both languages.
+- **Privacy by default.** Visitors have no accounts. "My journey" and quiz progress live in the browser. GA4 is not loaded at all until the visitor consents, while Vercel Analytics is cookieless. The text of guide questions and planner requests is sent to Google's Gemini API; the privacy page says so and asks visitors not to include personal information.
+
+---
+
+## Run it locally · التشغيل محليًا
+
+**Prerequisites:** Node.js 22+ (Node 20 works for the app, but the scripts then need `NODE_OPTIONS=--experimental-websocket`), a Supabase project, and a Gemini API key for the guide. Python 3 (standard library only) is needed for the content scripts, and ffmpeg only for importing video.
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000
+cp .env.example .env.local      # then fill in the values (names below)
+npm run dev                     # http://localhost:3000  (English: /en)
+npm test                        # 39 unit tests: planner, keyword reader, guide guard
 ```
 
-### `.env.local`
+**Environment variables** (names only; see [.env.example](.env.example) for what each one does):
 
-| Variable | Required | What it is |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Public (anon) API key |
-| `SUPABASE_SERVICE_ROLE_KEY` | scripts only | Dashboard → Project Settings → API keys → `service_role`. Never commit; never add to Vercel. (Watch out: the *anon* key looks identical — decode the JWT's `role` claim if uploads fail with RLS errors.) |
-| `REVALIDATE_SECRET` | optional | Guards `POST /api/revalidate` |
-| `NEXT_PUBLIC_SITE_URL` | dev only | `http://localhost:3000` locally |
-| `NEXT_PUBLIC_GA_ID` | production only | GA4 measurement ID. Deliberately unset locally and in previews, which keeps both the tag and the consent notice off — dev traffic never lands in the numbers shown to partners. |
+| Variable | Used by |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | App and scripts |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | App (public key; RLS applies) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Local scripts only. Never put it in the browser, in Vercel or in git |
+| `REVALIDATE_SECRET` | `POST /api/revalidate` |
+| `NEXT_PUBLIC_SITE_URL` | Canonical and Open Graph URLs (`http://localhost:3000` locally) |
+| `NEXT_PUBLIC_GA_ID` | Production only. Leave it unset locally, which keeps analytics and the consent notice off |
+| `GEMINI_API_KEY` | Guide, planner parsing, `scripts/extract-claims.ts` (server-side only) |
+| `GEMINI_MODEL_FAST` / `GEMINI_MODEL_SMART` | Visitor-facing calls (guide, planner) / offline claim extraction (`scripts/extract-claims.ts`). List the models available to your key with `npx tsx scripts/gemini-models.ts` |
+| `GEMINI_FALLBACK_MODELS` | Optional, comma-separated models tried when the primary one is at capacity. Not in `.env.example`; `src/lib/ai/gemini.ts` has a default list |
 
-**Node 20 note:** supabase-js needs a WebSocket global — run all scripts with `NODE_OPTIONS=--experimental-websocket` (or upgrade to Node 22+).
+**Database:**
+1. Apply `supabase/migrations/001…008` in order (SQL editor or Supabase CLI), then run `supabase/seed.sql`, which is safe to re-run. Then re-run `007_journeys_seed.sql` (also re-runnable), so the journey stops link to the places the seed created.
+2. Create an owner account with `npx tsx scripts/create-owner.ts --email … --password …` (or set `OWNER_EMAIL` / `OWNER_PASSWORD` in `.env.local`).
+3. Imported claims and journeys stay **pending**. They appear on the public pages only after you approve them in `/admin/claims` and `/admin/journeys`.
 
-**Build cache trap:** Next's fetch cache persists in `.next/cache` across builds; with 24h revalidate, a rebuild can silently serve day-old Supabase data. When content changed, always `rm -rf .next && npm run build`.
+**What a fresh database contains.** `seed.sql` is an earlier content pack (the Quba area plus placeholder places), not a copy of production. Five of the ten published places exist only in the production database, and the journey drafts in `content/journeys/*.json` point at production journey-stop and claim ids. A fresh database therefore runs the app, the guide, the planner and the review workflow, but it does not reproduce the live content exactly.
+
+**Without a Gemini key** the site, journeys and planner form still work: the planner falls back to its keyword reader. The guide replies that it cannot be reached.
+
+| npm script | Does |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` / `npm start` | Production build and serve. Run `rm -rf .next` first after content changes, because Next's fetch cache can serve day-old data |
+| `npm test` | Unit tests (`node --test` with `tsx`) |
+| `npm run lint` | ESLint. The stricter check this build passes: `npx eslint src scripts --max-warnings=0` and `npx tsc --noEmit` (there is no CI pipeline) |
+
+**Content pipeline** (offline, run in order):
+
+| Step | Command |
+|---|---|
+| Build the source corpus (Turath text, matched against al-Samarrai) | `python scripts/content/build_wafa_corpus.py`. The al-Samarrai scans are private and not in the repo; without them every paragraph stays flagged as unmatched |
+| Draft claims | Write drafts into `content/claims/<slug>.json` from the corpus paragraphs (how the current 194 drafts were made), or run `npx tsx scripts/extract-claims.ts --place <slug> [--dry-run]`, which drafts with Gemini and inserts the claims as pending directly |
+| Validate quotes word for word | `python scripts/content/validate_claims.py <slug> …` |
+| Import claims as pending | `npx tsx scripts/import-claims.ts [--place <slug>] [--dry-run]` |
+| Validate and import journeys (pending) | `python scripts/content/validate_journeys.py <slug>` then `npx tsx scripts/import-journeys.ts [--journey <slug>]` |
+| English content (hash-stamped) | `npx tsx scripts/i18n/dump-ar-content.mts <out.json>`, translate, then `npx tsx scripts/i18n/assemble-en.mts <ar.json> <translations.json>` |
+| Media (photos and video, then R2) | `npx tsx scripts/import-media.ts --dir "<folder>" --slug <slug>` then `node scripts/sync-media-to-r2.mjs` (needs a logged-in `wrangler`; the bucket and media domain are set in the script) |
 
 ---
 
-## Supabase
+## Repository map · خريطة المستودع
 
-- Project ref `eoicocqjjxskbmctirrb` (region `eu-central-1`, **free tier**).
-- Migrations in `supabase/migrations/` (applied); seed in `supabase/seed.sql` (idempotent).
-- Free tier: no on-the-fly image transforms (hence pre-generated variants), 1 GB storage, 50 MB/file, `media` bucket allows webp/jpeg/mp4 only.
-- **Pauses after ~1 week idle** — restore from the Dashboard if the site suddenly errors; no data is lost.
-
----
-
-## Media pipeline
-
-Uploads land in Supabase Storage; the public site serves everything from **Cloudflare R2** (`media.mazarat-madinah.com`, zero egress). Importing is therefore two steps.
-
-```bash
-# 1. Import a folder of photos and videos for one place
-NODE_OPTIONS=--experimental-websocket npx tsx scripts/import-media.ts --dir "<folder>" --slug <place-slug> [--dry-run]
-
-# 2. Copy new objects to R2 and repoint their DB rows (needs `npx wrangler login`)
-node scripts/sync-media-to-r2.mjs [--dry-run]
+```
+src/
+  app/(ar)/…              Arabic pages (lang=ar, dir=rtl); review console under (ar)/admin
+  app/(en)/en/…           English twins (lang=en, dir=ltr)
+  app/api/guide/          AI guide: claim context, streaming, citation guard, anonymous log
+  app/api/plan/parse/     Planner: free text → constraints (Gemini, with timeout)
+  app/api/revalidate/     On-demand refresh after admin edits
+  views/                  Page bodies shared by both languages
+  components/             guide/, journey/, planner/, place/, map/, tour/, admin/, layout/ …
+  lib/guide/              context.ts (claims + computed facts), prompt.ts, answer.ts (+ tests)
+  lib/planner/            solver.ts (deterministic), parse.ts (keyword reader) (+ tests)
+  lib/ai/gemini.ts        Gemini client, JSON schema, streaming, model fallback
+  lib/i18n*.ts            Language routing, hash-stamped English content
+  lib/content.ts          Public DTOs, [VERIFY] stripping
+  fonts/                  thmanyah typeface (proprietary; see Licences)
+messages/                 Interface strings (ar.json, en.json)
+content/claims/           Drafted claims per place (source paragraph + verbatim quote)
+content/journeys/         Journey scripts and quiz items
+content/i18n/en.json      English place/route texts with source hashes
+scripts/content/          Corpus builder and validators (Python, standard library)
+scripts/i18n/             Translation dump / assemble
+scripts/                  Claim/journey/media import, icons, owner creation
+supabase/migrations/      001–008: schema, RLS, storage, knowledge base, hardening
+public/                   Icons, hero images, share image, RTL text plugin
 ```
 
-- **Photos:** EXIF read first (capture date orders the gallery; GPS suggests the pin, never overwriting owner coordinates) → 400/800/1600 WebP + 1600 JPEG (OG) → Storage → one `media` row (idempotent, keyed on URL). Published files carry **no EXIF/GPS**.
-- **Videos** (needs ffmpeg + ffprobe on PATH): rotation-aware re-encode to 720p H.264 (crf 23, faststart), metadata stripped, ≤800px poster frame, `duration_seconds` recorded; per-file error if the result would exceed 50 MB. A 279 MB 8K phone clip lands at ~11 MB.
-- **The R2 sync is not optional** — a row still pointing at `supabase.co` is served from Supabase and bills egress against the free tier, which is what forced this split in the first place. The script is idempotent and deliberately serial (parallel `wrangler` processes race the shared OAuth refresh and log the CLI out mid-run).
-- Uploads retry with backoff — large files on a slow uplink are the usual "fetch failed" culprit; re-running heals anything (0 duplicate rows).
-- Google Photos albums are a **source only** — links expire; downloads usually have GPS already stripped (set pins in the admin).
+---
 
-**Landing hero pool (المسجد النبوي):** 11 owner-selected photos, 3 sizes each in `public/hero/`, manifest `src/lib/hero-images.ts`. Regenerate with `npx tsx scripts/build-hero.ts --dir "my_data/HERO_MASJAD_NABAWY/Selected_HERO"`. Where they appear (rotating by day-of-year): landing opening panel (`day`), landing farewell (`day+1`), `/places` header (`day+2`), `/routes` header fallback; the share image is a fixed crop of the dusk courtyard shot. Deliberately absent from the tour, map and place list — the Prophet's Mosque frames the app but is not one of its "hidden places".
+## Licences and credits · التراخيص والشكر
+
+- **Code.** No open-source licence has been chosen yet. Until a `LICENSE` file is added, the code is published for review and all rights are reserved by the team.
+- **Photos and videos.** The owner's original work, shot on site. All rights reserved. Published files carry no EXIF or GPS data.
+- **Typeface: thmanyah** (`src/fonts/`, loaded in `src/lib/fonts.ts`). Proprietary. thmanyah gave written permission (8 September 2026) to self-host it **for rendering this site only**, on two conditions: no direct download link and no hotlinking. A CORS rule in `next.config.ts` limits the font files to the production origin. The licence also forbids modification, so the files are shipped byte for byte and never subset. **They are not covered by any licence of this repository and may not be reused.** To build a fork, put your own licensed font files in `src/fonts/` and update `src/lib/fonts.ts`.
+- **Source texts.**
+  - *Wafa al-Wafa* by al-Samhudi: the Dar al-Kutub al-'Ilmiyya edition (1419 AH), via Turath's public API.
+  - Al-Samarrai's critical edition (Al-Furqan): used only to cross-check page references. The scans are not in this repository.
+  - Quran translation of the meaning: Saheeh International.
+- **Map.** Data © OpenStreetMap contributors. Tiles from [OpenFreeMap](https://openfreemap.org). Rendered by MapLibre GL JS (BSD-3-Clause) with `@mapbox/mapbox-gl-rtl-text` (BSD-2-Clause).
+- **Libraries.** Next.js, React, next-intl, Serwist, Tailwind CSS, motion, supabase-js, qrcode, exifr, browser-image-compression, `@vercel/analytics` (all MIT); lucide-react (ISC); `@google/genai` and sharp (Apache-2.0; sharp bundles libvips under LGPL-3.0 and is used only by the scripts).
+- **Third-party services.**
+  - Hosting and data: Google Gemini API, Supabase, Vercel, Cloudflare R2.
+  - Analytics: Google Analytics 4 (production only, after consent) and Vercel Analytics.
+  - Narration: the Web Speech voices of the visitor's own device.
+- **Referrals and recommendations.**
+  - Religious questions go to the official guidance of the Two Holy Mosques at [risala.prh.gov.sa](https://risala.prh.gov.sa).
+  - Place pages recommend the free «سيرة» Seerah audio app (third party).
+  - Our [Telegram channel](https://t.me/+j_RAlim-5ZE2MTJk) handles site questions.
 
 ---
 
-## Content review workflow
+## Limitations · حدود الحل
 
-- `[VERIFY: …]` markers inside any owner text are hidden from visitors automatically (a marker-only field hides its whole row) and surface in `/admin` as a "يحتاج مراجعة" badge.
-- `admin_notes_ar` holds private notes (provenance, open questions) that never render publicly.
+- **Most claims are still pending.** 30 of 198 claims are approved, so the guide can answer history questions only at the four Hijra-journey places, and only the Hijra journey is published. This is deliberate: nothing reaches visitors before review. The owner does the reviewing today, and a scholar's re-check is planned after the challenge. Until then, the guide disclosure's "reviewed by a specialist" means the project's own content reviewer.
+- **Three approved claims need re-review.** C1, C2 and C3 came from an early test run and were approved before the current pipeline existed. On 6 October we found that their cited page (vol. 1 p. 66) lists merits of the Prophet's Mosque, not Quba. The verbatim check passed because the quote is real; the context was misread. Details and status are in [SOURCES.md](SOURCES.md) §15.1.
+- **The al-Samarrai cross-check is advisory.** Approval does not yet record a manual check in the critical edition, and 12 of the 194 drafts cite a paragraph with no automatic match.
+- **Hadith gradings and Quran text are not independently checked yet.** Gradings are quoted only where al-Samhudi states them; verse text has not been checked against the King Fahd Complex text.
+- **The English translation has had no scholarly review yet**, and English pages say so. A place or route text whose Arabic changes is hidden until it is translated again. Claims are not hash-stamped yet, so a claim's English is not always flagged when a reviewer edits its Arabic.
+- **The citation guard checks that citations are present and real, not meaning.** It catches invented ids and uncited answers, but it does not prove that every sentence is supported by the claim it cites. The prompt, the small claim set per place, and the logging of every answer for review limit that risk.
+- **The AI runs on the free tier.** Gemini quotas and capacity errors can slow the guide, even with the model fallback chain. The planner never depends on the AI.
+- **One primary source.** The knowledge base draws on *Wafa al-Wafa* only. Other works named in our proposal (Sahih al-Bukhari, Sahih Muslim, Ibn Shabba's *Tarikh al-Madinah* and others) appear only where al-Samhudi quotes them. They have not been added as separate sources yet.
+- **The user sample is small.** The pre/post quiz is in place, but no learning gain is claimed yet.
+- **Narration uses the device's voice**, so quality depends on the phone. Recorded or neural narration is not built.
+- **Infrastructure runs on free tiers.** The Supabase free tier pauses after about a week without traffic. Paid tiers are needed before any promotion.
+- **One person creates the content.** Each new place needs a site visit, photography and source work.
+- **Reproducing the live content needs the production database** (see [What a fresh database contains](#run-it-locally--التشغيل-محليًا)).
 
----
+## Planned, not built · خطط لم تُنفَّذ بعد
 
-## PWA / offline
+These ideas come from our proposal (the place target comes from our earlier research notes). They are not part of the judged build unless they appear in [CHANGELOG.md](CHANGELOG.md):
 
-Installable; Serwist service worker precaches the shell and `/~offline`, runtime-caches pages, R2 media images and Madinah map tiles/glyphs (videos stay network-only, analytics beacons are `NetworkOnly`). New deploys activate on next launch (no mid-session chunk purging). Test offline in a production build (`npm run build && npm run start`, then DevTools → Network → Offline).
+- Children's narration for every place, aimed at ages 8–14. Today only the journey stops have a simplified Arabic version, and there is none in English.
+- Seasonal, evening and first-visit tours as journeys of their own (journeys already carry these tags and can be filtered by them).
+- Packages for hotels beyond the reception card, and use by local guides.
+- Recorded audio.
+- Growing from 11 places to 30–50.
+- A scholar's review of the claims, the journey texts and the English text.
 
----
-
-## Deployment (Vercel)
-
-Project `eslamnovas-projects/hidden-madinah`, repo <https://github.com/eslamNova/hidden-madinah> (private, branch `master`). Production domain `mazarat-madinah.com` (apex 308-redirects to `www`).
-
-### The standard release flow
-
-Run from the repo root (Git Bash):
-
-```bash
-# 1. Verify the code
-npx tsc --noEmit
-npx eslint src scripts --max-warnings=0
-
-# 2. If content or media changed, push it to R2 first
-node scripts/sync-media-to-r2.mjs
-
-# 3. Clean build — ALWAYS clean: Next's fetch cache in .next/cache can serve
-#    day-old database data under the 24h revalidate
-rm -rf .next && npm run build
-
-# 4. (optional) check it locally — http://localhost:3000, hard-refresh
-npx next start          # Ctrl+C to stop
-
-# 5. Deploy to production
-npx vercel --prod --scope eslamnovas-projects
-
-# 6. Save the work
-git add -A
-git commit -m "what changed"
-git push origin master
-```
-
-Good to know:
-
-- **Vercel builds on its own servers** with fresh database data — step 3 is a safety check, not what ships. If step 3 passes, step 5 will too.
-- **Content-only changes** (edits in `/admin`, newly imported media) still need a deploy to appear: pages are static for 24 h. Run steps 2 and 5.
-- **Media never rides the deploy** — `.vercelignore` keeps `my_data/` (~1 GB of originals) out; without it the CLI would try to upload it, because the CLI ignores `.gitignore`.
-- **Installed PWAs** pick up a new version on the next launch (close and reopen the app).
-- **Always pass `--scope eslamnovas-projects`.** Without it the CLI has returned "Not authorized" against this project.
-- **Check the deploy actually happened.** The CLI self-updates, and a version bump can silently drop it into a login flow instead of deploying — which looks like success if the output is piped. Confirm with `npx vercel inspect <url> --scope eslamnovas-projects` (expect `target production`, `status ● Ready`) or just curl the live site for the change.
-- If `vercel --prod` prints a JSON error blob, re-run it — transient upload hiccups on this uplink are common.
-- **Shortcut:** connecting the GitHub repo in Vercel (Project → Settings → Git) turns step 6 into the deploy. Safe now that no media lives in the repo.
-
-### Vercel configuration
-
-- Env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `REVALIDATE_SECRET`, `NEXT_PUBLIC_SITE_URL`, and `NEXT_PUBLIC_GA_ID` (**Production only** — previews must stay untracked). The service key never goes to Vercel.
-- Content edits also appear after `POST /api/revalidate` (with `REVALIDATE_SECRET`) without a full deploy.
-
-## Scripts reference
-
-| Script | Command | Purpose |
-|---|---|---|
-| Import media | `NODE_OPTIONS=--experimental-websocket npx tsx scripts/import-media.ts --dir "<folder>" --slug <slug> [--dry-run]` | Photos + videos → variants/encode → Storage → `media` rows, pin suggestion |
-| Sync to R2 | `node scripts/sync-media-to-r2.mjs [--dry-run]` | Copy new Storage objects to R2 and repoint their rows — run after every import |
-| Hero pool | `npx tsx scripts/build-hero.ts --dir "<folder>"` | Regenerate `public/hero` variants + `HERO_IMAGES` manifest |
-| Create owner | `NODE_OPTIONS=--experimental-websocket npx tsx scripts/create-owner.ts --email <email> --password <pw>` | Owner auth user + admin grant (idempotent) |
-| Icons + share image | `npx tsx scripts/generate-icons.ts` | Tab/Apple/PWA/maskable icons + `public/og-image.jpg` |
-
----
-
-## Future work
-
-**Content (the core loop):**
-- Grow from 10 published places toward the **30–50** that `research.md` identifies as the launch threshold. Eight entries are already drafted in the database and need the owner's real content and photos before publishing.
-- Resolve the remaining `[VERIFY]` items: أبو بكر's hadith wording/source, جبل الرماة's entry fee, قباء's open-hours/best-time, and the بئر غرس pin confirmation.
-- Photos for بستان المستظل (currently video-only; cards use its poster frame).
-- More curated routes — only one exists (جولة قباء, 2 stops).
-
-**Product:**
-- Sponsor placements: schema, admin field, and a labeled slot in list/index views (see the business model above — direct, vetted, no networks).
-- A dedicated `entry_fee` field in schema + visit card (fees currently live inside visiting tips).
-- Route builder in the admin (routes are seed-only today).
-- Audio narration per place (recorded or TTS) — pairs naturally with the elderly-first audience and the «سيرة» partnership.
-- Favorites / trip planner (offline-friendly, localStorage first).
-- English localization (next-intl is already in place; content model has `name_en` only).
-- Share cards / QR posters per place for on-site signage.
-
-**Engineering:**
-- **Connect GitHub auto-deploys** (now safe; do it in Vercel → Settings → Git) — this also removes the silent-deploy-failure class of bug above.
-- Automated tests (none exist): start with `stripVerify`/`coverImage` unit tests and a Playwright smoke of the four public routes.
-- Lighthouse + real-device pass (mid-range Android). The font swap to thmanyah added roughly 75 kB to the critical path versus the previous Google subsets — dropping thmanyah Sans Medium (500) would claw back 77 kB if field measurement says it matters.
-- Upgrade to Node 22+ to drop the `--experimental-websocket` flag.
-- **Supabase paid tier** (or scheduled pings) before promoting the site — the free-tier weekly pause is the main availability risk.
+**Sustainability.** Running costs are close to zero today. The revenue plan is **direct sponsorship by vetted, relevant businesses** (Umrah operators, hotels near the Haram, ziyarah transport, Islamic publishers), always clearly labelled. The project will **never use programmatic ad networks**, because trust is the whole asset. The review workflow (`/admin/claims`, `/admin/journeys`) lets the owner keep publishing content after the challenge.

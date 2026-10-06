@@ -1,6 +1,6 @@
 -- 007 — The knowledge journeys from the submitted plan, wired to existing places.
 -- Stop scripts, human moments, reflections and quizzes are generated from
--- VERIFIED claims afterwards (scripts/generate-journey-content.ts) and reviewed
+-- VERIFIED claims afterwards (drafted into content/journeys/*.json, imported with scripts/import-journeys.ts) and reviewed
 -- before a journey is published. Journeys start unpublished.
 -- Re-runnable: journeys upsert by slug; their stops are rebuilt.
 

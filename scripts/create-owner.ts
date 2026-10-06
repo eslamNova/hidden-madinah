@@ -16,7 +16,6 @@ import type { Database } from "../src/lib/database.types";
 
 dotenv.config({ path: ".env.local", quiet: true });
 
-const DEFAULT_OWNER_EMAIL = "islam.a.i@outlook.com";
 
 function printUsage(): void {
   console.error(
@@ -53,10 +52,10 @@ function parseArgs(argv: string[]): { email: string; password: string } {
     }
   }
 
-  email = email?.trim() || process.env.OWNER_EMAIL?.trim() || DEFAULT_OWNER_EMAIL;
+  email = email?.trim() || process.env.OWNER_EMAIL?.trim();
   password = password || process.env.OWNER_PASSWORD;
 
-  if (!email.includes("@")) {
+  if (!email || !email.includes("@")) {
     console.error(`خطأ: بريد إلكتروني غير صالح / Error: invalid email: ${email}`);
     process.exit(1);
   }
