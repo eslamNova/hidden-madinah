@@ -332,7 +332,7 @@ sequenceDiagram
 - **Player** (`src/components/journey/JourneyPlayer.tsx`):
   1. Intro, with an optional self-declared familiarity of new, some or good. The player never asks about religion.
   2. Pre-quiz.
-  3. Stops. Each has a script, a human moment, a reflection and its sources (volume/page). Narration uses the browser's Web Speech API, not generated audio (`NarrationPlayer.tsx`). The guide is scoped to the journey and stop.
+  3. Stops. Each has a script, a human moment, a reflection and its sources (volume/page). Narration plays the stop's recorded MP3 when one is installed (`public/audio/narration/`, listed in the generated `src/lib/narration-audio.ts` by `npm run audio:install`); otherwise, or when the recording can't load (e.g. offline), it uses the browser's Web Speech API (`NarrationPlayer.tsx`). The guide is scoped to the journey and stop.
   4. Post-quiz with the **same items** as the pre-quiz.
   5. A completion card, with the opt-in result and an optional testimonial form.
 - **On the device only.** Progress, quiz answers and check-ins live in `localStorage` (`src/lib/visits.ts`). Arabic and English answers are stored apart, because the English quiz omits items that are not yet translated.

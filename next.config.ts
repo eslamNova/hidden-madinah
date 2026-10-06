@@ -10,6 +10,9 @@ const withSerwist = withSerwistInit({
   disable: process.env.NODE_ENV === "development",
   // The offline fallback document must be precached — the PrecacheFallbackPlugin
   // serves it from the precache. New revision per build refreshes it.
+  // Giving this list also stops @serwist/next from precaching all of public/,
+  // which would pull every narration MP3 (public/audio/narration/) onto each
+  // visitor's phone at install.
   additionalPrecacheEntries: [{ url: "/~offline", revision: crypto.randomUUID() }],
 });
 

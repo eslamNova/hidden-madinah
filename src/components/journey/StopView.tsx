@@ -6,6 +6,7 @@ import { BookOpen, Car, CheckCircle2, Footprints, Heart, MapPinned, MessageCircl
 import type { PlayerStop, StopSource } from "@/lib/journey-view";
 import { formatDistance } from "@/lib/geo";
 import type { Lang } from "@/lib/i18n";
+import { narrationSrc } from "@/lib/narration-audio";
 import { addVisit, readVisits, VISITS_EVENT } from "@/lib/visits";
 import { PlaceImage } from "@/components/place/PlaceImage";
 import { GuideChat } from "@/components/guide/GuideChat";
@@ -43,6 +44,8 @@ export function StopView({
   }, [stop.placeSlug, preview]);
 
   const script = kids && stop.scriptKids ? stop.scriptKids : stop.script;
+  // The recorded narration of this script when one is installed (else the device's voice reads it).
+  const audio = narrationSrc(journeySlug, stop.order, kids && stop.scriptKids ? "kids-ar" : lang === "en" ? "en" : "ar");
   const access = [
     stop.hasStairs === true && { key: "stairs", warn: true, text: t("hasStairs") },
     stop.hasStairs === false && { key: "nostairs", warn: false, text: t("noStairs") },
@@ -66,7 +69,7 @@ export function StopView({
         </div>
       )}
 
-      {script && <NarrationPlayer text={script} lang={lang} />}
+      {script && <NarrationPlayer text={script} lang={lang} src={audio} />}
 
       {stop.scriptKids && (
         <label className="flex min-h-11 items-center gap-3 font-medium">

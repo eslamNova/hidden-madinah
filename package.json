@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "audio:install": "tsx scripts/audio/install-narration.mts",
     "test": "node --import tsx --test src/lib/planner/solver.test.ts src/lib/planner/parse.test.ts src/lib/guide/answer.test.ts"
   },
   "dependencies": {

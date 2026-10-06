@@ -572,6 +572,8 @@
     "resumeAudio": "متابعة",
     "stop": "إيقاف",
     "speed": "سرعة القراءة",
+    "audioPosition": "موضع التشغيل",
+    "audioTime": "{elapsed} من {total}",
     "noVoice": "لا يتوفر صوت عربي على جهازك؛ يمكنك قراءة النص أدناه.",
     "kidsVersion": "نسخة مبسطة للأطفال",
     "humanMoment": "موقف إنساني",

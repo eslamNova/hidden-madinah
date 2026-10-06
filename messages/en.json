@@ -338,6 +338,8 @@
     "resumeAudio": "Resume",
     "stop": "Stop",
     "speed": "Reading speed",
+    "audioPosition": "Playback position",
+    "audioTime": "{elapsed} of {total}",
     "noVoice": "No Arabic voice is available on your device. You can read the text below.",
     "kidsVersion": "Simplified version for children",
     "humanMoment": "A human moment",
