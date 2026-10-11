@@ -12,7 +12,7 @@ import {
   Route as RouteIcon,
   Send,
 } from "lucide-react";
-import { SEERAH_APP, TELEGRAM_CHANNEL } from "@/lib/constants";
+import { SEERAH_APP, SHOW_SEERAH_APP, TELEGRAM_CHANNEL } from "@/lib/constants";
 import {
   LazyMotion,
   MotionConfig,
@@ -458,6 +458,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                   </div>
                 </div>
               </StoryItem>
+              {SHOW_SEERAH_APP && (
               <StoryItem className="pt-3">
                 {/* Companion app, compact dark variant — the farewell is
                     "continue your journey", and «سيرة» is where it continues. */}
@@ -492,6 +493,7 @@ export function StoryLanding({ data }: { data: StoryData }) {
                   </div>
                 </div>
               </StoryItem>
+              )}
               <StoryItem className="pt-2">
                 {/* Channel invite, one slim row on purpose — the closing panel
                     already carries three CTAs and the companion card, and the

@@ -14,6 +14,7 @@ import { Gallery } from "@/components/place/Gallery";
 import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
 import { RelatedPlaces } from "@/components/place/RelatedPlaces";
 import { SeerahAppCard } from "@/components/place/SeerahAppCard";
+import { SHOW_SEERAH_APP } from "@/lib/constants";
 import { GuideChat } from "@/components/guide/GuideChat";
 import { QrCheckin } from "@/components/place/QrCheckin";
 import { DistanceToHere } from "@/components/place/DistanceToHere";
@@ -237,7 +238,7 @@ export async function PlaceView({ lang, params }: { lang: Lang; params: Params }
 
         <GuideChat place={place.slug} />
 
-        <SeerahAppCard />
+        {SHOW_SEERAH_APP && <SeerahAppCard />}
 
         <RelatedPlaces slugs={view.relatedSlugs} lang={lang} />
 

@@ -46,6 +46,12 @@ export const PRIVACY_UPDATED_EN = "5 October 2026";
 export const privacyUpdated = (lang: "ar" | "en") => (lang === "en" ? PRIVACY_UPDATED_EN : PRIVACY_UPDATED);
 
 /**
+ * The «سيرة» app cards (home closing panel, place pages) are hidden during
+ * the hackathon judging; set back to true to show them again.
+ */
+export const SHOW_SEERAH_APP = false;
+
+/**
  * Companion app «سيرة» (free Seerah audio journey) — recommended on place
  * pages: the visitor stands where the story happened; the app tells it whole.
  */
