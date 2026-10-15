@@ -26,6 +26,69 @@ export type Database = {
         }
         Relationships: []
       }
+      articles: {
+        Row: {
+          author: string | null
+          body_ar: string
+          body_en: string | null
+          cover_url: string | null
+          created_at: string
+          excerpt_ar: string | null
+          excerpt_en: string | null
+          id: string
+          journey_slugs: string[]
+          place_slugs: string[]
+          published_at: string | null
+          slug: string
+          sources: Json
+          status: string
+          tags: string[]
+          title_ar: string
+          title_en: string | null
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          body_ar?: string
+          body_en?: string | null
+          cover_url?: string | null
+          created_at?: string
+          excerpt_ar?: string | null
+          excerpt_en?: string | null
+          id?: string
+          journey_slugs?: string[]
+          place_slugs?: string[]
+          published_at?: string | null
+          slug: string
+          sources?: Json
+          status?: string
+          tags?: string[]
+          title_ar?: string
+          title_en?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          body_ar?: string
+          body_en?: string | null
+          cover_url?: string | null
+          created_at?: string
+          excerpt_ar?: string | null
+          excerpt_en?: string | null
+          id?: string
+          journey_slugs?: string[]
+          place_slugs?: string[]
+          published_at?: string | null
+          slug?: string
+          sources?: Json
+          status?: string
+          tags?: string[]
+          title_ar?: string
+          title_en?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       media: {
         Row: {
           caption_ar: string | null

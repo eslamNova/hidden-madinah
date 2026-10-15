@@ -417,6 +417,8 @@
     },
     "storiesCardTitle": "Human stories",
     "storiesCardText": "Humane moments from the Seerah, set in the places of Madinah, with their sources.",
+    "blogCardTitle": "Articles",
+    "blogCardText": "Articles on the Seerah sites and their history, with their sources.",
     "testimonial": {
       "title": "Share your thoughts",
       "intro": "Tell us what this journey meant to you. After review, we may publish it on the home page.",
@@ -552,6 +554,44 @@
       "worship": "Worship",
       "forgiveness": "Forgiveness",
       "neighbourliness": "Neighbourliness"
+    }
+  },
+  "blog": {
+    "title": "Articles",
+    "subtitle": "Articles on the Seerah sites of Madinah and their history, with references to Wafa al-Wafa.",
+    "intro": "Every article is written and reviewed by the Mazarat Madinah team before it is published, and lists its sources at the end.",
+    "empty": "No articles have been published yet. We review every article before it is published.",
+    "emptyCta": "Browse the places",
+    "listNotInEnglish": "The articles are not available in English yet. You can read them in Arabic now.",
+    "moreInArabic": "More articles are available in Arabic.",
+    "notInEnglish": "This article is not available in English yet. You can read it in Arabic now.",
+    "openArabic": "Open the Arabic version",
+    "publishedOn": "Published {date}",
+    "updatedOn": "Updated {date}",
+    "byAuthor": "By {name}",
+    "readMore": "Read the article",
+    "placesLabel": "Places in this article",
+    "placesTitle": "Places in this article",
+    "journeysTitle": "Related journeys",
+    "sourcesTitle": "Sources",
+    "sourcesIntro": "Where this is found in al-Samhudi's Wafa al-Wafa bi-Akhbar Dar al-Mustafa:",
+    "sourceRef": "Wafa al-Wafa, vol. {vol}, p. {page}",
+    "moreTitle": "More articles",
+    "allArticles": "All articles",
+    "rss": "Follow the articles by RSS",
+    "rssTitle": "Mazarat Madinah articles",
+    "filterLabel": "Filter articles",
+    "filterAll": "All",
+    "filterCount": "{count, plural, one {Showing # article} other {Showing # articles}}",
+    "tagsLabel": "Article tags",
+    "tags": {
+      "seerah": "Seerah",
+      "hijra": "The Hijra",
+      "mosques": "Mosques",
+      "wells": "Wells",
+      "gardens": "Gardens",
+      "history": "History",
+      "visiting-tips": "Visiting tips"
     }
   }
 }

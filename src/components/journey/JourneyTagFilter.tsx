@@ -10,10 +10,19 @@ export type JourneyFilterItem = { id: string; tags: string[]; card: ReactNode };
  * The journeys list with tag chips above it ("All" + every tag in use).
  * Cards are rendered on the server and passed in; filtering only hides them,
  * so nothing reloads. The chip row stays out of the way for a single journey
- * or when no journey is tagged.
+ * or when no journey is tagged. The blog list uses it too (`namespace="blog"`,
+ * which has the same filterLabel / filterAll / filterCount strings).
  */
-export function JourneyTagFilter({ items, tags }: { items: JourneyFilterItem[]; tags: JourneyTagOption[] }) {
-  const t = useTranslations("journey");
+export function JourneyTagFilter({
+  items,
+  tags,
+  namespace = "journey",
+}: {
+  items: JourneyFilterItem[];
+  tags: JourneyTagOption[];
+  namespace?: "journey" | "blog";
+}) {
+  const t = useTranslations(namespace);
   const [active, setActive] = useState<string | null>(null);
   const showChips = items.length >= 2 && tags.length > 0;
   // A tag can only be active while a chip for it exists.

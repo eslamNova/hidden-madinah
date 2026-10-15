@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import NextLink from "next/link";
 import Link from "@/components/i18n/Link";
 import { getTranslations } from "next-intl/server";
-import { BookHeart, ChevronLeft, Clock, Footprints } from "lucide-react";
+import { BookHeart, ChevronLeft, Clock, Footprints, Newspaper } from "lucide-react";
 import { coverImage } from "@/lib/content";
 import { HERO_IMAGES } from "@/lib/hero-images";
 import { languageAlternates, type Lang } from "@/lib/i18n";
@@ -143,6 +143,18 @@ export async function JourneysView({ lang }: { lang: Lang }) {
           <span className="min-w-0 flex-1 space-y-1">
             <span className="block text-xl font-semibold">{t("storiesCardTitle")}</span>
             <span className="block leading-relaxed text-muted">{t("storiesCardText")}</span>
+          </span>
+          <ChevronLeft aria-hidden="true" className="h-6 w-6 shrink-0 text-brand ltr:-scale-x-100" />
+        </Link>
+
+        {/* The articles: longer reading on the same places, with sources. */}
+        <Link href="/blog" className="card-elevated card-lift flex min-h-20 items-center gap-4 p-5">
+          <span aria-hidden="true" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-brand">
+            <Newspaper className="h-6 w-6" />
+          </span>
+          <span className="min-w-0 flex-1 space-y-1">
+            <span className="block text-xl font-semibold">{t("blogCardTitle")}</span>
+            <span className="block leading-relaxed text-muted">{t("blogCardText")}</span>
           </span>
           <ChevronLeft aria-hidden="true" className="h-6 w-6 shrink-0 text-brand ltr:-scale-x-100" />
         </Link>
