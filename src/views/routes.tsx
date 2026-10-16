@@ -4,7 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { Route as RouteIcon } from "lucide-react";
 import { coverImage, stripVerify } from "@/lib/content";
 import { HERO_IMAGES } from "@/lib/hero-images";
-import { languageAlternates, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { pageMetadata, shareImageOf } from "@/lib/page-metadata";
 import { getRoutesWithStops } from "@/lib/queries";
 import { PageHero } from "@/components/layout/PageHero";
 import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
@@ -12,7 +13,14 @@ import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
 /** /routes and /en/routes. The route files set the request locale before rendering. */
 export async function routesMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("routes");
-  return { title: t("title"), alternates: languageAlternates("/routes", lang) };
+  const routes = await getRoutesWithStops(lang);
+  return pageMetadata({
+    lang,
+    path: "/routes",
+    title: t("title"),
+    description: t("subtitle"),
+    image: shareImageOf(coverImage(routes[0]?.stops.flatMap((s) => s.media) ?? []), t("title")),
+  });
 }
 
 export async function RoutesView({ lang }: { lang: Lang }) {

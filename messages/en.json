@@ -100,7 +100,8 @@
       "garden": "Gardens",
       "historical_site": "Historical sites",
       "other": "Other places"
-    }
+    },
+    "metaDescription": "Every site in the guide to Madinah: historic mosques, wells, gardens and Seerah sites, with the distance from the Prophet's Mosque and the best time to visit. Search and filter by type and distance."
   },
   "place": {
     "visitInfo": "Visit information",
@@ -150,14 +151,22 @@
       "denied": "Location permission was turned down, so we can't work out the distance. You can allow it in your browser settings and try again.",
       "unavailable": "We couldn't find your location just now. Check that location is switched on in your phone, then try again.",
       "unsupported": "This browser can't share your location, so we can't work out the distance."
-    }
+    },
+    "galleryAlt": "{name} — photo {n}",
+    "wafaTitle": "From Wafa al-Wafa",
+    "wafaIntro": "Facts about this place from al-Samhudi's Wafa al-Wafa. Each one appears here only after it has been reviewed against its page in the book.",
+    "wafaRef": "Wafa al-Wafa, vol. {vol}, p. {page}",
+    "wafaMore": "{count, plural, one {Show # more fact} other {Show # more facts}}",
+    "wafaLess": "Show less",
+    "wafaMethod": "How we check our sources"
   },
   "map": {
     "title": "Map",
     "openPlace": "View place",
     "loading": "Loading map…",
     "legend": "Map key",
-    "closePreview": "Close preview"
+    "closePreview": "Close preview",
+    "metaDescription": "An interactive map of the sites in Madinah: every historic mosque, well, garden and historical site in the guide, each linked to its page and to directions."
   },
   "routes": {
     "title": "Tours",
@@ -206,7 +215,10 @@
     "unmute": "Unmute",
     "nabawiName": "The Prophet's Mosque (al-Masjid an-Nabawi ash-Sharif)",
     "nabawiSummary": "Where every journey in Madinah begins — scenes from the Prophet's Mosque and its courtyards, before we set out for the places visitors don't see.",
-    "empty": "No media yet — check back soon."
+    "empty": "No media yet — check back soon.",
+    "metaDescription": "A photo and video tour of Madinah's historic sites, starting at the Prophet's Mosque and moving through historic mosques, wells and gardens, all filmed on site.",
+    "placeMetaDescription": "Photos and video of {name} in Madinah, filmed on site: {count, plural, one {# scene} other {# scenes}} in a self-playing tour, with a link to the place's full page.",
+    "videoName": "{name} — video {n}"
   },
   "offline": {
     "title": "You are offline",
@@ -270,7 +282,10 @@
     "turnOn": "Turn on analytics",
     "turnOff": "Turn off analytics",
     "contactTitle": "Contact",
-    "contactBody": "For any question about privacy, or to ask us to delete data, email us at"
+    "contactBody": "For any question about privacy, or to ask us to delete data, email us at",
+    "sourcesTitle": "Sources and method",
+    "sourcesBody": "Where the site's historical information comes from, how it is reviewed, and how to report an error:",
+    "sourcesLink": "the sources page"
   },
   "guide": {
     "title": "Ask the Guide",
@@ -434,7 +449,10 @@
       "submit": "Send my thoughts",
       "sending": "Sending…",
       "thanks": "Thank you! Your words reached us and will appear on the site after review."
-    }
+    },
+    "fullText": "Full journey text",
+    "fullTextIntro": "The narration of every stop as the journey tells it, with its human moment and its sources in Wafa al-Wafa.",
+    "fullTextMethod": "How we check our sources"
   },
   "plan": {
     "title": "Plan your visit",
@@ -593,5 +611,64 @@
       "history": "History",
       "visiting-tips": "Visiting tips"
     }
+  },
+  "sources": {
+    "title": "Sources and method",
+    "intro": "Where the historical information on this site comes from, and how it is checked before it reaches you.",
+    "metaDescription": "Where Mazarat Madinah's information comes from: al-Samhudi's Wafa al-Wafa in the Dar al-Kutub al-'Ilmiyya edition, cross-checked against al-Samarrai's critical edition; human review before publication; how the AI guide answers; and how to report an error.",
+    "updated": "Last updated: {date}",
+    "bookTitle": "The book we rely on",
+    "bookBody": "Our primary source is Wafa al-Wafa bi-Akhbar Dar al-Mustafa by Nur al-Din 'Ali ibn 'Abd Allah al-Samhudi (d. 911 AH), in the Dar al-Kutub al-'Ilmiyya edition (Beirut, 1st ed., 1419 AH, 4 vols), whose text we take from the Turath platform (book 23695). Every reference on the site in the form “Wafa al-Wafa, vol. X, p. Y” means the volume and page of this edition.",
+    "bookLink": "Open the book on Turath",
+    "whyTitle": "Why this book and this edition",
+    "whyBody": "Wafa al-Wafa is the most comprehensive classical reference on the history and sites of Madinah: its mosques, wells, gardens and battlefields. It gathers earlier reports and names who reported them, such as Ibn Zabala and Ibn Shabba, so we can say who reported each account. We quote the Dar al-Kutub al-'Ilmiyya text because it is clean digital text that gives the printed volume and page of every passage, so a reader can open the same page and check it.",
+    "samarraiTitle": "Cross-checked with al-Samarrai's critical edition",
+    "samarraiBody": "Every passage is matched automatically against the critical edition by Qasim al-Samarrai (Al-Furqan Islamic Heritage Foundation, 5 vols). When a match is found, its location is given next to the reference, for example “al-Samarrai ed., vol. 3, p. 139”. When none is found, the reviewer sees the flag “not matched — must be verified before publication”. An automatic match is a lead to check, never a confirmation.",
+    "draftingTitle": "How each fact is written",
+    "draftingBody": "We gather the book's passages about each place. Short statements are then drafted from them with the help of an AI tool, during preparation only, and from the passage alone, never from memory. Each statement carries an excerpt copied word for word from the page it cites, and a program checks that the excerpt appears in that very passage before the statement can be imported; anything that fails is set aside, never “fixed” automatically. Disputed matters are attributed to those who held them and are not settled.",
+    "reviewTitle": "Human review before publication",
+    "reviewBody": "No statement is shown to visitors or used by the AI guide until a person has approved it by hand, after comparing it with its excerpt and page. The database enforces this: an unapproved statement cannot be read from the site at all. Today the reviewer is the project owner; a review by a qualified scholar of everything approved is planned.",
+    "guideTitle": "The AI guide",
+    "guideBody": "The AI guide answers only from approved statements and cites the source of every historical or religious sentence; the server removes any citation that was not among the statements it was given. When it has no approved statement, it says it has no verified source and does not guess. It gives no personal religious rulings and refers such questions to the official guidance of the Prophet's Mosque (risala.prh.gov.sa). It can make mistakes, and says so above the chat.",
+    "placeTextsTitle": "Place page texts",
+    "placeTextsBody": "The story, virtue and visiting tips of each place were written before the knowledge base was built, under the owner's review, and name their sources in the text (for example Sahih al-Bukhari and Sahih Muslim). Anything still awaiting confirmation is not shown. The “From Wafa al-Wafa” section of each place page comes from the reviewed knowledge base, and every statement in it gives its volume and page.",
+    "englishTitle": "The English translation",
+    "englishBody": "The English texts are translated from the reviewed Arabic and have not yet been reviewed by a scholar; the English pages say so. A statement from the book appears in English only once its translation has been reviewed, and when the Arabic is edited after translation, the old English is hidden until it is updated.",
+    "citeTitle": "Citing this site",
+    "citeBody": "When you quote information from the site, cite its original source by volume and page as shown next to it, for example “Wafa al-Wafa, vol. 3, p. 18”, with a link to the page you took it from. Do not attribute to the book or to the site anything they do not say.",
+    "reportTitle": "Report an error",
+    "reportBody": "If you find a mistake in a statement or a reference, please tell us, with the page link and where on the page. We review every report and correct what needs correcting.",
+    "reportTelegram": "Contact us through the site's Telegram channel"
+  },
+  "llms": {
+    "about": "Mazarat Madinah is a free, practical guide to the lesser-known Seerah sites of Madinah: historic mosques, wells, gardens and historical sites, with the distance from the Prophet's Mosque and how to get there, narrated learning journeys, human stories, and an AI guide that answers from verified facts. The site is in Arabic at the root; every public page has an English twin under /en.",
+    "policyTitle": "Sources policy",
+    "policyPrimary": "Primary source: Wafa al-Wafa bi-Akhbar Dar al-Mustafa by al-Samhudi (d. 911 AH), Dar al-Kutub al-'Ilmiyya edition, Beirut, 1419 AH, text from Turath ({book}). References read “Wafa al-Wafa, vol. X, p. Y”: the volume and page of this edition.",
+    "policySamarrai": "Every passage is cross-checked against Qasim al-Samarrai's critical edition, whose location is given when it matches; unmatched passages are flagged to the reviewer before publication.",
+    "policyReview": "Nothing is published before a person reviews and approves it by hand, and every statement carries a word-for-word excerpt from its page. Today the reviewer is the project owner; a review by a qualified scholar is planned.",
+    "policyGuide": "The AI guide answers only from approved statements and cites them, says so when it has no verified source, and gives no religious rulings.",
+    "policyPlaceTexts": "The place stories and virtues were written before the knowledge base, under the owner's review, and name their sources in the text; the “From Wafa al-Wafa” section of each place page comes from the reviewed statements.",
+    "policyEnglish": "The English is translated from the reviewed Arabic and is still awaiting a scholar's review.",
+    "citeTitle": "How to cite",
+    "citeBody": "Attribute each fact to its original source by volume and page as the page shows it (for example: Wafa al-Wafa, vol. 3, p. 18), with a link to the Mazarat Madinah page you took it from. Do not attribute to the site anything its pages do not say, and do not present the English text as scholar-reviewed.",
+    "privateTitle": "Private paths",
+    "privateBody": "/admin (the admin console) and /api (the guide and planner endpoints) are private: do not crawl or call them.",
+    "fullText": "Full reviewed text",
+    "placesTitle": "Places",
+    "journeysTitle": "Learning journeys",
+    "routesTitle": "Tours",
+    "themesTitle": "Human stories by theme",
+    "articlesTitle": "Articles",
+    "pagesTitle": "Other pages",
+    "noJourneys": "No journeys have been published yet.",
+    "noStories": "No stories have been approved yet.",
+    "noArticles": "No articles have been published yet.",
+    "placesFullTitle": "Place texts",
+    "journeysFullTitle": "Journey texts",
+    "storiesFullTitle": "Human stories with their sources",
+    "articlesFullTitle": "Article texts"
+  },
+  "seo": {
+    "city": "Madinah"
   }
 }

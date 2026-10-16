@@ -1,14 +1,28 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { languageAlternates, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/page-metadata";
 import { getPublishedPlaces } from "@/lib/queries";
-import { nabawiSlides, toTourSlides } from "@/lib/tour";
+import { jsonLdGraph } from "@/lib/structured-data";
+import { nabawiSlides, tourVideoNodes, toTourSlides } from "@/lib/tour";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { TourViewer } from "@/components/tour/TourViewer";
 
-/** /tour and /en/tour. The route files set the request locale before rendering. */
+/**
+ * /tour and /en/tour. The route files set the request locale before rendering.
+ * A video page: indexable, in the sitemap with its videos, and each video
+ * described as a schema.org VideoObject.
+ */
 export async function tourMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("tour");
-  return { title: t("title"), alternates: languageAlternates("/tour", lang) };
+  const poster = nabawiSlides("", "").find((s) => s.poster)?.poster ?? null;
+  return pageMetadata({
+    lang,
+    path: "/tour",
+    title: t("title"),
+    description: t("metaDescription"),
+    image: poster ? { url: poster.url, width: poster.width, height: poster.height, alt: t("title") } : null,
+  });
 }
 
 /**
@@ -30,6 +44,7 @@ export async function TourView({ lang }: { lang: Lang }) {
   return (
     <div className="-mb-28">
       <TourViewer slides={slides} exitHref="/" />
+      <JsonLd data={jsonLdGraph(...(await tourVideoNodes(slides, "/tour", lang, t("metaDescription"))))} />
     </div>
   );
 }

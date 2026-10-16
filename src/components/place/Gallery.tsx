@@ -53,6 +53,9 @@ export function Gallery({ media, placeName }: { media: MediaRow[]; placeName: st
         {media.map((m, i) => {
           // Captions are owner-entered — [VERIFY] markers must not reach the page.
           const caption = stripVerify(m.caption_ar);
+          // The caption describes the photo; without one, the place name and
+          // the slide's position, so no two photos share the same alt text.
+          const alt = caption ?? t("galleryAlt", { name: placeName, n: i + 1 });
           return (
             <div
               key={m.id}
@@ -69,7 +72,7 @@ export function Gallery({ media, placeName }: { media: MediaRow[]; placeName: st
                       high-priority fetch here contends with the hero LCP. */}
                   <PlaceImage
                     media={m}
-                    alt={caption ?? placeName}
+                    alt={alt}
                     sizes="(max-width: 768px) 100vw, 768px"
                     className="aspect-[4/3] w-full rounded-2xl object-cover"
                   />

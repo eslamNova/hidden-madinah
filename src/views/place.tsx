@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { getTranslations } from "next-intl/server";
 import Link from "@/components/i18n/Link";
 import { ExternalLink, Play, Star } from "lucide-react";
 import { coverImage, stripVerify, toPublicPlaceView } from "@/lib/content";
-import { INTL_LOCALE, languageAlternates, type Lang } from "@/lib/i18n";
+import { INTL_LOCALE, type Lang } from "@/lib/i18n";
+import { localizePlace } from "@/lib/i18n-content";
 import { CATEGORY_META, googleMapsUrl } from "@/lib/maps";
-import { variantUrl } from "@/lib/media-spec";
-import { getPlaceBySlug, getPublishedSlugs } from "@/lib/queries";
+import { pageMetadata, shareImageOf } from "@/lib/page-metadata";
+import { getPlaceBySlug, getPlaceClaims, getPublishedSlugs } from "@/lib/queries";
+import { breadcrumbNode, jsonLdGraph, placeImageUrls, placeNode } from "@/lib/structured-data";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { WafaClaims } from "@/components/place/WafaClaims";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { FeaturedQuote } from "@/components/place/FeaturedQuote";
 import { Gallery } from "@/components/place/Gallery";
@@ -36,47 +41,50 @@ export async function placeStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-function resolvePlace(rawSlug: string, lang: Lang) {
-  return getPlaceBySlug(decodeURIComponent(rawSlug), lang);
+/**
+ * The place's Arabic row, once per request (metadata and page share it). Each
+ * language's view is localized from it, so an English page still knows the
+ * Arabic name (and an Arabic page the English one) for the structured data.
+ */
+const loadPlace = cache((rawSlug: string) => getPlaceBySlug(decodeURIComponent(rawSlug), "ar"));
+
+async function resolvePlace(rawSlug: string, lang: Lang) {
+  const arabic = await loadPlace(rawSlug);
+  return arabic ? { arabic, place: localizePlace(arabic, lang) } : null;
 }
 
 const placePath = (slug: string) => `/places/${encodeURIComponent(slug)}`;
 
 export async function placeMetadata(lang: Lang, params: Params): Promise<Metadata> {
   const { slug } = await params;
-  const place = await resolvePlace(slug, lang);
-  if (!place) return {};
-  const description = stripVerify(place.summary_ar) ?? undefined;
-  // Pre-generated 1600 JPEG fallback doubles as the OG image (Arabic-safe).
-  // A video-only place falls back to its poster frame, which exists at 800 only.
-  const cover = coverImage(place.media);
-  const ogImage = !cover
-    ? "/og-image.jpg"
-    : cover.singleVariant
-      ? cover.url
-      : variantUrl(cover.url, 1600).replace(/\.webp$/, ".jpg");
-  return {
+  const found = await resolvePlace(slug, lang);
+  if (!found) return {};
+  const { place } = found;
+  // Pre-generated 1600 JPEG doubles as the share image (Arabic-safe); a
+  // video-only place falls back to its poster frame.
+  return pageMetadata({
+    lang,
+    path: placePath(place.slug),
     title: place.name_ar,
-    description,
-    alternates: languageAlternates(placePath(place.slug), lang),
-    openGraph: {
-      title: place.name_ar,
-      description,
-      images: [{ url: ogImage }],
-      type: "article",
-      locale: lang === "ar" ? "ar_SA" : "en_US",
-    },
-  };
+    description: stripVerify(place.summary_ar),
+    image: shareImageOf(coverImage(place.media), place.name_ar),
+    article: { modifiedTime: place.last_updated },
+  });
 }
 
 export async function PlaceView({ lang, params }: { lang: Lang; params: Params }) {
   const { slug } = await params;
-  const place = await resolvePlace(slug, lang);
-  if (!place) notFound();
+  const found = await resolvePlace(slug, lang);
+  if (!found) notFound();
+  const { arabic, place } = found;
 
   const t = await getTranslations("place");
   const tCommon = await getTranslations("common");
+  const tNav = await getTranslations("nav");
+  const tSeo = await getTranslations("seo");
   const meta = CATEGORY_META[place.category];
+  // Verified claims only (RLS + the query's filter); English: reviewed English only.
+  const claims = await getPlaceClaims(place.id, lang);
 
   // Everything below renders from the sanitized view only — the raw row (with
   // [VERIFY] markers and owner notes) never crosses into the rendered tree.
@@ -206,6 +214,8 @@ export async function PlaceView({ lang, params }: { lang: Lang; params: Params }
           </section>
         )}
 
+        <WafaClaims claims={claims} lang={lang} />
+
         {view.tips && (
           <section aria-label={t("tips")} className="space-y-3">
             <h2 className="text-2xl">{t("tips")}</h2>
@@ -246,6 +256,31 @@ export async function PlaceView({ lang, params }: { lang: Lang; params: Params }
           {tCommon("lastUpdated", { date: lastUpdated })}
         </footer>
       </div>
+
+      {/* Built from the cleaned public view only: no [VERIFY] text can reach it. */}
+      <JsonLd
+        data={jsonLdGraph(
+          placeNode({
+            slug: view.slug,
+            lang,
+            category: view.category,
+            name: view.name_ar,
+            names: [arabic.name_ar, localizePlace(arabic, "en").name_ar],
+            description: view.summary,
+            images: placeImageUrls(place.media),
+            lat: view.lat,
+            lng: view.lng,
+            mapsUrl: view.mapsUrl,
+            openingHours: view.openingHours,
+            city: tSeo("city"),
+          }),
+          breadcrumbNode(lang, [
+            [tNav("home"), "/"],
+            [tNav("places"), "/places"],
+            [view.name_ar, placePath(view.slug)],
+          ])
+        )}
+      />
     </article>
   );
 }

@@ -8,14 +8,17 @@ import Link from "@/components/i18n/Link";
 import { articleCover, markdownSummary, ogImageOf, SLUG_RE } from "@/lib/article-format";
 import { articleHtml } from "@/lib/article-html";
 import { getArticle, getArticleSlugs, getPublishedArticles, type Article } from "@/lib/articles";
-import { SITE_NAME, SITE_NAME_EN, siteName, siteUrl } from "@/lib/constants";
+import { SITE_NAME, SITE_NAME_EN } from "@/lib/constants";
 import { coverImage, type CoverImage } from "@/lib/content";
 import { HERO_IMAGES } from "@/lib/hero-images";
-import { INTL_LOCALE, languageAlternates, localizeHref, type Lang } from "@/lib/i18n";
+import { INTL_LOCALE, type Lang } from "@/lib/i18n";
 import { hasEnglishVersion, journeyTexts } from "@/lib/journey-view";
+import { pageMetadata, shareImageOf } from "@/lib/page-metadata";
 import { getPlacesBySlugs, getPublishedJourneys, type PlaceWithMedia } from "@/lib/queries";
+import { absoluteUrl, organizationId, pageUrl, placeRef } from "@/lib/structured-data";
 import { PageHero } from "@/components/layout/PageHero";
 import { PlaceCard, toPlaceCardData } from "@/components/place/PlaceCard";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 /**
  * /blog/[slug] and /en/blog/[slug]. The route files set the request locale
@@ -58,33 +61,31 @@ export async function articleMetadata(lang: Lang, params: Params): Promise<Metad
   if (!article.available) {
     // /en without English: one canonical Arabic page, and /en stays out of the index.
     const t = await getTranslations("blog");
-    return { title: t("title"), alternates: { canonical: path }, robots: { index: false } };
+    return pageMetadata({ lang, path, title: t("title"), bilingual: false, noindex: true });
   }
 
   const places = await loadPlaces(article.placeSlugs.join(","), lang);
-  const cover = pickCover(article, places);
-  const ogImage = cover ? ogImageOf(cover) : "/og-image.jpg";
-  const desc = description(article);
-  return {
+  // An owner-set cover's size is unknown (articleCover only sets a ratio), so
+  // it goes out without dimensions; a place photo's are exact.
+  const ownCover = articleCover(article.coverUrl);
+  const image = ownCover
+    ? { url: ogImageOf(ownCover), alt: article.title }
+    : shareImageOf(coverImage(places.flatMap((p) => p.media)), article.title);
+  return pageMetadata({
+    lang,
+    path,
     title: article.title,
-    description: desc,
+    description: description(article),
+    image,
     // Arabic-only articles have no English twin to point to.
-    alternates: article.hasEnglish ? languageAlternates(path, lang) : { canonical: path },
-    openGraph: {
-      type: "article",
-      title: article.title,
-      description: desc,
-      url: localizeHref(path, lang),
-      siteName: siteName(lang),
-      locale: lang === "ar" ? "ar_SA" : "en_US",
+    bilingual: article.hasEnglish,
+    article: {
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt,
       ...(article.author ? { authors: [article.author] } : {}),
       ...(article.tags.length ? { tags: article.tags } : {}),
-      images: [{ url: ogImage }],
     },
-    twitter: { card: "summary_large_image", title: article.title, description: desc, images: [ogImage] },
-  };
+  });
 }
 
 export async function ArticleView({ lang, params }: { lang: Lang; params: Params }) {
@@ -223,28 +224,27 @@ export async function ArticleView({ lang, params }: { lang: Lang; params: Params
         </Link>
       </div>
 
-      <script
-        type="application/ld+json"
-        // JSON-LD is data, not markup: "<" is escaped so no text can close the tag.
-        dangerouslySetInnerHTML={{ __html: articleJsonLd(article, lang, places, cover) }}
-      />
+      <JsonLd data={articleJsonLd(article, lang, places, cover)} />
     </article>
   );
 }
 
-/** schema.org Article for search engines: headline, dates, language, image, publisher, and the places it is about. */
-function articleJsonLd(article: Article, lang: Lang, places: PlaceWithMedia[], cover: CoverImage | null): string {
-  const base = siteUrl();
-  const abs = (path: string) => (/^https?:\/\//.test(path) ? path : `${base}${path}`);
-  const url = abs(localizeHref(articlePath(article.slug), lang));
+/**
+ * schema.org Article for search engines: headline, dates, language, image,
+ * publisher, and the places it is about — each by its site-wide entity @id
+ * ("<site>/places/<slug>#place"), the same node the place page describes.
+ */
+function articleJsonLd(article: Article, lang: Lang, places: PlaceWithMedia[], cover: CoverImage | null) {
+  const url = pageUrl(articlePath(article.slug), lang);
   const organization = {
     "@type": "Organization",
+    "@id": organizationId(),
     name: SITE_NAME_EN,
     alternateName: SITE_NAME,
-    url: base,
-    logo: { "@type": "ImageObject", url: `${base}/icons/icon-512.png`, width: 512, height: 512 },
+    url: absoluteUrl("/"),
+    logo: { "@type": "ImageObject", url: absoluteUrl("/icons/icon-512.png"), width: 512, height: 512 },
   };
-  const data = {
+  return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
@@ -252,23 +252,14 @@ function articleJsonLd(article: Article, lang: Lang, places: PlaceWithMedia[], c
     datePublished: article.publishedAt,
     dateModified: article.updatedAt,
     inLanguage: lang,
-    image: [abs(cover ? ogImageOf(cover) : "/og-image.jpg")],
+    image: [absoluteUrl(cover ? ogImageOf(cover) : "/og-image.jpg")],
     author: article.author ? { "@type": "Person", name: article.author } : organization,
     publisher: organization,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
     ...(article.tags.length ? { keywords: article.tags.join(", ") } : {}),
-    ...(places.length
-      ? {
-          about: places.map((p) => ({
-            "@type": "Place",
-            name: p.name_ar,
-            url: abs(localizeHref(`/places/${encodeURIComponent(p.slug)}`, lang)),
-          })),
-        }
-      : {}),
+    ...(places.length ? { about: places.map((p) => placeRef({ slug: p.slug, name: p.name_ar, category: p.category }, lang)) } : {}),
   };
-  return JSON.stringify(data).replace(/</g, "\\u003c");
 }
 
 /** /en for an article that exists only in Arabic so far. */

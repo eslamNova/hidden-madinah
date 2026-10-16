@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { coverImage, stripVerify } from "@/lib/content";
-import { languageAlternates, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/page-metadata";
 import {
   getPublishedPlaces,
   getRoutesWithStops,
@@ -22,7 +23,7 @@ import type { StoryPhoto } from "@/components/home/StoryPanel";
  * title is the root layout's default (the site name in the page's language).
  */
 export async function homeMetadata(lang: Lang): Promise<Metadata> {
-  return { alternates: languageAlternates("/", lang) };
+  return pageMetadata({ lang, path: "/" });
 }
 
 export async function HomeView({ lang }: { lang: Lang }) {

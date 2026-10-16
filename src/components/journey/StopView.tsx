@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { BookOpen, Car, CheckCircle2, Footprints, Heart, MapPinned, MessageCircleQuestion, TriangleAlert } from "lucide-react";
 import type { PlayerStop, StopSource } from "@/lib/journey-view";
+import { parseSamarrai } from "@/lib/citations";
 import { formatDistance } from "@/lib/geo";
 import type { Lang } from "@/lib/i18n";
 import { narrationSrc } from "@/lib/narration-audio";
@@ -200,9 +201,6 @@ export function StopView({
   );
 }
 
-/** "ج1 ص424" — al-Samarrai edition references are stored in Arabic notation. */
-const SAMARRAI_VOL_PAGE = /^ج\s*(\d+)\s*ص\s*(\d+(?:\s*[-–]\s*\d+)?)$/;
-
 /**
  * English pages: the al-Samarrai reference in English notation when it parses,
  * and the hadith reference and grading — Arabic citations, kept as written —
@@ -210,14 +208,14 @@ const SAMARRAI_VOL_PAGE = /^ج\s*(\d+)\s*ص\s*(\d+(?:\s*[-–]\s*\d+)?)$/;
  */
 function ForeignRefs({ source: s }: { source: StopSource }) {
   const t = useTranslations("journey");
-  const m = s.samarrai?.trim().match(SAMARRAI_VOL_PAGE);
+  const m = parseSamarrai(s.samarrai);
   return (
     <>
       {s.samarrai && (
         <>
           {" · "}
           {m ? (
-            t("samarraiVolPage", { vol: m[1], page: m[2].replace(/\s+/g, "") })
+            t("samarraiVolPage", m)
           ) : (
             <bdi lang="ar">{t("samarraiRef", { ref: s.samarrai })}</bdi>
           )}

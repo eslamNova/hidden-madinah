@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import { storyAnchor } from "@/lib/citations";
 import { useLang } from "@/lib/use-lang";
 import type { HumaneStory, StoryTheme, StoryThemeGroup } from "@/lib/stories";
 import { StoryCard } from "./StoryCard";
@@ -37,7 +38,9 @@ function Count({ n, active }: { n: number; active: boolean }) {
 
 /**
  * Theme chips over the story list. The chosen theme is kept in ?theme= so a
- * filtered list can be shared or linked to (e.g. /stories?theme=mercy).
+ * filtered list can be shared or linked to (e.g. /stories?theme=mercy). Each
+ * story has its own anchor (#story-<claim id>, StoryCard); a link to one
+ * story never lands on a theme that hides it.
  */
 export function StoryBrowser({ stories, groups }: { stories: HumaneStory[]; groups: StoryThemeGroup[] }) {
   const t = useTranslations("stories");
@@ -48,8 +51,12 @@ export function StoryBrowser({ stories, groups }: { stories: HumaneStory[]; grou
   useEffect(() => {
     const wanted = new URLSearchParams(window.location.search).get("theme");
     const group = groups.find((g) => g.theme === wanted);
-    if (group) setActive(group.theme);
-  }, [groups]);
+    if (!group) return;
+    // A linked story outside that theme wins: show everything instead.
+    const target = stories.find((s) => `#${storyAnchor(s.id)}` === window.location.hash);
+    if (target && !group.ids.includes(target.id)) return;
+    setActive(group.theme);
+  }, [groups, stories]);
 
   const choose = (next: Filter) => {
     setActive(next);

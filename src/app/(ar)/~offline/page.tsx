@@ -1,7 +1,11 @@
+import type { Metadata } from "next";
 import { createTranslator, useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { WifiOff } from "lucide-react";
 import enMessages from "../../../../messages/en.json";
+
+/** The service worker's fallback document: never a search result. */
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 /**
  * The service worker's offline fallback (precached, served for any failed

@@ -128,6 +128,8 @@ export type PublicPlaceView = {
   mapsUrl: string | null;
   relatedSlugs: string[];
   lastUpdated: string;
+  /** Structured hours from the practical-info editor (null when none are stored). */
+  openingHours: OpeningHours | null;
 };
 
 export function toPublicPlaceView(
@@ -160,7 +162,26 @@ export function toPublicPlaceView(
     mapsUrl,
     relatedSlugs: place.related_place_slugs,
     lastUpdated: place.last_updated,
+    openingHours: parseOpeningHours(place.opening_hours),
   };
+}
+
+/** places.opening_hours as written by /admin/practical: { always: true } or { daily: [["08:00", "22:00"], …] }. */
+export type OpeningHours = { always: boolean; daily: [string, string][] };
+
+const HH_MM = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+/** Safely parse the opening_hours jsonb column; anything malformed reads as "not stored". */
+export function parseOpeningHours(json: Json | null | undefined): OpeningHours | null {
+  if (!json || typeof json !== "object" || Array.isArray(json)) return null;
+  if (json.always === true) return { always: true, daily: [] };
+  if (!Array.isArray(json.daily)) return null;
+  const daily = json.daily.flatMap((slot): [string, string][] =>
+    Array.isArray(slot) && typeof slot[0] === "string" && typeof slot[1] === "string" && HH_MM.test(slot[0]) && HH_MM.test(slot[1])
+      ? [[slot[0], slot[1]]]
+      : []
+  );
+  return daily.length ? { always: false, daily } : null;
 }
 
 export type TransportOption = {

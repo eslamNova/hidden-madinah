@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
+import { cache } from "react";
 import { getTranslations } from "next-intl/server";
+import { ogImageOf } from "@/lib/article-format";
 import { coverImage, stripVerify } from "@/lib/content";
 import { haversineKm } from "@/lib/geo";
-import { languageAlternates, localizeHref, type Lang } from "@/lib/i18n";
+import { localizeHref, type Lang } from "@/lib/i18n";
+import { pageMetadata, shareImageOf } from "@/lib/page-metadata";
 import { getRouteSlugById, getRouteSlugs, getRouteWithStops } from "@/lib/queries";
+import { jsonLdGraph, touristTripNode, wafaBookNode } from "@/lib/structured-data";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { PageHero } from "@/components/layout/PageHero";
 import { PlaceCard, toPlaceCardData } from "@/components/place/PlaceCard";
 import type { RouteMapStop } from "@/components/map/RouteMap";
@@ -28,23 +33,27 @@ export async function routeStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
+// generateMetadata and the page read the same rows: once per request.
+const load = cache((rawSlug: string, lang: Lang) => getRouteWithStops(decodeURIComponent(rawSlug), lang));
+
 export async function routeMetadata(lang: Lang, params: Params): Promise<Metadata> {
   const { slug } = await params;
-  const route = await getRouteWithStops(decodeURIComponent(slug), lang);
+  const route = await load(slug, lang);
+  if (!route) return {};
   // Route descriptions are owner content — strip [VERIFY] like place fields.
-  return route
-    ? {
-        title: route.title_ar,
-        description: stripVerify(route.description_ar) ?? undefined,
-        alternates: languageAlternates(routePath(route.slug), lang),
-      }
-    : {};
+  return pageMetadata({
+    lang,
+    path: routePath(route.slug),
+    title: route.title_ar,
+    description: stripVerify(route.description_ar),
+    image: shareImageOf(coverImage(route.stops.flatMap((s) => s.media)), route.title_ar),
+  });
 }
 
 export async function RouteView({ lang, params }: { lang: Lang; params: Params }) {
   const { slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
-  const route = await getRouteWithStops(slug, lang);
+  const route = await load(rawSlug, lang);
   if (!route) {
     // Routes used to be addressed by UUID — 308 old shared links to the slug,
     // in the language the link was opened in.
@@ -73,11 +82,12 @@ export async function RouteView({ lang, params }: { lang: Lang; params: Params }
     totalKm += haversineKm(mapStops[i - 1], mapStops[i]);
   }
   totalKm = Math.round(totalKm * 10) / 10;
+  const cover = coverImage(route.stops.flatMap((s) => s.media));
 
   return (
     <>
       <PageHero
-        photo={coverImage(route.stops.flatMap((s) => s.media))}
+        photo={cover}
         category={route.stops[0]?.category}
         title={route.title_ar}
         subtitle={description}
@@ -120,6 +130,19 @@ export async function RouteView({ lang, params }: { lang: Lang; params: Params }
         ))}
       </ol>
       </div>
+      <JsonLd
+        data={jsonLdGraph(
+          touristTripNode({
+            lang,
+            path: routePath(route.slug),
+            name: route.title_ar,
+            description,
+            image: cover ? ogImageOf(cover) : null,
+            stops: route.stops.map((s) => ({ name: s.name_ar, place: { slug: s.slug, category: s.category } })),
+          }),
+          wafaBookNode(lang)
+        )}
+      />
     </>
   );
 }

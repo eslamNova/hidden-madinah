@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { ConsentSettings } from "@/components/analytics/ConsentSettings";
+import Link from "@/components/i18n/Link";
 import { CONTACT_EMAIL, privacyUpdated } from "@/lib/constants";
-import { languageAlternates, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/page-metadata";
 
 /** /privacy and /en/privacy. The route files set the request locale before rendering. */
 export async function privacyMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("privacy");
-  return { title: t("title"), description: t("intro"), alternates: languageAlternates("/privacy", lang) };
+  return pageMetadata({ lang, path: "/privacy", title: t("title"), description: t("intro") });
 }
 
 /** Bulleted section — the notice is mostly "here is exactly what we store". */
@@ -86,6 +88,16 @@ export async function PrivacyView({ lang }: { lang: Lang }) {
           </p>
         </section>
       )}
+
+      <section className="space-y-3">
+        <h2 className="text-xl">{t("sourcesTitle")}</h2>
+        <p className="text-muted">
+          {t("sourcesBody")}{" "}
+          <Link href="/sources" className="text-brand underline underline-offset-4">
+            {t("sourcesLink")}
+          </Link>
+        </p>
+      </section>
     </div>
   );
 }

@@ -5,8 +5,9 @@ import { getTranslations } from "next-intl/server";
 import { BookHeart, ChevronLeft, Clock, Footprints, Newspaper } from "lucide-react";
 import { coverImage } from "@/lib/content";
 import { HERO_IMAGES } from "@/lib/hero-images";
-import { languageAlternates, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
 import { hasEnglishVersion, journeyTexts } from "@/lib/journey-view";
+import { pageMetadata, shareImageOf } from "@/lib/page-metadata";
 import { getPublishedJourneys } from "@/lib/queries";
 import { PageHero } from "@/components/layout/PageHero";
 import { PlaceImage, PlaceholderImage } from "@/components/place/PlaceImage";
@@ -26,7 +27,15 @@ const normalizeTags = (tags: string[] | null | undefined) =>
  */
 export async function journeysMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("journey");
-  return { title: t("listTitle"), description: t("listSubtitle"), alternates: languageAlternates("/journeys", lang) };
+  const all = await getPublishedJourneys(lang);
+  const first = (lang === "en" ? all.filter(hasEnglishVersion) : all)[0];
+  return pageMetadata({
+    lang,
+    path: "/journeys",
+    title: t("listTitle"),
+    description: t("listSubtitle"),
+    image: shareImageOf(coverImage(first?.stops.flatMap((s) => s.place?.media ?? []) ?? []), t("listTitle")),
+  });
 }
 
 export async function JourneysView({ lang }: { lang: Lang }) {

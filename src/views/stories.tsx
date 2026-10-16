@@ -3,10 +3,23 @@ import NextLink from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Route } from "lucide-react";
 import Link from "@/components/i18n/Link";
+import { storyAnchor } from "@/lib/citations";
 import { HERO_IMAGES } from "@/lib/hero-images";
-import { languageAlternates, type Lang } from "@/lib/i18n";
-import { getHumaneStories } from "@/lib/stories";
+import type { Lang } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/page-metadata";
+import { getHumaneStories, type HumaneStory } from "@/lib/stories";
+import {
+  jsonLdGraph,
+  pageUrl,
+  placeEntityId,
+  wafaBookId,
+  wafaBookNode,
+  wafaPageCitation,
+  websiteId,
+  type JsonLdNode,
+} from "@/lib/structured-data";
 import { PageHero } from "@/components/layout/PageHero";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { StoryBrowser } from "@/components/stories/StoryBrowser";
 
 /**
@@ -17,7 +30,53 @@ import { StoryBrowser } from "@/components/stories/StoryBrowser";
  */
 export async function storiesMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("stories");
-  return { title: t("title"), description: t("subtitle"), alternates: languageAlternates("/stories", lang) };
+  return pageMetadata({ lang, path: "/stories", title: t("title"), description: t("subtitle") });
+}
+
+/**
+ * schema.org CollectionPage: each story is a CreativeWork at its own anchor
+ * (#story-<claim id>), about its place's entity (or its topic), citing its
+ * volume and page of the shared Wafa al-Wafa Book entry.
+ */
+async function storiesJsonLd(lang: Lang, stories: HumaneStory[]) {
+  const t = await getTranslations("stories");
+  const url = pageUrl("/stories", lang);
+  const story = (s: HumaneStory): JsonLdNode => {
+    const id = `${url}#${storyAnchor(s.id)}`;
+    return {
+      "@type": "CreativeWork",
+      "@id": id,
+      url: id,
+      text: s.text,
+      inLanguage: lang,
+      ...(s.themes.length ? { keywords: s.themes.map((theme) => t(`themes.${theme}`)).join(", ") } : {}),
+      ...(s.place
+        ? { about: { "@id": placeEntityId(s.place.slug), name: s.place.name } }
+        : s.topic
+          ? { about: { "@type": "Thing", name: t(`topics.${s.topic}`) } }
+          : {}),
+      ...(s.vol != null && s.page != null
+        ? { citation: wafaPageCitation(s.vol, s.page, t("source", { vol: s.vol, page: s.page })) }
+        : { citation: { "@id": wafaBookId() } }),
+    };
+  };
+  return jsonLdGraph(
+    {
+      "@type": "CollectionPage",
+      "@id": `${url}#page`,
+      url,
+      name: t("title"),
+      description: t("subtitle"),
+      inLanguage: lang,
+      isPartOf: { "@id": websiteId(lang) },
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: stories.length,
+        itemListElement: stories.map((s, i) => ({ "@type": "ListItem", position: i + 1, item: story(s) })),
+      },
+    },
+    wafaBookNode(lang)
+  );
 }
 
 export async function StoriesView({ lang }: { lang: Lang }) {
@@ -79,6 +138,7 @@ export async function StoriesView({ lang }: { lang: Lang }) {
           </Link>
         )}
       </div>
+      {stories.length > 0 && <JsonLd data={await storiesJsonLd(lang, stories)} />}
     </>
   );
 }

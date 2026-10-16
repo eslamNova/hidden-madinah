@@ -11,6 +11,9 @@ import { localizeHref } from "@/lib/i18n";
  */
 export function revalidateSite() {
   revalidatePath("/", "layout");
+  // Root route handlers sit under no layout: named explicitly.
+  revalidatePath("/llms.txt");
+  revalidatePath("/llms-full.txt");
 }
 
 /** One exact page and its English twin (/plan and /en/plan) — for pages without dynamic segments. */

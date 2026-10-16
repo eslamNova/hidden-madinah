@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { stripVerify } from "@/lib/content";
 import { HERO_IMAGES } from "@/lib/hero-images";
-import { languageAlternates, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/page-metadata";
 import { getPublishedPlaces } from "@/lib/queries";
 import { PageHero } from "@/components/layout/PageHero";
 import { toPlaceCardData } from "@/components/place/PlaceCard";
@@ -20,7 +20,7 @@ import { TelegramCard } from "@/components/place/TelegramCard";
 /** /places and /en/places. The route files set the request locale before rendering. */
 export async function placesMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("places");
-  return { title: t("title"), alternates: languageAlternates("/places", lang) };
+  return pageMetadata({ lang, path: "/places", title: t("title"), description: t("metaDescription") });
 }
 
 export async function PlacesView({ lang }: { lang: Lang }) {
@@ -59,10 +59,9 @@ export async function PlacesView({ lang }: { lang: Lang }) {
         innerClassName="max-w-5xl"
       />
       <div className="mx-auto max-w-5xl space-y-10 px-4 pb-8 pt-8">
-        {/* Suspense: PlacesExplorer reads ?category= via useSearchParams. */}
-        <Suspense>
-          <PlacesExplorer places={dtos} />
-        </Suspense>
+        {/* No Suspense: the explorer reads ?category= after hydration, so the
+            full list (a link per place) is in the static HTML. */}
+        <PlacesExplorer places={dtos} />
         {/* Geolocation on explicit request only (moved from the story landing). */}
         <NearestPlaces places={nearestInput} />
         <TelegramCard />

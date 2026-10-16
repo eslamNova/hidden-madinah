@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { coverImage, stripVerify } from "@/lib/content";
-import { languageAlternates, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/page-metadata";
 import { getPublishedPlaces } from "@/lib/queries";
 import { MapView as PlacesMap, type MapPin } from "@/components/map/MapView";
 
@@ -12,7 +13,7 @@ import { MapView as PlacesMap, type MapPin } from "@/components/map/MapView";
  */
 export async function mapMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("map");
-  return { title: t("title"), alternates: languageAlternates("/map", lang) };
+  return pageMetadata({ lang, path: "/map", title: t("title"), description: t("metaDescription") });
 }
 
 export async function MapView({ lang }: { lang: Lang }) {

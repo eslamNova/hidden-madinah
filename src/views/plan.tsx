@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { HERO_IMAGES } from "@/lib/hero-images";
-import { languageAlternates, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/page-metadata";
 import { getPlannerPlaces } from "@/lib/queries";
 import { PageHero } from "@/components/layout/PageHero";
 import { Planner } from "@/components/planner/Planner";
@@ -9,7 +10,7 @@ import { Planner } from "@/components/planner/Planner";
 /** /plan and /en/plan. The route files set the request locale before rendering. */
 export async function planMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("plan");
-  return { title: t("title"), description: t("subtitle"), alternates: languageAlternates("/plan", lang) };
+  return pageMetadata({ lang, path: "/plan", title: t("title"), description: t("subtitle") });
 }
 
 export async function PlanView({ lang }: { lang: Lang }) {

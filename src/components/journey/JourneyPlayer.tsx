@@ -130,7 +130,18 @@ export function JourneyPlayer({
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-paper">
                 <span className="ltr-nums leading-none">{s.index}</span>
               </span>
-              <span className="text-lg">{s.title}</span>
+              {/* A link to the stop's place: the intro is the player's first
+                  render, so these links are in the page's server HTML. */}
+              {s.placeSlug ? (
+                <Link
+                  href={`/places/${encodeURIComponent(s.placeSlug)}`}
+                  className="text-lg underline decoration-ink/20 underline-offset-4 hover:decoration-brand"
+                >
+                  {s.title}
+                </Link>
+              ) : (
+                <span className="text-lg">{s.title}</span>
+              )}
             </li>
           ))}
         </ol>

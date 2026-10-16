@@ -45,6 +45,34 @@ export const PRIVACY_UPDATED = "5 أكتوبر 2026";
 export const PRIVACY_UPDATED_EN = "5 October 2026";
 export const privacyUpdated = (lang: "ar" | "en") => (lang === "en" ? PRIVACY_UPDATED_EN : PRIVACY_UPDATED);
 
+/** Shown on /sources; update with the page's wording (messages: sources.*). */
+export const SOURCES_UPDATED = "15 أكتوبر 2026";
+export const SOURCES_UPDATED_EN = "15 October 2026";
+export const SOURCES_UPDATED_ISO = "2026-10-15";
+export const sourcesUpdated = (lang: "ar" | "en") => (lang === "en" ? SOURCES_UPDATED_EN : SOURCES_UPDATED);
+
+/**
+ * The primary source, as recorded in the `sources` table (row `wafa-dki`,
+ * supabase/migrations/006_knowledge.sql): the edition every claim quotes and
+ * cites by printed volume and page. Used for the shared schema.org Book entry
+ * and llms.txt; the visitor-facing wording lives in messages (sources.*).
+ */
+export const WAFA_BOOK = {
+  title: { ar: "وفاء الوفاء بأخبار دار المصطفى", en: "Wafa al-Wafa bi-Akhbar Dar al-Mustafa" },
+  author: { ar: "نور الدين علي بن عبد الله السمهودي", en: "Nur al-Din 'Ali ibn 'Abd Allah al-Samhudi" },
+  authorDeath: { ar: "ت 911هـ", en: "d. 911 AH" },
+  publisher: { ar: "دار الكتب العلمية", en: "Dar al-Kutub al-'Ilmiyya" },
+  edition: { ar: "بيروت، الطبعة الأولى، 1419هـ، 4 مجلدات", en: "Beirut, 1st ed., 1419 AH, 4 vols" },
+  turathId: "23695",
+  url: "https://app.turath.io/book/23695",
+} as const;
+
+/** The critical edition every passage is cross-checked against (row `wafa-samarrai`). */
+export const SAMARRAI_EDITION = {
+  ar: "تحقيق قاسم السامرائي، مؤسسة الفرقان للتراث الإسلامي، 5 مجلدات",
+  en: "ed. Qasim al-Samarrai, Al-Furqan Islamic Heritage Foundation, 5 vols",
+} as const;
+
 /**
  * The «سيرة» app cards (home closing panel, place pages) are hidden during
  * the hackathon judging; set back to true to show them again.

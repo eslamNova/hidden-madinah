@@ -249,6 +249,94 @@ export async function getJourney(
   };
 }
 
+// ── Verified claims (place pages, sitemap, llms.txt) ───────────────────────
+
+/** One verified claim as a place page shows it «من وفاء الوفاء». */
+export type PlaceClaim = {
+  id: number;
+  /** In the page's language: English only when its translation was reviewed. */
+  text: string;
+  vol: number | null;
+  page: number | null;
+  /** al-Samarrai edition reference as stored ("ج3 ص139"). */
+  samarrai: string | null;
+  /** Narration reference and grading, as written in the source (Arabic). */
+  hadith: string | null;
+  grading: string | null;
+};
+
+const PLACE_CLAIM_COLUMNS = "id, place_id, text_ar, text_en, en_reviewed, vol, page, samarrai_ref, hadith_ref, grading";
+
+type PlaceClaimRow = Pick<ClaimRow, "id" | "place_id" | "text_ar" | "text_en" | "en_reviewed" | "vol" | "page" | "samarrai_ref" | "hadith_ref" | "grading">;
+
+function toPlaceClaims(rows: PlaceClaimRow[], lang: Lang): PlaceClaim[] {
+  return rows.flatMap((c) => {
+    // English pages show only claims whose English was reviewed.
+    const text = claimText(c, lang);
+    if (!text) return [];
+    return [
+      {
+        id: c.id,
+        text,
+        vol: c.vol,
+        page: c.page,
+        samarrai: c.samarrai_ref?.trim() || null,
+        hadith: c.hadith_ref?.trim() || null,
+        grading: c.grading?.trim() || null,
+      },
+    ];
+  });
+}
+
+/**
+ * A place's verified claims in book order (volume, page). RLS returns only
+ * verified claims to the anon client; the filter is repeated here so the
+ * page never depends on the policy alone.
+ */
+export async function getPlaceClaims(placeId: string, lang: Lang = "ar"): Promise<PlaceClaim[]> {
+  const { data, error } = await publicClient
+    .from("claims")
+    .select(PLACE_CLAIM_COLUMNS)
+    .eq("place_id", placeId)
+    .eq("status", "verified")
+    .order("vol", { ascending: true, nullsFirst: false })
+    .order("page", { ascending: true, nullsFirst: false })
+    .order("id", { ascending: true });
+  if (isMissingTable(error)) return [];
+  if (error) throw error;
+  return toPlaceClaims(data ?? [], lang);
+}
+
+/** Every published place's verified claims, by place id, in book order (llms-full.txt). */
+export async function getAllPlaceClaims(lang: Lang = "ar"): Promise<Map<string, PlaceClaim[]>> {
+  const { data, error } = await publicClient
+    .from("claims")
+    .select(PLACE_CLAIM_COLUMNS)
+    .eq("status", "verified")
+    .not("place_id", "is", null)
+    .order("vol", { ascending: true, nullsFirst: false })
+    .order("page", { ascending: true, nullsFirst: false })
+    .order("id", { ascending: true });
+  if (isMissingTable(error)) return new Map();
+  if (error) throw error;
+  const byPlace = new Map<string, PlaceClaimRow[]>();
+  for (const c of data ?? []) if (c.place_id) byPlace.set(c.place_id, [...(byPlace.get(c.place_id) ?? []), c]);
+  return new Map([...byPlace].map(([id, rows]) => [id, toPlaceClaims(rows, lang)]));
+}
+
+/** When each verified claim was approved (else created) — the sitemap's lastModified for pages built on claims. */
+export type ClaimDate = { id: number; placeId: string | null; kind: ClaimRow["kind"]; date: string };
+
+export async function getVerifiedClaimDates(): Promise<ClaimDate[]> {
+  const { data, error } = await publicClient
+    .from("claims")
+    .select("id, place_id, kind, reviewed_at, created_at")
+    .eq("status", "verified");
+  if (isMissingTable(error)) return [];
+  if (error) throw error;
+  return (data ?? []).map((c) => ({ id: c.id, placeId: c.place_id, kind: c.kind, date: c.reviewed_at ?? c.created_at }));
+}
+
 // ── Trip planner ────────────────────────────────────────────────────────────
 
 /**

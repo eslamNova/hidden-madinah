@@ -3,16 +3,21 @@
 import { useTranslations } from "next-intl";
 import { BookOpen, Landmark, MapPin } from "lucide-react";
 import Link from "@/components/i18n/Link";
+import { storyAnchor } from "@/lib/citations";
 import type { Lang } from "@/lib/i18n";
 import type { HumaneStory } from "@/lib/stories";
 
-/** One verified story: its text, its themes, its place, and where it is in the book. */
+/**
+ * One verified story: its text, its themes, its place, and where it is in the
+ * book. Its stable id (story-<claim id>) lets a single story be linked:
+ * /stories#story-312.
+ */
 export function StoryCard({ story, lang }: { story: HumaneStory; lang: Lang }) {
   const t = useTranslations("stories");
   const ref = story.hadithRef ? `${story.hadithRef}${story.grading ? ` (${story.grading})` : ""}` : null;
 
   return (
-    <article className="card-elevated space-y-4 border-s-4 border-s-accent/70 p-5">
+    <article id={storyAnchor(story.id)} className="card-elevated scroll-mt-20 space-y-4 border-s-4 border-s-accent/70 p-5">
       {story.themes.length > 0 && (
         <ul aria-label={t("themesLabel")} className="flex flex-wrap gap-2">
           {story.themes.map((theme) => (

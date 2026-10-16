@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { HERO_IMAGES } from "@/lib/hero-images";
-import { languageAlternates, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/page-metadata";
 import { hasEnglishVersion } from "@/lib/journey-view";
 import { getPublishedJourneys, getPublishedPlaces } from "@/lib/queries";
 import { PageHero } from "@/components/layout/PageHero";
@@ -15,7 +16,7 @@ import { MyJourney } from "@/components/journey/MyJourney";
  */
 export async function myJourneyMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("journey");
-  return { title: t("myJourney"), robots: { index: false }, alternates: languageAlternates("/my-journey", lang) };
+  return pageMetadata({ lang, path: "/my-journey", title: t("myJourney"), description: t("myJourneySubtitle"), noindex: true });
 }
 
 export async function MyJourneyView({ lang }: { lang: Lang }) {

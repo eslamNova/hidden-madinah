@@ -10,6 +10,8 @@ import { OfflineBanner } from "@/components/layout/OfflineBanner";
 import { siteDescription, siteName, siteUrl } from "@/lib/constants";
 import { thmanyahSans, thmanyahSerif } from "@/lib/fonts";
 import type { Lang } from "@/lib/i18n";
+import { jsonLdGraph, organizationNode, websiteNode } from "@/lib/structured-data";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 /**
  * The <html> document both root layouts share (src/app/(ar)/layout.tsx and
@@ -17,8 +19,9 @@ import type { Lang } from "@/lib/i18n";
  * and dir are correct in the server HTML and every page stays static.
  */
 
-// Share previews (WhatsApp, iMessage, X, Facebook) read these. Child pages
-// that only set `title` inherit the image; place pages supply their own.
+// Share previews (WhatsApp, iMessage, X, Facebook) read these. Every public
+// page replaces them with its own complete set (src/lib/page-metadata.ts);
+// these remain for pages that set none (admin, error screens).
 export function rootMetadata(lang: Lang): Metadata {
   const name = siteName(lang);
   const description = siteDescription(lang);
@@ -60,12 +63,17 @@ export const rootViewport: Viewport = {
 // the OS prefers-color-scheme is deliberately NOT consulted.
 export const fontStepScript = `try{var d=document.documentElement,s=localStorage.getItem("hm-font-step");if(s==="1"||s==="2"){d.dataset.fontStep=s}var t=localStorage.getItem("hm-theme");if(t!=="dark"&&t!=="light"){t="dark"}d.dataset.theme=t}catch(e){}`;
 
+/**
+ * Message namespaces only server components read: kept out of every page's
+ * client payload. The admin layout provides the full set for /admin/*; the
+ * sources page, llms.txt and the structured data render on the server only.
+ */
+const SERVER_ONLY_NAMESPACES = new Set(["admin", "sources", "llms", "seo"]);
+
 export async function SiteDocument({ lang, children }: { lang: Lang; children: React.ReactNode }) {
-  // Admin strings stay out of public pages' RSC payload; the admin layout
-  // provides the full message set for /admin/*.
   const allMessages = await getMessages();
   const publicMessages = Object.fromEntries(
-    Object.entries(allMessages).filter(([namespace]) => namespace !== "admin")
+    Object.entries(allMessages).filter(([namespace]) => !SERVER_ONLY_NAMESPACES.has(namespace))
   );
   const t = await getTranslations("common");
 
@@ -104,6 +112,8 @@ export async function SiteDocument({ lang, children }: { lang: Lang; children: R
           {/* GA4 + its notice; both no-ops until NEXT_PUBLIC_GA_ID is set. */}
           <SiteAnalytics />
         </NextIntlClientProvider>
+        {/* Who publishes the site, in both names, and its sources policy (/sources). */}
+        <JsonLd data={jsonLdGraph(organizationNode(lang), websiteNode(lang))} />
       </body>
     </html>
   );

@@ -7,7 +7,8 @@ import { articleCover, KNOWN_ARTICLE_TAGS } from "@/lib/article-format";
 import { getPublishedArticles } from "@/lib/articles";
 import { coverImage } from "@/lib/content";
 import { HERO_IMAGES } from "@/lib/hero-images";
-import { INTL_LOCALE, languageAlternates, localizeHref, type Lang } from "@/lib/i18n";
+import { INTL_LOCALE, localizeHref, type Lang } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/page-metadata";
 import { getPlacesBySlugs } from "@/lib/queries";
 import { PageHero } from "@/components/layout/PageHero";
 import { PlaceImage } from "@/components/place/PlaceImage";
@@ -21,11 +22,11 @@ import { JourneyTagFilter, type JourneyTagOption } from "@/components/journey/Jo
  */
 export async function blogMetadata(lang: Lang): Promise<Metadata> {
   const t = await getTranslations("blog");
+  const meta = pageMetadata({ lang, path: "/blog", title: t("title"), description: t("subtitle") });
   return {
-    title: t("title"),
-    description: t("subtitle"),
+    ...meta,
     alternates: {
-      ...languageAlternates("/blog", lang),
+      ...meta.alternates,
       types: { "application/rss+xml": [{ url: localizeHref("/blog/rss.xml", lang), title: t("rssTitle") }] },
     },
   };

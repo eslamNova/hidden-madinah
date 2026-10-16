@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "@/components/i18n/Link";
-import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { List, Map as MapIcon, Search } from "lucide-react";
 import { normalizeArabic, normalizeLatin, searchIncludes } from "@/lib/arabic";
@@ -78,19 +77,29 @@ function Chip({
   );
 }
 
-/** Client-side search + filters over the (small) published-places list. */
+const isCategory = (c: string | null): c is PlaceCategory => CATEGORY_ORDER.includes(c as PlaceCategory);
+
+/**
+ * Client-side search + filters over the (small) published-places list.
+ *
+ * The first render shows every place, so the static HTML carries a card and
+ * a link for each one (search engines and no-JS readers see the full list).
+ * A ?category= link (the home page's category tiles) is applied right after
+ * hydration — read from the URL here rather than with useSearchParams, which
+ * would bail the whole list out of the server HTML.
+ */
 export function PlacesExplorer({ places }: { places: ExplorerPlace[] }) {
   const t = useTranslations("places");
   const lang = useLang();
-  const initialCategory = useSearchParams().get("category") ?? undefined;
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<PlaceCategory | "all">(
-    CATEGORY_ORDER.includes(initialCategory as PlaceCategory)
-      ? (initialCategory as PlaceCategory)
-      : "all"
-  );
+  const [category, setCategory] = useState<PlaceCategory | "all">("all");
   const [distance, setDistance] = useState<DistanceFilter>("all");
   const [time, setTime] = useState<TimeFilter>("all");
+
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get("category");
+    if (isCategory(wanted)) setCategory(wanted);
+  }, []);
 
   const filtered = useMemo(
     () =>
