@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ArticleEditor } from "@/components/admin/ArticleEditor";
-import { loadEditorOptions } from "../options";
+import { editorMediaOptions, loadEditorOptions } from "../options";
 
 export default async function NewArticlePage() {
   const t = await getTranslations("admin.articles");
@@ -14,7 +14,7 @@ export default async function NewArticlePage() {
         {t("back")}
       </Link>
       <h2 className="text-xl">{t("new")}</h2>
-      <ArticleEditor article={null} places={places} journeys={journeys} />
+      <ArticleEditor article={null} places={places} journeys={journeys} {...editorMediaOptions()} />
     </div>
   );
 }

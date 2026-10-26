@@ -610,6 +610,17 @@
       "gardens": "Gardens",
       "history": "History",
       "visiting-tips": "Visiting tips"
+    },
+    "share": {
+      "title": "Share this article",
+      "native": "Share",
+      "facebook": "Facebook",
+      "whatsapp": "WhatsApp",
+      "x": "X (Twitter)",
+      "shareOn": "Share on {network} (opens a new window)",
+      "copy": "Copy link",
+      "copied": "Link copied",
+      "copyFailed": "Couldn't copy. Copy the link from the address bar."
     }
   },
   "sources": {

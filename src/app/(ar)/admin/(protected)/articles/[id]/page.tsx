@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { isArticleStatus, parseSources } from "@/lib/article-format";
 import { ArticleEditor, type EditableArticle } from "@/components/admin/ArticleEditor";
-import { loadEditorOptions } from "../options";
+import { editorMediaOptions, loadEditorOptions } from "../options";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -47,7 +47,13 @@ export default async function EditArticlePage({ params }: { params: Promise<{ id
         {t("edit")}: {row.title_ar.trim() || t("untitled")}
       </h2>
       {/* Keyed by id: after "new" redirects here, the editor starts from the saved row. */}
-      <ArticleEditor key={row.id} article={article} places={options.places} journeys={options.journeys} />
+      <ArticleEditor
+        key={row.id}
+        article={article}
+        places={options.places}
+        journeys={options.journeys}
+        {...editorMediaOptions()}
+      />
     </div>
   );
 }

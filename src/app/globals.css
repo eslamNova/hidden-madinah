@@ -443,8 +443,24 @@ html[data-immersive] body::before {
 .article-body h4,
 .article-body h5,
 .article-body h6 {
-  font-size: 1.125rem;
+  font-size: 1.2rem;
   margin-top: 1.3em;
+}
+/* A heading binds to the text it introduces. */
+.article-body :is(h2, h3, h4) + * {
+  margin-top: 0.5em;
+}
+.article-body > :first-child,
+.article-body > :is(h2, h3, h4):first-child {
+  margin-top: 0;
+}
+.article-body em,
+.article-body i {
+  font-style: italic;
+}
+.article-body u {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
 }
 .article-body a {
   color: var(--color-brand);
@@ -472,10 +488,26 @@ html[data-immersive] body::before {
   background-color: color-mix(in srgb, var(--color-ink) 5%, transparent);
   padding: 0.75em 1em;
 }
+/* The visual editor wraps quote lines and list items in paragraphs. */
+.article-body blockquote > * + * {
+  margin-top: 0.6em;
+}
+.article-body li > p + p,
+.article-body li > :is(ul, ol) {
+  margin-top: 0.4em;
+}
+.article-body li::marker {
+  color: var(--color-brand);
+}
 .article-body img {
   max-width: 100%;
   height: auto;
   border-radius: 1rem;
+}
+/* A picture on its own line (the editor's images) is centred and spaced like a paragraph. */
+.article-body > img {
+  display: block;
+  margin-inline: auto;
 }
 .article-body hr {
   border: 0;
@@ -516,4 +548,31 @@ html[data-immersive] body::before {
 .article-body th[align="center"],
 .article-body td[align="center"] {
   text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   The admin's article editor (src/components/admin/RichTextEditor.tsx): the
+   public .article-body typography inside an editable box.
+   -------------------------------------------------------------------------- */
+.rich-editor {
+  min-height: 22rem;
+  padding: 1rem 1.25rem 1.5rem;
+  outline: none;
+}
+.rich-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: inline-start;
+  height: 0;
+  pointer-events: none;
+  color: var(--color-muted);
+}
+.rich-editor img {
+  cursor: pointer;
+}
+.rich-editor img.ProseMirror-selectednode {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.rich-editor a {
+  cursor: text;
 }

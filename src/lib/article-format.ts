@@ -1,5 +1,6 @@
 import type { CoverImage } from "@/lib/content";
 import type { Json } from "@/lib/database.types";
+import { articleImageSize, uploadedShareImage } from "@/lib/article-images";
 import { MEDIA_PUBLIC_BASE, variantUrl } from "@/lib/media-spec";
 
 /**
@@ -79,6 +80,50 @@ export function articleHasEnglish(a: { title_en: string | null; body_en: string 
 }
 
 /**
+ * Bodies saved by the visual editor are HTML; articles written before it are
+ * Markdown. The editor's HTML always starts with a tag, so the first
+ * non-space character tells them apart.
+ */
+export const isHtmlBody = (body: string) => body.trimStart().startsWith("<");
+
+/**
+ * Whether the editor may store a link target: http(s), mailto, a site path
+ * ("/places/quba") or an in-page anchor. The public page applies the same
+ * rule again when it sanitises the body (src/lib/article-html.ts).
+ */
+export function isEditorLinkAllowed(href: string): boolean {
+  if (!href || /[\u0000-\u001f\u007f\\\s]/.test(href)) return false;
+  if (/^#[\w-]*$/.test(href) || /^\/(?!\/)/.test(href)) return true;
+  try {
+    return ["http:", "https:", "mailto:"].includes(new URL(href).protocol);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A link as the owner typed it, ready to store — or null when it cannot be a
+ * link. "www.example.com" and "example.com/page" gain https://, a bare email
+ * address gains mailto:.
+ */
+export function normalizeEditorLink(raw: string): string | null {
+  let href = raw.trim();
+  if (!href) return null;
+  if (/^[^\s@/:]+@[^\s@/:]+\.[a-z]{2,}$/i.test(href)) href = `mailto:${href}`;
+  else if (!href.includes(":") && /^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}(?:[/?#]|$)/i.test(href)) href = `https://${href}`;
+  return isEditorLinkAllowed(href) ? href : null;
+}
+
+const cutAt = (text: string, max: number) => {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).trim()}…`;
+};
+
+const SUMMARY_ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', "#39": "'", apos: "'", nbsp: " " };
+
+/**
  * Plain text from Markdown, for a meta description when the excerpt is empty:
  * images dropped, links reduced to their text, block markers removed.
  */
@@ -87,15 +132,29 @@ export function markdownSummary(md: string, max = 160): string {
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, " ")
     .replace(/<[^>]*>/g, " ")
     .replace(/^\s{0,3}(?:#{1,6}\s+|>\s?|[-*+]\s+|\d+[.)]\s+)/gm, "")
     .replace(/[*_~`|]/g, "")
     .replace(/\s+/g, " ")
     .trim();
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max);
-  const space = cut.lastIndexOf(" ");
-  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).trim()}…`;
+  return cutAt(text, max);
+}
+
+/** Plain text from an article body (editor HTML or legacy Markdown), for a meta description. */
+export function bodySummary(body: string, max = 160): string {
+  if (!isHtmlBody(body)) return markdownSummary(body, max);
+  const text = body
+    .replace(/<(script|style|template)[^>]*>[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&(#\d+|[a-z]+);/gi, (m, e: string) => {
+      if (SUMMARY_ENTITIES[e.toLowerCase()]) return SUMMARY_ENTITIES[e.toLowerCase()];
+      const code = e[0] === "#" ? Number(e.slice(1)) : NaN;
+      return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : m;
+    })
+    .replace(/\s+/g, " ")
+    .trim();
+  return cutAt(text, max);
 }
 
 // ── Cover images ────────────────────────────────────────────────────────────
@@ -106,18 +165,32 @@ const VARIANT_RE = /-(?:400|800|1600)\.(?:webp|jpg)$/;
  * An article's cover URL as a CoverImage for PlaceImage / PageHero. Our own
  * media variants (media.mazarat-madinah.com/…-800.webp) keep their responsive
  * srcset; any other https image renders as a bare src. The cover is always
- * shown cropped (object-cover), so the stated size only sets the ratio.
+ * shown cropped (object-cover), so the stated size only sets the ratio — the
+ * real one when an editor upload carries it in its name, else 16:9.
  */
 export function articleCover(url: string | null | undefined): CoverImage | null {
   const src = url?.trim();
   if (!src || !/^https:\/\//.test(src)) return null;
   const isVariant = src.startsWith(`${MEDIA_PUBLIC_BASE}/`) && VARIANT_RE.test(src);
-  return { url: src, width: 1600, height: 900, singleVariant: !isVariant };
+  const size = articleImageSize(src) ?? { width: 1600, height: 900 };
+  return { url: src, ...size, singleVariant: !isVariant };
 }
 
 /** The image a share preview should use for a cover: the 1600px JPEG of a variant set (Arabic-safe), else the URL itself. */
 export function ogImageOf(cover: CoverImage): string {
   return cover.singleVariant ? cover.url : variantUrl(cover.url, 1600).replace(/\.webp$/, ".jpg");
+}
+
+/**
+ * An article's own cover as a share image (og:image, twitter:image, JSON-LD):
+ * an editor upload gives its JPEG twin with the exact size from its name; a
+ * media variant its 1600px JPEG; any other https URL itself. Sizes are only
+ * stated when known to be exact.
+ */
+export function articleShareImage(url: string | null | undefined): { url: string; width?: number; height?: number } | null {
+  const cover = articleCover(url);
+  if (!cover) return null;
+  return uploadedShareImage(cover.url) ?? { url: ogImageOf(cover) };
 }
 
 // ── Admin input validation (the editor and the server action run the same checks) ──

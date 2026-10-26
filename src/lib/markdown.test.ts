@@ -5,7 +5,8 @@ import { articleHtml } from "./article-html";
 import { markdownSummary, parseSources, slugify, validateArticle, type ArticleInput } from "./article-format";
 
 test("markdown: raw HTML in the body is shown as text, never as markup", () => {
-  const html = articleHtml('<script>alert(1)</script>\n\nText <img src=x onerror="alert(1)"> and <b>bold</b>', "ar");
+  // A body that starts with "<" is editor HTML (see article-html.test.ts); Markdown starts with text.
+  const html = articleHtml('Intro\n\n<script>alert(1)</script>\n\nText <img src=x onerror="alert(1)"> and <b>bold</b>', "ar");
   // No element survives; the attribute is visible text inside an escaped tag.
   assert.doesNotMatch(html, /<script|<img|<b>/i);
   assert.match(html, /&lt;img src=x onerror="alert\(1\)"&gt;/);

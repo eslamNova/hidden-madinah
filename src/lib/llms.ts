@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { articleText } from "@/lib/article-html";
 import { getArticle, getPublishedArticles } from "@/lib/articles";
 import { parseSamarrai, storyAnchor } from "@/lib/citations";
 import { SITE_DESCRIPTION, SITE_DESCRIPTION_EN, SITE_NAME, SITE_NAME_EN, WAFA_BOOK } from "@/lib/constants";
@@ -318,7 +319,7 @@ async function articlesFull(site: Site): Promise<string[]> {
       if (!a || !a.available) continue;
       out.push(`### ${a.title}`, "", pageUrl(`/blog/${a.slug}`, lang), "");
       if (a.excerpt) out.push(a.excerpt, "");
-      if (a.body) out.push(a.body.trim(), "");
+      if (a.body) out.push(articleText(a.body, lang), "");
       if (a.sources.length) {
         out.push(`#### ${t.blog[lang]("sourcesTitle")}`, "");
         for (const s of a.sources) out.push(`- ${t.blog[lang]("sourceRef", { vol: s.vol, page: s.page })}${s.note ? ` — ${flat(s.note)}` : ""}`);

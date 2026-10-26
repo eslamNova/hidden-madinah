@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Refreshes the Supabase auth session cookies for the admin area
+ * Refreshes the Supabase auth session cookies for the admin area and its API
  * (the @supabase/ssr middleware pattern). Public pages stay untouched.
  */
 export async function middleware(request: NextRequest) {
@@ -32,5 +32,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*"],
 };

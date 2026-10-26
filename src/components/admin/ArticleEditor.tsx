@@ -1,12 +1,13 @@
 "use client";
 
-import { useDeferredValue, useId, useMemo, useRef, useState, useTransition } from "react";
+import { useId, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ExternalLink, Loader2, Plus, Trash2, TriangleAlert, X } from "lucide-react";
+import { Eye, EyeOff, ExternalLink, ImageUp, Loader2, Plus, Trash2, TriangleAlert, X } from "lucide-react";
 import {
   KNOWN_ARTICLE_TAGS,
   SLUG_RE,
+  isHtmlBody,
   normalizeTag,
   slugify,
   validateArticle,
@@ -17,7 +18,13 @@ import {
 import { arabicIncludes } from "@/lib/arabic";
 import type { Lang } from "@/lib/i18n";
 import { markdownToHtml } from "@/lib/markdown";
-import { deleteArticleAction, saveArticleAction } from "@/app/(ar)/admin/(protected)/articles/actions";
+import { RichTextEditor, UploadNotice } from "@/components/admin/RichTextEditor";
+import { useImageUpload } from "@/components/admin/image-upload";
+import {
+  deleteArticleAction,
+  previewArticleBodyAction,
+  saveArticleAction,
+} from "@/app/(ar)/admin/(protected)/articles/actions";
 
 /** A place or journey the article can link to. */
 export type EditorOption = { slug: string; label: string; published: boolean };
@@ -48,11 +55,21 @@ const inputClass = "min-h-[52px] w-full rounded-xl border-[1.5px] border-ink/30 
 const LANGS: Lang[] = ["ar", "en"];
 
 /**
- * The article editor: Arabic and English tabs (title, excerpt, Markdown body
- * with a live preview rendered by the same renderer as the public page), then
- * the slug, cover, linked places and journeys, Wafa al-Wafa references, tags
- * and author. One save writes everything and sets the status: a draft is
- * saved or published; a published article is saved as is or unpublished.
+ * A stored body as editor HTML. Articles written before the visual editor are
+ * Markdown: they open converted (site paths kept language-neutral) and are
+ * saved as HTML from the first change; until then the stored Markdown is left
+ * as it is.
+ */
+const toEditorHtml = (body: string) => (!body.trim() ? "" : isHtmlBody(body) ? body : markdownToHtml(body, "ar"));
+
+/**
+ * The article editor: Arabic and English tabs (title, excerpt, and the body in
+ * a Word-like visual editor that uses the public page's typography, with an
+ * optional server-rendered preview of exactly what visitors will get), then
+ * the slug, cover (uploaded to R2, or a pasted https URL), linked places and
+ * journeys, Wafa al-Wafa references, tags and author. One save writes
+ * everything and sets the status: a draft is saved or published; a published
+ * article is saved as is or unpublished.
  *
  * The status pill changes as soon as a save starts (optimistic) and reverts
  * if the save fails; the status line shows a spinner meanwhile. The same
@@ -63,10 +80,16 @@ export function ArticleEditor({
   article,
   places,
   journeys,
+  uploadsEnabled,
+  imageOrigins,
 }: {
   article: EditableArticle | null;
   places: EditorOption[];
   journeys: EditorOption[];
+  /** Whether the R2 variables are set on the server (image uploads work). */
+  uploadsEnabled: boolean;
+  /** Origins whose images may appear in a body (articleImageOrigins()). */
+  imageOrigins: string[];
 }) {
   const t = useTranslations("admin.articles");
   const router = useRouter();
@@ -95,9 +118,16 @@ export function ArticleEditor({
   const [tags, setTags] = useState((article?.tags ?? []).join(", "));
   const [status, setStatus] = useState<ArticleStatus>(article?.status ?? "draft");
 
+  // The editors start from the saved bodies once; afterwards they own their content.
+  const [initialHtml] = useState<Record<Lang, string>>(() => ({
+    ar: toEditorHtml(article?.body_ar ?? ""),
+    en: toEditorHtml(article?.body_en ?? ""),
+  }));
+  const [preview, setPreview] = useState<{ lang: Lang; html: string } | "loading" | "error" | null>(null);
+  const coverUpload = useImageUpload(uploadsEnabled);
+  const coverFileRef = useRef<HTMLInputElement>(null);
+
   const current = texts[tab];
-  const deferredBody = useDeferredValue(current.body);
-  const previewHtml = useMemo(() => markdownToHtml(deferredBody, tab), [deferredBody, tab]);
   const englishComplete = !!texts.en.title.trim() && !!texts.en.body.trim();
   const slugInvalid = slug.trim() !== "" && !SLUG_RE.test(slug.trim());
   const coverPreview = /^https:\/\/\S+$/.test(cover.trim()) ? cover.trim() : null;
@@ -106,7 +136,24 @@ export function ArticleEditor({
   const setText = (lang: Lang, key: keyof Texts, value: string) => {
     setTexts((prev) => ({ ...prev, [lang]: { ...prev[lang], [key]: value } }));
     if (lang === "en" && key === "title" && !slugTouched) setSlug(slugify(value));
+    if (key === "body") setPreview(null);
   };
+
+  /** Renders the current tab's body on the server, through the public page's own sanitiser. */
+  function showPreview() {
+    const lang = tab;
+    const body = texts[lang].body;
+    setPreview("loading");
+    startTransition(async () => {
+      const res = await previewArticleBodyAction(body, lang);
+      setPreview(res.ok ? { lang, html: res.data.html } : "error");
+    });
+  }
+
+  async function uploadCover(file: File) {
+    const uploaded = await coverUpload.upload(file);
+    if (uploaded) setCover(uploaded.url);
+  }
 
   const toggle = (list: string[], value: string, on: boolean) =>
     on ? (list.includes(value) ? list : [...list, value]) : list.filter((v) => v !== value);
@@ -273,35 +320,59 @@ export function ArticleEditor({
             />
           </div>
           <div>
-            <label htmlFor={`${uid}-body`} className={fieldLabel}>
+            <p id={`${uid}-body-label`} className={fieldLabel}>
               {t("fields.body")}
-            </label>
-            <textarea
-              id={`${uid}-body`}
-              rows={16}
-              lang={lang}
-              dir={dir}
-              value={current.body}
-              onChange={(e) => setText(tab, "body", e.target.value)}
-              aria-describedby={`${uid}-md-hint`}
-              className={`${inputClass} py-3 text-base leading-relaxed`}
-            />
-            <p id={`${uid}-md-hint`} className="mt-1 text-sm text-muted">
-              {t("markdownHint")}
             </p>
-          </div>
-          <div>
-            <p className="mb-2 text-base font-semibold">{t("preview")}</p>
-            {previewHtml ? (
-              <div
-                lang={lang}
-                dir={dir}
-                className="article-body rounded-2xl border border-ink/10 bg-sand/40 p-4"
-                // The same hardened renderer as the public page (raw HTML escaped, unsafe links dropped).
-                dangerouslySetInnerHTML={{ __html: previewHtml }}
+            <p id={`${uid}-body-hint`} className="mb-2 text-sm text-muted">
+              {t("editorHint")}
+            </p>
+            {/* One editor per language, both kept mounted: each keeps its own undo history. */}
+            {LANGS.map((l) => (
+              <RichTextEditor
+                key={l}
+                lang={l}
+                hidden={l !== tab}
+                initialHtml={initialHtml[l]}
+                onChange={(html) => setText(l, "body", html)}
+                uploadsEnabled={uploadsEnabled}
+                imageOrigins={imageOrigins}
+                labelledBy={`${uid}-body-label`}
+                describedBy={`${uid}-body-hint`}
               />
-            ) : (
-              <p className="rounded-2xl border border-dashed border-ink/20 p-4 text-muted">{t("previewEmpty")}</p>
+            ))}
+            {!uploadsEnabled && (
+              <p className="mt-2 flex items-start gap-2 text-sm font-semibold">
+                <TriangleAlert aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                {t("upload.errors.not_configured")}
+              </p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <button
+              type="button"
+              aria-expanded={preview !== null && preview !== "loading"}
+              disabled={preview === "loading" || !current.body.trim()}
+              onClick={() => (preview && preview !== "loading" ? setPreview(null) : showPreview())}
+              className="flex min-h-12 items-center gap-2 rounded-xl border-[1.5px] border-ink/30 bg-surface px-4 font-medium disabled:opacity-50"
+            >
+              {preview === "loading" ? (
+                <Loader2 aria-hidden="true" className="h-5 w-5 animate-spin" />
+              ) : preview ? (
+                <EyeOff aria-hidden="true" className="h-5 w-5" />
+              ) : (
+                <Eye aria-hidden="true" className="h-5 w-5" />
+              )}
+              {preview && preview !== "loading" ? t("previewHide") : t("preview")}
+            </button>
+            {preview === "error" && <p className="text-sm font-semibold">{t("previewError")}</p>}
+            {preview && typeof preview === "object" && preview.lang === tab && (
+              <div
+                lang={preview.lang}
+                dir={preview.lang === "ar" ? "rtl" : "ltr"}
+                className="article-body rounded-2xl border border-ink/10 bg-sand/40 p-4"
+                // Server-rendered by the public page's own sanitiser (src/lib/article-html.ts).
+                dangerouslySetInnerHTML={{ __html: preview.html }}
+              />
             )}
           </div>
         </div>
@@ -347,29 +418,70 @@ export function ArticleEditor({
           </p>
         </div>
 
-        <div>
-          <label htmlFor={`${uid}-cover`} className={fieldLabel}>
-            {t("fields.cover")}
-          </label>
-          <input
-            id={`${uid}-cover`}
-            type="url"
-            dir="ltr"
-            inputMode="url"
-            maxLength={1000}
-            value={cover}
-            onChange={(e) => setCover(e.target.value)}
-            aria-describedby={`${uid}-cover-hint`}
-            className={inputClass}
-          />
-          <p id={`${uid}-cover-hint`} className="mt-1 text-sm text-muted">
-            {t("fields.coverHint")}
-          </p>
+        <fieldset className="space-y-3">
+          <legend className={fieldLabel}>{t("fields.cover")}</legend>
           {coverPreview && (
             // eslint-disable-next-line @next/next/no-img-element -- an arbitrary admin-entered URL, previewed as is
-            <img src={coverPreview} alt="" className="mt-3 aspect-[16/9] w-full max-w-sm rounded-xl object-cover" />
+            <img src={coverPreview} alt={t("fields.coverPreviewAlt")} className="aspect-[16/9] w-full max-w-sm rounded-xl object-cover" />
           )}
-        </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={coverUpload.busy}
+              onClick={() => (uploadsEnabled ? coverFileRef.current?.click() : coverUpload.report("not_configured"))}
+              className="flex min-h-12 items-center gap-2 rounded-xl bg-primary px-5 font-semibold text-paper disabled:opacity-60"
+            >
+              <ImageUp aria-hidden="true" className="h-5 w-5" />
+              {coverPreview ? t("fields.coverReplace") : t("fields.coverUpload")}
+            </button>
+            {cover.trim() && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCover("");
+                  coverUpload.clear();
+                }}
+                className="flex min-h-12 items-center gap-2 rounded-xl border-[1.5px] border-ink/30 bg-surface px-4 font-medium"
+              >
+                <Trash2 aria-hidden="true" className="h-5 w-5" />
+                {t("fields.coverRemove")}
+              </button>
+            )}
+            <input
+              ref={coverFileRef}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (file) void uploadCover(file);
+              }}
+            />
+          </div>
+          <p role="status" aria-live="polite" className="text-sm">
+            <UploadNotice status={coverUpload.status} />
+          </p>
+          <div>
+            <label htmlFor={`${uid}-cover`} className="mb-1 block text-sm font-semibold text-muted">
+              {t("fields.coverUrl")}
+            </label>
+            <input
+              id={`${uid}-cover`}
+              type="url"
+              dir="ltr"
+              inputMode="url"
+              maxLength={1000}
+              value={cover}
+              onChange={(e) => setCover(e.target.value)}
+              aria-describedby={`${uid}-cover-hint`}
+              className={inputClass}
+            />
+          </div>
+          <p id={`${uid}-cover-hint`} className="text-sm text-muted">
+            {t("fields.coverHint")}
+          </p>
+        </fieldset>
       </section>
 
       {/* Linked places */}

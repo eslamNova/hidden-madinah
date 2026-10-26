@@ -2,9 +2,11 @@
 
 import { revalidateSite } from "@/lib/revalidate";
 import { requireAdmin, type ActionResult } from "@/lib/admin-auth";
-import { validateArticle, type ArticleErrorCode, type ArticleInput, type ArticleStatus } from "@/lib/article-format";
+import { ARTICLE_LIMITS, validateArticle, type ArticleErrorCode, type ArticleInput, type ArticleStatus } from "@/lib/article-format";
+import { articleHtml } from "@/lib/article-html";
 import { isMissingTable } from "@/lib/articles";
 import type { TablesInsert } from "@/lib/database.types";
+import type { Lang } from "@/lib/i18n";
 
 /** Message keys under admin.articles.errors. */
 export type ArticleActionError = ArticleErrorCode | "unauthorized" | "slug_taken" | "missing_table" | "not_found" | "generic";
@@ -51,6 +53,21 @@ export async function saveArticleAction(
 
   revalidateSite();
   return { ok: true, data: { id: data.id, slug: data.slug, status: data.status === "published" ? "published" : "draft" } };
+}
+
+/**
+ * The editor's «معاينة» button: a body rendered exactly as the public page
+ * renders it (src/lib/article-html.ts), so the owner sees what the sanitiser
+ * keeps. Nothing is saved.
+ */
+export async function previewArticleBodyAction(body: string, lang: Lang): Promise<ActionResult<{ html: string }>> {
+  try {
+    await requireAdmin();
+  } catch {
+    return { ok: false, error: "unauthorized" };
+  }
+  if (typeof body !== "string" || [...body].length > ARTICLE_LIMITS.body) return { ok: false, error: "too_long" };
+  return { ok: true, data: { html: articleHtml(body, lang === "en" ? "en" : "ar") } };
 }
 
 /** Delete one article for good (the editor asks for confirmation first). */

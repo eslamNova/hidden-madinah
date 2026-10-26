@@ -1,5 +1,10 @@
 import type { createClient } from "@/lib/supabase/server";
 import type { EditorOption } from "@/components/admin/ArticleEditor";
+import { articleImageOrigins } from "@/lib/article-images";
+import { isR2Configured } from "@/lib/r2";
+
+/** Image upload settings for the editor: whether R2 is set up, and which image origins a body may use. */
+export const editorMediaOptions = () => ({ uploadsEnabled: isR2Configured(), imageOrigins: articleImageOrigins() });
 
 /**
  * Places and journeys an article can link to, for the editor's pickers —

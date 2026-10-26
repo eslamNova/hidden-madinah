@@ -5,7 +5,7 @@ import { cache } from "react";
 import { getTranslations } from "next-intl/server";
 import { BookOpen, ChevronLeft, Route } from "lucide-react";
 import Link from "@/components/i18n/Link";
-import { articleCover, markdownSummary, ogImageOf, SLUG_RE } from "@/lib/article-format";
+import { articleCover, articleShareImage, bodySummary, SLUG_RE } from "@/lib/article-format";
 import { articleHtml } from "@/lib/article-html";
 import { getArticle, getArticleSlugs, getPublishedArticles, type Article } from "@/lib/articles";
 import { SITE_NAME, SITE_NAME_EN } from "@/lib/constants";
@@ -13,19 +13,25 @@ import { coverImage, type CoverImage } from "@/lib/content";
 import { HERO_IMAGES } from "@/lib/hero-images";
 import { INTL_LOCALE, type Lang } from "@/lib/i18n";
 import { hasEnglishVersion, journeyTexts } from "@/lib/journey-view";
-import { pageMetadata, shareImageOf } from "@/lib/page-metadata";
+import { DEFAULT_SHARE_IMAGE, pageMetadata, shareImageOf, type ShareImage } from "@/lib/page-metadata";
 import { getPlacesBySlugs, getPublishedJourneys, type PlaceWithMedia } from "@/lib/queries";
 import { absoluteUrl, organizationId, pageUrl, placeRef } from "@/lib/structured-data";
 import { PageHero } from "@/components/layout/PageHero";
 import { PlaceCard, toPlaceCardData } from "@/components/place/PlaceCard";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { ShareButtons } from "@/components/blog/ShareButtons";
 
 /**
  * /blog/[slug] and /en/blog/[slug]. The route files set the request locale
- * before rendering. The body is the owner's Markdown, rendered on the server
- * with raw HTML escaped and sanitised against an allowlist
- * (src/lib/article-html.ts) — nothing from the body reaches the page as markup
- * the renderer did not produce.
+ * before rendering. The body is the owner's text from the visual editor (HTML)
+ * or, for older articles, Markdown; either way it is sanitised on the server
+ * against a strict allowlist (src/lib/article-html.ts) before it reaches the
+ * page.
+ *
+ * Shared links: the page's Open Graph / X card carries the cover (an editor
+ * upload's JPEG twin with its exact size), else the first linked place's
+ * photo, else the site's share image — always with alt text, og:type article
+ * and the publication date. Share buttons sit under the text.
  *
  * An article without English (title and body) is not shown half-translated on
  * /en: the page says so and links to the Arabic, and it is kept out of search
@@ -50,7 +56,17 @@ function pickCover(article: Article, places: PlaceWithMedia[]): CoverImage | nul
   return articleCover(article.coverUrl) ?? coverImage(places.flatMap((p) => p.media));
 }
 
-const description = (article: Article) => article.excerpt ?? (article.body ? markdownSummary(article.body) : undefined);
+const description = (article: Article) => article.excerpt ?? (article.body ? bodySummary(article.body) || undefined : undefined);
+
+/**
+ * The share image: the article's own cover, else the first linked place's
+ * photo (exact size), else the site-wide share image (1200×630).
+ */
+function shareImage(article: Article, places: PlaceWithMedia[]): ShareImage {
+  const own = articleShareImage(article.coverUrl);
+  if (own) return { ...own, alt: article.title };
+  return shareImageOf(coverImage(places.flatMap((p) => p.media)), article.title) ?? { ...DEFAULT_SHARE_IMAGE, alt: article.title };
+}
 
 export async function articleMetadata(lang: Lang, params: Params): Promise<Metadata> {
   const { slug } = await params;
@@ -65,18 +81,13 @@ export async function articleMetadata(lang: Lang, params: Params): Promise<Metad
   }
 
   const places = await loadPlaces(article.placeSlugs.join(","), lang);
-  // An owner-set cover's size is unknown (articleCover only sets a ratio), so
-  // it goes out without dimensions; a place photo's are exact.
-  const ownCover = articleCover(article.coverUrl);
-  const image = ownCover
-    ? { url: ogImageOf(ownCover), alt: article.title }
-    : shareImageOf(coverImage(places.flatMap((p) => p.media)), article.title);
   return pageMetadata({
     lang,
     path,
     title: article.title,
     description: description(article),
-    image,
+    // Sizes only when exact: an editor upload's (from its file name) or a place photo's.
+    image: shareImage(article, places),
     // Arabic-only articles have no English twin to point to.
     bilingual: article.hasEnglish,
     article: {
@@ -128,6 +139,8 @@ export async function ArticleView({ lang, params }: { lang: Lang; params: Params
 
       <div className="mx-auto max-w-3xl space-y-10 px-4 pb-10 pt-8">
         <div className="article-body" dangerouslySetInnerHTML={{ __html: html }} />
+
+        <ShareButtons url={pageUrl(articlePath(article.slug), lang)} title={article.title} />
 
         {article.sources.length > 0 && (
           <section aria-labelledby="article-sources" className="card-elevated space-y-3 p-5">
@@ -224,7 +237,7 @@ export async function ArticleView({ lang, params }: { lang: Lang; params: Params
         </Link>
       </div>
 
-      <JsonLd data={articleJsonLd(article, lang, places, cover)} />
+      <JsonLd data={articleJsonLd(article, lang, places)} />
     </article>
   );
 }
@@ -234,7 +247,7 @@ export async function ArticleView({ lang, params }: { lang: Lang; params: Params
  * publisher, and the places it is about — each by its site-wide entity @id
  * ("<site>/places/<slug>#place"), the same node the place page describes.
  */
-function articleJsonLd(article: Article, lang: Lang, places: PlaceWithMedia[], cover: CoverImage | null) {
+function articleJsonLd(article: Article, lang: Lang, places: PlaceWithMedia[]) {
   const url = pageUrl(articlePath(article.slug), lang);
   const organization = {
     "@type": "Organization",
@@ -252,7 +265,7 @@ function articleJsonLd(article: Article, lang: Lang, places: PlaceWithMedia[], c
     datePublished: article.publishedAt,
     dateModified: article.updatedAt,
     inLanguage: lang,
-    image: [absoluteUrl(cover ? ogImageOf(cover) : "/og-image.jpg")],
+    image: [absoluteUrl(shareImage(article, places).url)],
     author: article.author ? { "@type": "Person", name: article.author } : organization,
     publisher: organization,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
